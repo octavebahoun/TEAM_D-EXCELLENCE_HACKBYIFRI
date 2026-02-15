@@ -49,7 +49,7 @@ npm run dev
 - [API Documentation](docs/API.md)
 - [Guide de déploiement](docs/DEPLOYMENT.md)
 
-## 🎯 URLs
+## 🎯 URLs en locale 
 
 - Frontend: http://localhost:5173
 - Laravel API: http://localhost:8000
