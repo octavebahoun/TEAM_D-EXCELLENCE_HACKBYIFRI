@@ -45,9 +45,21 @@ npm run dev
 
 ## 📚 Documentation
 
-- [Cahier des charges](docs/CHARGES.md)
-- [API Documentation](docs/API.md)
-- [Guide de déploiement](docs/DEPLOYMENT.md)
+Consultez le dossier [/docs](./docs/) pour la documentation complète :
+
+### 🚀 Guides de Démarrage
+- **[README](./docs/README.md)** - Point d'entrée de la documentation
+- **[Installation](./docs/INSTALLATION.md)** - Setup complet développement local
+- **[Fonctionnalités MVP](./docs/FEATURES_MVP.md)** - Features prioritaires et différenciateurs
+
+### 🏗️ Architecture & Technique
+- **[Architecture](./docs/ARCHITECTURE.md)** - Microservices, diagrammes, stack
+- **[API](./docs/API.md)** - Endpoints Laravel, Python, WebSocket Node.js
+- **[Base de Données](./docs/DATABASE.md)** - Schéma, tables, relations
+
+### 📖 Guides Utilisateur & Déploiement
+- **[Parcours Utilisateur](./docs/USER_JOURNEY.md)** - Flow complet de l'étudiant
+- **[Déploiement](./docs/DEPLOYMENT.md)** - Guide production (VPS, Cloud)
 
 ## 🎯 URLs en locale 
 
