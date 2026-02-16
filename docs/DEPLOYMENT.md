@@ -3,6 +3,7 @@
 ## Vue d'Ensemble
 
 Ce guide couvre le déploiement en production d'AcademiX avec :
+
 - Frontend React sur **Vercel** ou **Netlify**
 - Backend Laravel sur **VPS** (DigitalOcean, Linode) ou **Laravel Forge**
 - Service Python sur **Railway** ou **Heroku**
@@ -25,6 +26,7 @@ Redis → Upstash (ou VPS)
 ```
 
 **Avantages:**
+
 - ✅ Frontend ultra-rapide (CDN)
 - ✅ Python scaling automatique
 - ✅ Coût modéré (~30$/mois)
@@ -45,6 +47,7 @@ Tout sur 1 VPS:
 ```
 
 **Avantages:**
+
 - ✅ Coût minimal (~10$/mois)
 - ✅ Contrôle total
 - ❌ Scaling limité
@@ -64,6 +67,7 @@ services:
 ```
 
 **Avantages:**
+
 - ✅ Portable
 - ✅ Facile à dupliquer
 - ✅ CI/CD simplifié
@@ -75,14 +79,13 @@ services:
 ### 1. Préparation
 
 **Fichier `frontend/vercel.json`:**
+
 ```json
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
 ```
 
@@ -109,6 +112,7 @@ vercel --prod
 ```
 
 **OU via GitHub:**
+
 1. Push sur GitHub
 2. Connecter repo sur vercel.com
 3. Auto-deploy sur chaque push
@@ -120,6 +124,7 @@ vercel --prod
 ### 1. Prérequis VPS
 
 **Specs minimum:**
+
 - **CPU**: 2 vCPU
 - **RAM**: 4 GB
 - **Storage**: 50 GB SSD
@@ -201,6 +206,7 @@ nano .env
 ```
 
 **Fichier `.env` production:**
+
 ```env
 APP_NAME="AcademiX API"
 APP_ENV=production
@@ -246,11 +252,12 @@ sudo chmod -R 775 storage bootstrap/cache
 ### 5. Configuration Nginx
 
 **Fichier `/etc/nginx/sites-available/academix-api`:**
+
 ```nginx
 server {
     listen 80;
     server_name api.academix.com;
-    
+
     root /home/academix/TEAM_D-EXCELLENCE_HACKBYIFRI_2026/backend/laravel/public;
     index index.php;
 
@@ -283,6 +290,7 @@ certbot --nginx -d api.academix.com
 ### 6. Supervisor pour Laravel Queue
 
 **Fichier `/etc/supervisor/conf.d/laravel-worker.conf`:**
+
 ```ini
 [program:laravel-worker]
 process_name=%(program_name)s_%(process_num)02d
@@ -311,6 +319,7 @@ supervisorctl start laravel-worker:*
 ### 1. Préparation
 
 **Fichier `python/railway.json`:**
+
 ```json
 {
   "build": {
@@ -325,6 +334,7 @@ supervisorctl start laravel-worker:*
 ```
 
 **Fichier `python/runtime.txt`:**
+
 ```
 python-3.11.7
 ```
@@ -366,6 +376,7 @@ nano .env
 ```
 
 **Fichier `.env`:**
+
 ```env
 PORT=3001
 NODE_ENV=production
@@ -395,6 +406,7 @@ pm2 monit
 ### 3. Nginx pour WebSocket
 
 **Fichier `/etc/nginx/sites-available/academix-socket`:**
+
 ```nginx
 upstream socket_backend {
     server 127.0.0.1:3001;
@@ -436,6 +448,7 @@ certbot --nginx -d socket.academix.com
 4. Mettre à jour `.env` Laravel
 
 **Connection string:**
+
 ```env
 DB_CONNECTION=mysql
 DB_HOST=aws.connect.psdb.cloud
@@ -451,6 +464,7 @@ MYSQL_ATTR_SSL_CA=/etc/ssl/certs/ca-certificates.crt
 ## 🔄 CI/CD avec GitHub Actions
 
 **Fichier `.github/workflows/deploy.yml`:**
+
 ```yaml
 name: Deploy to Production
 
@@ -472,7 +486,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
+          vercel-args: "--prod"
 
   deploy-backend:
     runs-on: ubuntu-latest

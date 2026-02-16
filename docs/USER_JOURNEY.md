@@ -13,9 +13,11 @@ Ce document décrit le **parcours complet d'un étudiant** utilisant AcademiX, d
 ### Étape 1.1: Arrivée sur la plateforme
 
 **Contexte:**
+
 > Sophie a entendu parler d'AcademiX par un ami. Elle cherche une solution pour mieux organiser ses études.
 
 **Actions:**
+
 1. Visite `https://academix.com`
 2. Découvre la landing page avec les 3 piliers :
    - 📅 Organisation
@@ -30,6 +32,7 @@ Ce document décrit le **parcours complet d'un étudiant** utilisant AcademiX, d
 ### Étape 1.2: Inscription
 
 **Actions:**
+
 1. Remplit le formulaire d'inscription
    - Email: sophie.martin@universite.fr
    - Mot de passe sécurisé
@@ -47,6 +50,7 @@ Ce document décrit le **parcours complet d'un étudiant** utilisant AcademiX, d
 ### Étape 1.3: Onboarding - Profil
 
 **Actions:**
+
 1. Redirigée vers page de création de profil
 2. Remplit ses informations :
    - Nom: Martin
@@ -68,6 +72,7 @@ Ce document décrit le **parcours complet d'un étudiant** utilisant AcademiX, d
 ### Étape 1.4: Onboarding - Matières
 
 **Actions:**
+
 1. Page "Ajoutez vos matières"
 2. Ajoute ses matières du semestre :
    - Algorithmique (coefficient 3, couleur bleue)
@@ -85,6 +90,7 @@ Ce document décrit le **parcours complet d'un étudiant** utilisant AcademiX, d
 ### Étape 1.5: Onboarding - Emploi du temps
 
 **Actions:**
+
 1. Option 1: Upload PDF emploi du temps
    - Upload `emploi_temps_S6.pdf`
    - Système extrait automatiquement les cours
@@ -97,6 +103,7 @@ Ce document décrit le **parcours complet d'un étudiant** utilisant AcademiX, d
 3. Clique sur "Terminer"
 
 **Endpoints**:
+
 - `POST /taches/extract` (si upload PDF)
 - `POST /emploi_temps` (x plusieurs)
 
@@ -107,6 +114,7 @@ Ce document décrit le **parcours complet d'un étudiant** utilisant AcademiX, d
 ### ✅ Résultat Phase 1
 
 Sophie a maintenant :
+
 - ✅ Un compte créé et vérifié
 - ✅ Un profil complet
 - ✅ 4 matières configurées
@@ -123,6 +131,7 @@ Sophie a maintenant :
 #### 8h00 - Connexion & Dashboard
 
 **Actions:**
+
 1. Sophie se connecte sur `https://academix.com`
 2. Arrive sur son **Dashboard**
 3. Voit :
@@ -138,9 +147,11 @@ Sophie a maintenant :
 #### 10h30 - Ajout d'une Tâche
 
 **Contexte:**
+
 > Le prof d'Algorithmique vient de donner un TD à rendre pour jeudi.
 
 **Actions:**
+
 1. Sophie clique sur "+" dans le widget Tâches
 2. Remplit le formulaire rapide :
    - Titre: "TD Arbres Binaires"
@@ -159,9 +170,11 @@ Sophie a maintenant :
 #### 14h00 - Ajout de Notes
 
 **Contexte:**
+
 > Sophie a récupéré sa note du partiel de Base de Données.
 
 **Actions:**
+
 1. Va dans "Mes Notes"
 2. Clique sur "Ajouter une note"
 3. Remplit :
@@ -177,6 +190,7 @@ Sophie a maintenant :
    - ⚠️ **Alerte**: "Ta moyenne est en dessous de ton objectif"
 
 **Endpoints**:
+
 - `POST /notes`
 - `GET /moyennes` (auto-refresh)
 
@@ -185,6 +199,7 @@ Sophie a maintenant :
 #### 14h15 - Réaction à l'Alerte
 
 **Actions:**
+
 1. Sophie clique sur l'alerte
 2. Voit le détail :
    - "Ta moyenne (13.0) est inférieure à ton objectif (14.5)"
@@ -203,9 +218,11 @@ Sophie a maintenant :
 #### 9h00 - Génération de Fiche IA
 
 **Contexte:**
+
 > Sophie veut réviser le cours de BDD sur la normalisation.
 
 **Actions:**
+
 1. Va dans "IA - Génération de Contenus"
 2. Clique sur "Nouvelle Fiche"
 3. Upload `cours_normalisation.pdf` (15 pages)
@@ -229,6 +246,7 @@ Sophie a maintenant :
 11. Télécharge `normalisation.mp3` (8 minutes)
 
 **Endpoints**:
+
 - `POST /ai/extract-from-pdf`
 - `POST /ai/generate-summary`
 - `POST /ai/generate-podcast`
@@ -240,6 +258,7 @@ Sophie a maintenant :
 #### 10h00 - Génération de Quiz
 
 **Actions:**
+
 1. Clique sur "Générer Quiz" depuis la fiche
 2. Paramètres :
    - Nombre de questions: 10
@@ -255,6 +274,7 @@ Sophie a maintenant :
    - "Dépendances fonctionnelles"
 
 **Endpoints**:
+
 - `POST /ai/generate-quiz`
 - `POST /quiz-resultats`
 
@@ -267,9 +287,11 @@ Sophie a maintenant :
 #### 19h00 - Session Collaborative
 
 **Contexte:**
+
 > Sophie veut réviser l'Algorithmique avec d'autres étudiants avant le partiel de demain.
 
 **Actions:**
+
 1. Va dans "Sessions Collaboratives"
 2. Filtre :
    - Matière: Algorithmique
@@ -293,6 +315,7 @@ Sophie a maintenant :
 #### 19h30 - Dans la Session
 
 **Actions:**
+
 1. Reçoit notification: "Ta session commence dans 5 min"
 2. Clique sur le lien de la session
 3. Entre dans la room WebSocket
@@ -307,6 +330,7 @@ Sophie a maintenant :
 9. Laisse commentaire: "Super utile, merci Jean !"
 
 **WebSocket Events**:
+
 - `join-session`
 - `send-message`
 - `new-message`
@@ -322,9 +346,11 @@ Sophie a maintenant :
 #### 18h00 - Quiz Compétitif
 
 **Contexte:**
+
 > Un étudiant a créé un quiz live sur le chapitre de Réseaux.
 
 **Actions:**
+
 1. Sophie reçoit notification: "Quiz live sur Réseaux dans 5 min !"
 2. Clique sur le lien
 3. Entre le code de la room: `#RESEAUX123`
@@ -346,6 +372,7 @@ Sophie a maintenant :
    - +50 XP gagnés
 
 **WebSocket Events**:
+
 - `join-quiz`
 - `answer-question`
 - `quiz-update`
@@ -362,9 +389,11 @@ Sophie a maintenant :
 #### 14h00 - Recherche de Tuteur
 
 **Contexte:**
+
 > Sophie a besoin d'aide en Réseaux (moyenne: 11.5).
 
 **Actions:**
+
 1. Va dans "Trouver un Tuteur"
 2. Sélectionne matière: Réseaux
 3. **IA analyse et propose 3 tuteurs compatibles** :
@@ -385,9 +414,11 @@ Sophie a maintenant :
 #### 10h00 - Suggestions de Révision
 
 **Contexte:**
+
 > Sophie a 3 partiels dans 2 semaines.
 
 **Actions:**
+
 1. Va dans "Mon Planning"
 2. **IA génère suggestions de créneaux** :
    - Lundi 14h-16h: Révision Algorithmique (priorité haute)
@@ -407,9 +438,11 @@ Sophie a maintenant :
 #### 16h00 - Partage de Ressource
 
 **Contexte:**
+
 > Sophie a trouvé un super cours PDF sur les arbres AVL.
 
 **Actions:**
+
 1. Va dans "Bibliothèque"
 2. Clique sur "Partager une Ressource"
 3. Upload `cours_arbres_avl.pdf`
@@ -429,6 +462,7 @@ Sophie a maintenant :
 #### 16h15 - Recherche de Ressources
 
 **Actions:**
+
 1. Recherche: "Base de données normalisation"
 2. Filtre: ⭐⭐⭐⭐⭐ (5 étoiles uniquement)
 3. Voit 5 ressources top-notées :
@@ -447,12 +481,14 @@ Sophie a maintenant :
 ### Statistiques de Sophie
 
 **Académique:**
+
 - Moyenne générale: **14.2** (↗️ +1.2 depuis le début)
 - Objectif: 14.5 (écart: -0.3, en bonne voie ✅)
 - Notes ajoutées: 8
 - Tâches complétées: 12/15 (80%)
 
 **Apprentissage IA:**
+
 - Fiches générées: 5
 - Quiz générés: 8
 - Quiz complétés: 12
@@ -460,6 +496,7 @@ Sophie a maintenant :
 - Podcasts écoutés: 3
 
 **Collaboration:**
+
 - Sessions rejointes: 4
 - Sessions créées: 1
 - Messages envoyés: 47
@@ -467,6 +504,7 @@ Sophie a maintenant :
 - Ressources partagées: 2
 
 **Gamification:**
+
 - XP total: 450
 - Niveau: 4
 - Badges débloqués: 6
@@ -484,15 +522,19 @@ Sophie a maintenant :
 ### Ce que Sophie apprécie le plus :
 
 1. **⏱️ Gain de temps**
+
    > "En 5 secondes, j'ai une fiche complète de révision"
 
 2. **🎯 Organisation**
+
    > "Je vois tout d'un coup d'œil, plus de stress"
 
 3. **🤝 Collaboration**
+
    > "J'ai trouvé des camarades pour réviser facilement"
 
 4. **🎮 Gamification**
+
    > "Les quiz live sont addictifs, je révise sans m'en rendre compte"
 
 5. **⚠️ Alertes intelligentes**

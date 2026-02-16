@@ -117,7 +117,7 @@ frontend/
 **Technologies:**
 
 ```yaml
-Framework: Laravel 11
+Framework: Laravel 12
 Auth: Laravel Sanctum
 Database: Eloquent ORM
 Validation: Form Requests

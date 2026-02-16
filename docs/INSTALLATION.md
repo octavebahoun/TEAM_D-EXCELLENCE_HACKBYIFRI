@@ -3,6 +3,7 @@
 ## Prérequis Système
 
 ### Obligatoires
+
 - **OS**: Linux (Ubuntu 22.04+), macOS, ou Windows (WSL2)
 - **PHP**: 8.2+ avec extensions (voir ci-dessous)
 - **Node.js**: 20.x LTS
@@ -12,6 +13,7 @@
 - **Git**: Latest
 
 ### Optionnels
+
 - **Redis**: 7.x (pour cache & WebSocket scaling)
 - **Docker**: 24.x (déploiement conteneurisé)
 
@@ -22,6 +24,7 @@
 ### 1. PHP & Extensions
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt update
 sudo apt install -y php8.2 php8.2-cli php8.2-fpm \
@@ -35,6 +38,7 @@ php -m | grep -E 'mysql|mbstring|xml|curl'
 ```
 
 **macOS (Homebrew):**
+
 ```bash
 brew install php@8.2
 brew services start php@8.2
@@ -60,6 +64,7 @@ composer --version
 ### 3. Node.js & npm
 
 **Ubuntu/Debian:**
+
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
@@ -70,6 +75,7 @@ npm -v   # 10.x.x
 ```
 
 **macOS:**
+
 ```bash
 brew install node@20
 ```
@@ -79,6 +85,7 @@ brew install node@20
 ### 4. Python
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt install -y python3.11 python3.11-venv python3-pip
 
@@ -87,6 +94,7 @@ python3 --version  # Python 3.11.x
 ```
 
 **macOS:**
+
 ```bash
 brew install python@3.11
 ```
@@ -96,6 +104,7 @@ brew install python@3.11
 ### 5. MySQL
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt install -y mysql-server mysql-client
 
@@ -108,12 +117,14 @@ sudo mysql_secure_installation
 ```
 
 **macOS:**
+
 ```bash
 brew install mysql@8.0
 brew services start mysql
 ```
 
 **Créer la base de données:**
+
 ```bash
 sudo mysql <<EOF
 CREATE DATABASE academix CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -129,6 +140,7 @@ EOF
 ### 6. Redis (Optionnel mais recommandé)
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt install -y redis-server
 sudo systemctl start redis-server
@@ -139,6 +151,7 @@ redis-cli ping  # PONG
 ```
 
 **macOS:**
+
 ```bash
 brew install redis
 brew services start redis
@@ -164,6 +177,7 @@ chmod +x setup_all.sh
 ```
 
 Ce script va :
+
 1. ✅ Installer les dépendances Laravel (Composer)
 2. ✅ Installer les dépendances Node.js (npm)
 3. ✅ Créer l'environnement virtuel Python
@@ -193,6 +207,7 @@ nano .env
 ```
 
 **Configuration `.env` Laravel:**
+
 ```env
 APP_NAME="AcademiX API"
 APP_ENV=local
@@ -211,16 +226,19 @@ NODE_SOCKET_SERVICE_URL=http://localhost:3001
 ```
 
 **Générer la clé Laravel:**
+
 ```bash
 php artisan key:generate
 ```
 
 **Exécuter les migrations:**
+
 ```bash
 php artisan migrate
 ```
 
 **Optionnel: Seeder avec données de test:**
+
 ```bash
 php artisan db:seed
 ```
@@ -243,6 +261,7 @@ nano .env
 ```
 
 **Configuration `.env` Node.js:**
+
 ```env
 PORT=3001
 NODE_ENV=development
@@ -284,6 +303,7 @@ nano .env
 ```
 
 **Configuration `.env` Python:**
+
 ```env
 # API Keys
 OPENAI_API_KEY=sk-proj-...
@@ -299,6 +319,7 @@ GENERATED_DIR=./generated
 ```
 
 **Créer les dossiers:**
+
 ```bash
 mkdir -p uploads generated
 ```
@@ -321,6 +342,7 @@ nano .env
 ```
 
 **Configuration `.env` Frontend:**
+
 ```env
 VITE_API_URL=http://localhost:8000/api/v1
 VITE_SOCKET_URL=http://localhost:3001
@@ -328,6 +350,7 @@ VITE_PYTHON_API_URL=http://localhost:8001/api/v1
 ```
 
 **Builder (optionnel en dev):**
+
 ```bash
 npm run build
 ```
@@ -337,6 +360,7 @@ npm run build
 ## 🎯 Vérification de l'Installation
 
 ### Vérifier Laravel
+
 ```bash
 cd backend/laravel
 php artisan --version
@@ -344,12 +368,14 @@ php artisan migrate:status
 ```
 
 ### Vérifier Node.js
+
 ```bash
 cd backend/node
 npm list --depth=0
 ```
 
 ### Vérifier Python
+
 ```bash
 cd python
 source venv/bin/activate
@@ -357,6 +383,7 @@ python -c "import fastapi; print(fastapi.__version__)"
 ```
 
 ### Vérifier Frontend
+
 ```bash
 cd frontend
 npm list react
@@ -367,6 +394,7 @@ npm list react
 ## 🚀 Lancer Tous les Services
 
 ### Option 1: Script Automatique
+
 ```bash
 cd /home/octave/Bureau/hackaton
 chmod +x start-all.sh
@@ -376,6 +404,7 @@ chmod +x start-all.sh
 ### Option 2: Manuellement (4 terminaux)
 
 **Terminal 1 - Laravel:**
+
 ```bash
 cd backend/laravel
 php artisan serve
@@ -383,6 +412,7 @@ php artisan serve
 ```
 
 **Terminal 2 - Node.js:**
+
 ```bash
 cd backend/node
 npm run dev
@@ -390,6 +420,7 @@ npm run dev
 ```
 
 **Terminal 3 - Python:**
+
 ```bash
 cd python
 source venv/bin/activate
@@ -398,6 +429,7 @@ uvicorn main:app --reload --port 8001
 ```
 
 **Terminal 4 - Frontend:**
+
 ```bash
 cd frontend
 npm run dev
@@ -409,16 +441,19 @@ npm run dev
 ## 🧪 Tester les APIs
 
 ### Laravel API
+
 ```bash
 curl http://localhost:8000/api/v1/health
 ```
 
 ### Python API
+
 ```bash
 curl http://localhost:8001/health
 ```
 
 ### WebSocket (avec wscat)
+
 ```bash
 npm install -g wscat
 wscat -c ws://localhost:3001
@@ -429,16 +464,19 @@ wscat -c ws://localhost:3001
 ## 🐛 Dépannage
 
 ### Erreur: "Class 'ZipArchive' not found"
+
 ```bash
 sudo apt install php8.2-zip
 ```
 
 ### Erreur: "PDOException: could not find driver"
+
 ```bash
 sudo apt install php8.2-mysql
 ```
 
 ### Erreur: Port déjà utilisé
+
 ```bash
 # Trouver le processus
 sudo lsof -i :8000
@@ -447,12 +485,14 @@ kill -9 <PID>
 ```
 
 ### Erreur: Permission denied (uploads/)
+
 ```bash
 cd python
 chmod 777 uploads generated
 ```
 
 ### MySQL: Access denied
+
 ```bash
 # Reset mot de passe
 sudo mysql
@@ -467,16 +507,19 @@ FLUSH PRIVILEGES;
 ### Générer des secrets sécurisés
 
 **JWT Secret:**
+
 ```bash
 openssl rand -base64 32
 ```
 
 **API Key:**
+
 ```bash
 openssl rand -hex 32
 ```
 
 **Laravel APP_KEY:**
+
 ```bash
 cd backend/laravel
 php artisan key:generate

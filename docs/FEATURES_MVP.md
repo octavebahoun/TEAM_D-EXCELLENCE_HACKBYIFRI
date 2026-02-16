@@ -3,6 +3,7 @@
 ## Vue d'Ensemble
 
 Le MVP (Minimum Viable Product) d'AcademiX se concentre sur **3 piliers fondamentaux** :
+
 1. **Organisation Intelligente**
 2. **Apprentissage Assisté par IA**
 3. **Collaboration & Social Learning**
@@ -19,6 +20,7 @@ Le MVP (Minimum Viable Product) d'AcademiX se concentre sur **3 piliers fondamen
 **Statut**: ✅ Priorité Absolue
 
 **Features:**
+
 - ✅ Inscription avec email/mot de passe
 - ✅ Connexion sécurisée (Laravel Sanctum)
 - ✅ Profil étudiant complet
@@ -31,6 +33,7 @@ Le MVP (Minimum Viable Product) d'AcademiX se concentre sur **3 piliers fondamen
 - ✅ Déconnexion
 
 **Endpoints Laravel:**
+
 - `POST /auth/register`
 - `POST /auth/login`
 - `GET /auth/me`
@@ -38,6 +41,7 @@ Le MVP (Minimum Viable Product) d'AcademiX se concentre sur **3 piliers fondamen
 - `POST /auth/logout`
 
 **Impact Utilisateur:**
+
 > "Je peux créer mon compte et personnaliser mon profil en 2 minutes"
 
 ---
@@ -47,6 +51,7 @@ Le MVP (Minimum Viable Product) d'AcademiX se concentre sur **3 piliers fondamen
 **Statut**: ✅ Priorité Absolue
 
 **Features:**
+
 - ✅ Vue semaine/mois du calendrier
 - ✅ Affichage de l'emploi du temps
   - Cours planifiés (CM/TD/TP)
@@ -57,11 +62,13 @@ Le MVP (Minimum Viable Product) d'AcademiX se concentre sur **3 piliers fondamen
 - ✅ Navigation simple entre les dates
 
 **Composants React:**
+
 - `CalendarWeekView`
 - `CalendarMonthView`
 - `EventCard`
 
 **Impact Utilisateur:**
+
 > "Je visualise toute ma semaine en un coup d'œil"
 
 ---
@@ -71,6 +78,7 @@ Le MVP (Minimum Viable Product) d'AcademiX se concentre sur **3 piliers fondamen
 **Statut**: ✅ Priorité Absolue
 
 **Features:**
+
 - ✅ Créer une tâche/devoir
   - Titre, description
   - Matière associée
@@ -84,6 +92,7 @@ Le MVP (Minimum Viable Product) d'AcademiX se concentre sur **3 piliers fondamen
   - Extraire dates et devoirs
 
 **Endpoints Laravel:**
+
 - `GET /taches` (avec filtres)
 - `POST /taches`
 - `PATCH /taches/{id}/complete`
@@ -91,6 +100,7 @@ Le MVP (Minimum Viable Product) d'AcademiX se concentre sur **3 piliers fondamen
 - `POST /taches/extract` (upload PDF)
 
 **Impact Utilisateur:**
+
 > "Je ne rate plus jamais un devoir, tout est centralisé"
 
 ---
@@ -100,6 +110,7 @@ Le MVP (Minimum Viable Product) d'AcademiX se concentre sur **3 piliers fondamen
 **Statut**: ✅ Priorité Absolue
 
 **Features:**
+
 - ✅ Ajouter une note
   - Note obtenue / Note max
   - Matière
@@ -116,11 +127,13 @@ Le MVP (Minimum Viable Product) d'AcademiX se concentre sur **3 piliers fondamen
   - Comparaison objectif vs réalité
 
 **Endpoints Laravel:**
+
 - `POST /notes`
 - `GET /notes` (filtres par matière)
 - `GET /moyennes` (calculs automatiques)
 
 **Impact Utilisateur:**
+
 > "Je connais ma moyenne en temps réel et vois ma progression"
 
 ---
@@ -130,6 +143,7 @@ Le MVP (Minimum Viable Product) d'AcademiX se concentre sur **3 piliers fondamen
 **Statut**: ✅ Priorité Absolue
 
 **Features:**
+
 - ✅ **Alertes automatiques**
   - Moyenne en baisse
   - Deadline proche (48h)
@@ -143,6 +157,7 @@ Le MVP (Minimum Viable Product) d'AcademiX se concentre sur **3 piliers fondamen
 - ✅ Historique des alertes
 
 **Logique Backend:**
+
 ```php
 // MoyenneService.php
 if ($moyenne_actuelle < $objectif - 1.0) {
@@ -158,6 +173,7 @@ if ($moyenne_actuelle < $objectif - 1.0) {
 ```
 
 **Impact Utilisateur:**
+
 > "Je suis prévenu avant qu'il ne soit trop tard pour rattraper mon retard"
 
 ---
@@ -167,6 +183,7 @@ if ($moyenne_actuelle < $objectif - 1.0) {
 **Statut**: ✅ Priorité Absolue
 
 **Features:**
+
 - ✅ **Fiches de révision**
   - Upload PDF ou copier-coller texte
   - Génération via GPT-4/Claude
@@ -184,15 +201,18 @@ if ($moyenne_actuelle < $objectif - 1.0) {
   - Téléchargement
 
 **Endpoints Python FastAPI:**
+
 - `POST /ai/generate-summary`
 - `POST /ai/generate-quiz`
 - `POST /ai/extract-from-pdf`
 
 **Models IA utilisés:**
+
 - OpenAI GPT-4
 - Anthropic Claude 3
 
 **Impact Utilisateur:**
+
 > "Je transforme mes cours en fiches et quiz en quelques secondes"
 
 ---
@@ -202,6 +222,7 @@ if ($moyenne_actuelle < $objectif - 1.0) {
 **Statut**: ✅ Priorité Absolue
 
 **Features:**
+
 - ✅ Créer une session de révision
   - Titre, description
   - Matière associée
@@ -215,17 +236,20 @@ if ($moyenne_actuelle < $objectif - 1.0) {
 - ✅ Historique des sessions
 
 **Endpoints Laravel:**
+
 - `GET /sessions` (liste + filtres)
 - `POST /sessions` (créer)
 - `POST /sessions/{id}/join`
 - `POST /sessions/{id}/rate`
 
 **WebSocket Events:**
+
 - `join-session`
 - `send-message`
 - `new-message`
 
 **Impact Utilisateur:**
+
 > "Je trouve facilement des camarades pour réviser ensemble"
 
 ---
@@ -235,6 +259,7 @@ if ($moyenne_actuelle < $objectif - 1.0) {
 **Statut**: ✅ Priorité Absolue
 
 **Features:**
+
 - ✅ Notifications temps réel (WebSocket)
   - Nouvelle note ajoutée
   - Deadline proche (24h)
@@ -245,14 +270,16 @@ if ($moyenne_actuelle < $objectif - 1.0) {
 - ✅ Centre de notifications dans le header
 
 **WebSocket Event:**
+
 ```javascript
-socket.on('notification', (notif) => {
+socket.on("notification", (notif) => {
   // Afficher toast notification
   toast.info(notif.message);
 });
 ```
 
 **Impact Utilisateur:**
+
 > "Je suis informé instantanément de tout ce qui est important"
 
 ---
@@ -264,6 +291,7 @@ socket.on('notification', (notif) => {
 **Statut**: ⭐ Différenciateur Clé
 
 **Features:**
+
 - Algorithme de matching basé sur:
   - Matières en difficulté
   - Style d'apprentissage compatible
@@ -274,6 +302,7 @@ socket.on('notification', (notif) => {
 - Messagerie privée
 
 **Valeur ajoutée:**
+
 > "Trouver le bon tuteur automatiquement, sans chercher"
 
 ---
@@ -283,6 +312,7 @@ socket.on('notification', (notif) => {
 **Statut**: ⭐ Différenciateur Clé
 
 **Features:**
+
 - IA suggère des créneaux de révision
 - Priorise selon:
   - Deadlines proches
@@ -292,6 +322,7 @@ socket.on('notification', (notif) => {
 - Optimise le temps de révision
 
 **Valeur ajoutée:**
+
 > "L'IA organise ma semaine pour maximiser mes chances de réussite"
 
 ---
@@ -301,6 +332,7 @@ socket.on('notification', (notif) => {
 **Statut**: ⭐ Différenciateur Clé
 
 **Features:**
+
 - Quiz multi-joueurs synchronisés
 - Timer par question
 - Classement en direct (leaderboard)
@@ -309,12 +341,14 @@ socket.on('notification', (notif) => {
 - Système de rooms (codes d'accès)
 
 **WebSocket Events:**
+
 - `join-quiz`
 - `answer-question`
 - `leaderboard-update`
 - `quiz-ended`
 
 **Valeur ajoutée:**
+
 > "Réviser devient un jeu compétitif et motivant"
 
 ---
@@ -324,6 +358,7 @@ socket.on('notification', (notif) => {
 **Statut**: ⭐ Différenciateur Clé
 
 **Features:**
+
 - Partage de ressources (PDF, liens, vidéos)
 - Tags & recherche avancée
 - Système de notation (⭐ /5)
@@ -332,6 +367,7 @@ socket.on('notification', (notif) => {
 - Upload direct
 
 **Valeur ajoutée:**
+
 > "Accès à toutes les meilleures ressources de ma promo"
 
 ---
@@ -341,6 +377,7 @@ socket.on('notification', (notif) => {
 **Statut**: ⭐ Différenciateur Clé
 
 **Features:**
+
 - Conversion texte → audio
 - Voix naturelles (gTTS, ElevenLabs)
 - Réglage vitesse lecture
@@ -348,9 +385,11 @@ socket.on('notification', (notif) => {
 - Mode "révision en déplacement"
 
 **Endpoint Python:**
+
 - `POST /ai/generate-podcast`
 
 **Valeur ajoutée:**
+
 > "J'écoute mes fiches dans le bus ou en faisant du sport"
 
 ---
@@ -360,16 +399,19 @@ socket.on('notification', (notif) => {
 ### Semaine 1 (Jours 1-7)
 
 **Jours 1-2: Setup & Architecture**
+
 - [x] Configuration environnements
 - [x] Base de données & migrations
 - [x] Authentication Laravel
 
 **Jours 3-4: Core Features**
+
 - [ ] CRUD Matières, Tâches, Notes
 - [ ] Calcul moyennes
 - [ ] Frontend Dashboard basique
 
 **Jours 5-7: IA & Collaboration**
+
 - [ ] Intégration OpenAI (fiches + quiz)
 - [ ] Sessions collaboratives
 - [ ] WebSocket notifications
@@ -377,16 +419,19 @@ socket.on('notification', (notif) => {
 ### Semaine 2 (Jours 8-14)
 
 **Jours 8-10: Features Avancées**
+
 - [ ] Quiz temps réel (WebSocket)
 - [ ] Early Warning System
 - [ ] Extraction PDF tâches
 
 **Jours 11-13: Différenciateurs**
+
 - [ ] Matching intelligent
 - [ ] Planning adaptatif
 - [ ] Bibliothèque collaborative
 
 **Jour 14: Polish & Démo**
+
 - [ ] Corrections bugs
 - [ ] UI/UX finitions
 - [ ] Préparation présentation
@@ -396,6 +441,7 @@ socket.on('notification', (notif) => {
 ## 🎯 Critères de Succès MVP
 
 ### Fonctionnel
+
 - ✅ Un étudiant peut s'inscrire et créer son profil
 - ✅ Il peut ajouter ses matières et son emploi du temps
 - ✅ Il peut créer et gérer ses tâches
@@ -406,6 +452,7 @@ socket.on('notification', (notif) => {
 - ✅ Il reçoit des notifications en temps réel
 
 ### Technique
+
 - ✅ Toutes les APIs fonctionnent (Laravel, Python, Node)
 - ✅ Frontend responsive (mobile-friendly)
 - ✅ WebSocket stable (quiz + chat)
@@ -413,6 +460,7 @@ socket.on('notification', (notif) => {
 - ✅ Temps de réponse API < 500ms
 
 ### Expérience
+
 - ✅ Interface claire et intuitive
 - ✅ Onboarding fluide (< 3 min)
 - ✅ Feedback visuel sur actions
@@ -422,14 +470,14 @@ socket.on('notification', (notif) => {
 
 ## 📈 Métriques de Succès
 
-| Métrique | Objectif MVP |
-|----------|--------------|
-| Temps inscription | < 2 minutes |
-| Génération fiche IA | < 5 secondes |
-| Temps réponse API | < 500ms |
-| Participants quiz live | 2-10 joueurs simultanés |
-| Taux complétion profil | > 80% |
-| Sessions créées/semaine | > 5 |
+| Métrique                | Objectif MVP            |
+| ----------------------- | ----------------------- |
+| Temps inscription       | < 2 minutes             |
+| Génération fiche IA     | < 5 secondes            |
+| Temps réponse API       | < 500ms                 |
+| Participants quiz live  | 2-10 joueurs simultanés |
+| Taux complétion profil  | > 80%                   |
+| Sessions créées/semaine | > 5                     |
 
 ---
 
@@ -452,12 +500,14 @@ Ces fonctionnalités sont **reportées après le MVP** :
 ## 💡 Évolutions Post-MVP
 
 ### Version 1.1 (1 mois après)
+
 - Tableau blanc collaboratif
 - OCR notes manuscrites
 - Gamification complète
 - Intégration calendrier externe
 
 ### Version 2.0 (3 mois après)
+
 - Application mobile (React Native)
 - Système de recommandation ML
 - Marketplace tuteurs

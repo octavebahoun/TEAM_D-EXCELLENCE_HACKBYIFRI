@@ -27,6 +27,7 @@ docs/
 ## 📖 Contenu par Fichier
 
 ### 1. README.md (Point d'Entrée)
+
 - Vision du projet
 - Table des matières complète
 - Architecture en bref (diagramme)
@@ -39,6 +40,7 @@ docs/
 ---
 
 ### 2. ARCHITECTURE.md (Technique)
+
 - Vue d'ensemble architecture
 - Diagrammes (global, flux de données)
 - Détails des 4 services (React, Laravel, Python, Node.js)
@@ -49,6 +51,7 @@ docs/
 **Lignes**: ~550 | **Taille**: 16 KB
 
 **Inclut**:
+
 - 4 architectures ASCII
 - 3 flux de données détaillés
 - Code examples (PHP, JavaScript, Python)
@@ -57,6 +60,7 @@ docs/
 ---
 
 ### 3. API.md (Référence API)
+
 - Laravel REST API (50+ endpoints)
 - Python FastAPI (10+ endpoints)
 - WebSocket Node.js (20+ events)
@@ -67,6 +71,7 @@ docs/
 **Lignes**: ~750 | **Taille**: 18 KB
 
 **Endpoints documentés**:
+
 - ✅ Authentification (4)
 - ✅ Matières (4)
 - ✅ Tâches (5)
@@ -82,6 +87,7 @@ docs/
 ---
 
 ### 4. DATABASE.md (Schéma)
+
 - Schéma relationnel complet
 - 15 tables détaillées
 - Colonnes, types, contraintes
@@ -92,6 +98,7 @@ docs/
 **Lignes**: ~900 | **Taille**: 23 KB
 
 **Tables documentées**:
+
 1. users
 2. matieres
 3. emploi_temps
@@ -111,6 +118,7 @@ docs/
 ---
 
 ### 5. INSTALLATION.md (Setup)
+
 - Prérequis système (OS, versions)
 - Installation dépendances (PHP, Node, Python, MySQL)
 - Installation automatique (script)
@@ -122,6 +130,7 @@ docs/
 **Lignes**: ~450 | **Taille**: 8.7 KB
 
 **Couvre**:
+
 - Ubuntu/Debian
 - macOS
 - Configuration MySQL
@@ -131,6 +140,7 @@ docs/
 ---
 
 ### 6. FEATURES_MVP.md (Fonctionnalités)
+
 - MVP Essentiel (8 features prioritaires)
 - Différenciateurs clés (5 features avancées)
 - Priorisation Hackathon (semaine 1 & 2)
@@ -142,6 +152,7 @@ docs/
 **Lignes**: ~550 | **Taille**: 11 KB
 
 **Features documentées**:
+
 - ✅ Authentification & Profil
 - ✅ Calendrier unifié
 - ✅ Gestion tâches
@@ -159,6 +170,7 @@ docs/
 ---
 
 ### 7. DEPLOYMENT.md (Production)
+
 - 3 architectures de déploiement
 - Déploiement Frontend (Vercel)
 - Déploiement Laravel (VPS)
@@ -174,6 +186,7 @@ docs/
 **Lignes**: ~600 | **Taille**: 12 KB
 
 **Inclut**:
+
 - Configurations Nginx
 - Docker Compose
 - Supervisor
@@ -184,6 +197,7 @@ docs/
 ---
 
 ### 8. USER_JOURNEY.md (UX)
+
 - Parcours complet étudiant (Sophie)
 - Phase 1: Onboarding (8 minutes)
 - Phase 2: Utilisation quotidienne (semaine 1)
@@ -194,6 +208,7 @@ docs/
 **Lignes**: ~650 | **Taille**: 13 KB
 
 **Scénarios détaillés**:
+
 - Inscription & profil
 - Ajout matières
 - Import emploi du temps
@@ -213,6 +228,7 @@ docs/
 ## 🎯 Points Forts de la Documentation
 
 ### ✅ Complétude
+
 - **100%** des services couverts
 - **100%** des fonctionnalités MVP documentées
 - **100+** endpoints API détaillés
@@ -220,12 +236,14 @@ docs/
 - **3** architectures de déploiement
 
 ### ✅ Modularité
+
 - **8 fichiers** séparés par thème
 - Navigation claire entre fichiers
 - Chaque fichier autonome
 - Index principal (README)
 
 ### ✅ Qualité
+
 - Exemples de code concrets
 - Diagrammes ASCII
 - Commandes copy-paste ready
@@ -233,6 +251,7 @@ docs/
 - Basée sur documentation officielle prototype
 
 ### ✅ Praticité
+
 - Guide installation pas-à-pas
 - Script automatique fourni
 - Checklist pré-déploiement
@@ -242,23 +261,24 @@ docs/
 
 ## 📊 Statistiques Globales
 
-| Métrique | Valeur |
-|----------|--------|
-| **Fichiers** | 8 |
-| **Lignes totales** | ~4 544 |
-| **Taille totale** | ~96 KB |
-| **Endpoints API** | 100+ |
-| **Tables DB** | 15 |
-| **Exemples code** | 50+ |
-| **Diagrammes** | 8 |
-| **Commandes shell** | 100+ |
-| **Temps lecture** | ~2h30 |
+| Métrique            | Valeur |
+| ------------------- | ------ |
+| **Fichiers**        | 8      |
+| **Lignes totales**  | ~4 544 |
+| **Taille totale**   | ~96 KB |
+| **Endpoints API**   | 100+   |
+| **Tables DB**       | 15     |
+| **Exemples code**   | 50+    |
+| **Diagrammes**      | 8      |
+| **Commandes shell** | 100+   |
+| **Temps lecture**   | ~2h30  |
 
 ---
 
 ## 🚀 Comment Utiliser
 
 ### Pour les Développeurs
+
 1. Commencer par [README.md](./README.md)
 2. Setup: [INSTALLATION.md](./INSTALLATION.md)
 3. Comprendre archi: [ARCHITECTURE.md](./ARCHITECTURE.md)
@@ -266,11 +286,13 @@ docs/
 5. Base de données: [DATABASE.md](./DATABASE.md)
 
 ### Pour les Chefs de Projet
+
 1. Vision: [README.md](./README.md)
 2. Features: [FEATURES_MVP.md](./FEATURES_MVP.md)
 3. Parcours utilisateur: [USER_JOURNEY.md](./USER_JOURNEY.md)
 
 ### Pour les DevOps
+
 1. Setup local: [INSTALLATION.md](./INSTALLATION.md)
 2. Déploiement: [DEPLOYMENT.md](./DEPLOYMENT.md)
 3. Architecture: [ARCHITECTURE.md](./ARCHITECTURE.md)
@@ -280,6 +302,7 @@ docs/
 ## 📝 Maintenance Documentation
 
 ### À mettre à jour quand:
+
 - ✏️ Ajout d'un nouveau endpoint → API.md
 - ✏️ Nouvelle table DB → DATABASE.md
 - ✏️ Nouvelle feature → FEATURES_MVP.md
@@ -287,6 +310,7 @@ docs/
 - ✏️ Nouveau service → DEPLOYMENT.md
 
 ### Versionning
+
 - Version actuelle: **1.0.0**
 - Dernière mise à jour: **16 février 2026**
 - Prochaine révision: Après MVP (fin février 2026)
@@ -296,6 +320,7 @@ docs/
 ## 🎓 Ressources Externes
 
 ### Basé sur:
+
 - [Prototypes officiels](https://octavebahoun.github.io/prototypagehackbyifri/docu.html)
 - Documentation Laravel 11
 - Documentation FastAPI
@@ -303,6 +328,7 @@ docs/
 - Best practices microservices
 
 ### Outils utilisés:
+
 - Markdown (GitHub Flavored)
 - Diagrammes ASCII
 - Mermaid (pour futurs diagrammes)
@@ -325,6 +351,7 @@ docs/
 ## 🏆 Résultat
 
 **Documentation professionnelle, complète et modulaire** prête pour:
+
 - ✅ Développement (équipe technique)
 - ✅ Présentation (démo hackathon)
 - ✅ Onboarding (nouveaux développeurs)
