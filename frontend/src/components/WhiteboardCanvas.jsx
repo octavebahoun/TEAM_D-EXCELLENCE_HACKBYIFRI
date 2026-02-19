@@ -171,6 +171,7 @@ const CodeEditorOverlay = ({ code, setCode, onClose }) => {
     () => localStorage.getItem("rapidapi_key") || "",
   );
   const [showSettings, setShowSettings] = useState(false);
+  const textareaRef = useRef(null);
 
   // État de la disposition : 'split' (50/50), 'editor' (100% code), 'preview' (100% output)
   const [layout, setLayout] = useState("split");
@@ -189,6 +190,25 @@ const CodeEditorOverlay = ({ code, setCode, onClose }) => {
       return () => clearTimeout(timeout);
     }
   }, [code, language]);
+
+  // Hook pour conserver la position du curseur lors des mises à jour distantes
+  const cursorRef = useRef(null);
+
+  React.useLayoutEffect(() => {
+    if (textareaRef.current && document.activeElement === textareaRef.current) {
+      if (cursorRef.current !== null) {
+        textareaRef.current.setSelectionRange(
+          cursorRef.current,
+          cursorRef.current,
+        );
+      }
+    }
+  }, [code]);
+
+  const handleChange = (e) => {
+    cursorRef.current = e.target.selectionStart;
+    setCode(e.target.value);
+  };
 
   const runCode = async () => {
     if (LANGUAGE_CONFIG[language].type === "browser") return;
@@ -362,8 +382,9 @@ const CodeEditorOverlay = ({ code, setCode, onClose }) => {
             {LANGUAGE_CONFIG[language].name}
           </div>
           <textarea
+            ref={textareaRef}
             value={code}
-            onChange={(e) => setCode(e.target.value)}
+            onChange={handleChange}
             wrap="off"
             className="flex-1 w-full min-h-0 bg-[#0d1117] text-slate-300 p-4 font-mono text-sm outline-none resize-none leading-relaxed min-w-0 overflow-auto overscroll-contain"
             spellCheck="false"
