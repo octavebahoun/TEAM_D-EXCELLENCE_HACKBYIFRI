@@ -30,7 +30,7 @@ const socketService = require('./services/socketService');
 const app = express();
 const server = http.createServer(app);
 const allowedOrigins = (
-  process.env.FRONTEND_URLS || process.env.FRONTEND_URL || 'http://localhost:5173'
+  process.env.FRONTEND_URLS || process.env.FRONTEND_URL || 'https://team-d-excellence-hackbyifri-2026.vercel.app,http://localhost:5173'
 )
   .split(',')
   .map((origin) => origin.trim())
