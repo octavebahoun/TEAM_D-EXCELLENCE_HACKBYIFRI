@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('matiere_difficile', 100)->nullable();
             $table->timestamps();
             
-            $table->unique(['filiere_id', 'annee_academique', 'semestre']);
+            $table->unique(['filiere_id', 'annee_academique', 'semestre'], 'stat_fil_unique');
         });
     }
 
