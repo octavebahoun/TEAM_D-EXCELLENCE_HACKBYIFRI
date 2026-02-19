@@ -98,11 +98,22 @@ class SessionSocketService {
     }
   }
 
+  codeUpdate(sessionId, code, language) {
+    if (this.socket) {
+      this.socket.emit('code-update', {
+        sessionId,
+        code,
+        language
+      });
+    }
+  }
+
   requestWhiteboardSync(sessionId) {
     if (this.socket) {
       this.socket.emit('whiteboard-sync-request', { sessionId });
     }
   }
+
 
   typingStart(sessionId, user) {
     if (this.socket) {
@@ -184,6 +195,12 @@ class SessionSocketService {
   onWhiteboardState(callback) {
     if (this.socket) {
       this.socket.on('whiteboard-state', callback);
+    }
+  }
+
+  onCodeUpdate(callback) {
+    if (this.socket) {
+      this.socket.on('code-update', callback);
     }
   }
 

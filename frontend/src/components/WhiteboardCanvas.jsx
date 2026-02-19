@@ -464,6 +464,7 @@ const WhiteboardCanvas = ({
   operations = [],
   onOperation,
   disabled = false,
+  sessionId = null,
 }) => {
   const canvasRef = useRef(null);
   const drawingRef = useRef(false);
@@ -480,6 +481,42 @@ const WhiteboardCanvas = ({
   const [codeContent, setCodeContent] = useState(
     LANGUAGE_CONFIG.web.defaultCode,
   );
+
+  // --- Synchronisation Code via Socket ---
+  // Écouter les mises à jour distantes
+  useEffect(() => {
+    if (!sessionId) return;
+
+    const handleCodeUpdate = (data) => {
+      // Éviter de remplacer si c'est notre propre modification (optimiste)
+      // Mais ici on simplifie : on met à jour si le timestamp est plus récent
+      // Pour une vraie collab temps réel (OT/CRDT), utiliser Yjs.
+      // Ici c'est du "last write wins" simple.
+      setCodeContent(data.code);
+      // Si le langage change, on pourrait aussi le mettre à jour ici
+    };
+
+    import("../services/sessionSocket").then((module) => {
+      module.default.onCodeUpdate(handleCodeUpdate);
+    });
+
+    return () => {
+      // Cleanup listener if possible
+    };
+  }, [sessionId]);
+
+  // Émettre les changements locaux (Debounced)
+  useEffect(() => {
+    if (!sessionId) return;
+
+    const timeoutId = setTimeout(() => {
+      import("../services/sessionSocket").then((module) => {
+        module.default.codeUpdate(sessionId, codeContent, "web"); // TODO: sync language
+      });
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [codeContent, sessionId]);
 
   // Callback Audio
   const handleFinalTranscript = useCallback((newText) => {

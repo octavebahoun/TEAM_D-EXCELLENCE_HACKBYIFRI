@@ -1263,6 +1263,7 @@ const ChatPage = ({ session, onLeave }) => {
               operations={whiteboardOperations}
               onOperation={handleWhiteboardOperation}
               disabled={!sessionId || isDemoSession}
+              sessionId={sessionId}
             />
           </div>
         </div>

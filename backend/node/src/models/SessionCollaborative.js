@@ -100,6 +100,14 @@ const sessionCollaborativeSchema = new mongoose.Schema({
   whiteboard_updated_at: {
     type: Date,
     default: null
+  },
+  code_content: {
+    type: String,
+    default: ""
+  },
+  code_language: {
+    type: String,
+    default: "web"
   }
 }, {
   timestamps: true,

@@ -381,8 +381,15 @@ module.exports = (io) => {
         socket.emit('session-role', { sessionId, role: resolvedRole });
 
         const latestSession = await SessionCollaborative.findById(sessionObjectId)
-          .select('whiteboard_state whiteboard_updated_at')
+          .select('whiteboard_state whiteboard_updated_at code_content code_language')
           .lean();
+
+        socket.emit('code-update', {
+          code: latestSession?.code_content || '',
+          language: latestSession?.code_language || 'web',
+          timestamp: new Date().toISOString(),
+          isInitial: true
+        });
 
         socket.emit('whiteboard-state', {
           sessionId,
@@ -636,6 +643,35 @@ module.exports = (io) => {
         });
       } catch (error) {
         logger.error('Error whiteboard-draw:', error);
+      }
+    });
+
+    socket.on('code-update', async (data) => {
+      const { sessionId, code, language } = data || {};
+      if (!sessionId) return;
+      const sessionObjectId = toObjectId(sessionId);
+      if (!sessionObjectId) return;
+
+      try {
+        await SessionCollaborative.updateOne(
+          { _id: sessionObjectId },
+          {
+            $set: {
+              code_content: code,
+              code_language: language,
+              updatedAt: new Date()
+            }
+          }
+        );
+
+        socket.to(sessionRoomName(sessionId)).emit('code-update', {
+          code,
+          language,
+          by: socket.user?.id || null,
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        logger.error('Error code-update:', error);
       }
     });
 
