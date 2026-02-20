@@ -38,15 +38,15 @@ class FiliereController extends Controller
      */
     public function index(Request $request)
     {
-        // TODO: Récupérer l'admin connecté
-        // $admin = $request->user();
-
         // TODO: Construire la requête selon le rôle
+        // $admin = $request->user();
         // $filieres = Filiere::with('departement')
         //     ->withCount('users')
+        //     // ⚠️ isChefDepartement() et departement_id sont définis dans le modèle ChefDepartement.
+        //     //    Si $admin est un Super Admin (modèle Admin), isChefDepartement() retourne false.
+        //     //    Si $admin est un Chef (modèle ChefDepartement), departement_id est disponible.
         //     ->when($admin->isChefDepartement(), fn($q) => $q->where('departement_id', $admin->departement_id))
         //     ->when($request->niveau, fn($q, $n) => $q->where('niveau', $n))
-        //     ->when($request->annee_academique, fn($q, $a) => $q->where('annee_academique', $a))
         //     ->orderBy('departement_id')->orderBy('niveau')
         //     ->get();
 
@@ -90,6 +90,9 @@ class FiliereController extends Controller
         // ]);
 
         // TODO: (Sécurité) Un chef ne peut créer que dans SON département
+        // ⚠️ $admin->departement_id existe UNIQUEMENT sur le modèle ChefDepartement.
+        //    Si $admin est un Super Admin (modèle Admin), cette propriété n'existe pas.
+        //    La condition isChefDepartement() garantit qu'on est bien sur un ChefDepartement.
         // if ($admin->isChefDepartement()) {
         //     $validated['departement_id'] = $admin->departement_id;
         // }

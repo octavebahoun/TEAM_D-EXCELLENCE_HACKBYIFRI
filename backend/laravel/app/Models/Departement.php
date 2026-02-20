@@ -9,7 +9,8 @@ class Departement extends Model
     protected $fillable = [
         'nom',
         'code',
-        'description',
+        'description',  // Description du département (nullable)
+        'created_by',   // ID du Super Admin créateur (obligatoire selon la migration)
     ];
 
     public function filieres(): HasMany

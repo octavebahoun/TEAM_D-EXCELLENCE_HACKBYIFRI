@@ -35,14 +35,23 @@ return [
     |
     */
 
-     'guards' => [
+    'guards' => [
+        // ✅ Guard web standard avec driver 'session' (pas 'sanctum')
+        // Sanctum intercepte les Bearer Tokens lui-même via son middleware,
+        // AVANT que le guard soit résolu. Le driver 'session' est correct ici.
         'web' => [
-            'driver' => 'sanctum', // Changé de 'session' à 'sanctum'
+            'driver' => 'session',
             'provider' => 'users',
         ],
+        // Guard Admin (Eloquent standard)
         'admin' => [
-            'driver' => 'sanctum', // Changé de 'session' à 'sanctum'
+            'driver' => 'session',
             'provider' => 'admins',
+        ],
+        // Guard Chef (Eloquent standard)
+        'chef' => [
+            'driver' => 'session',
+            'provider' => 'chefs',
         ],
     ],
 
@@ -65,13 +74,20 @@ return [
     */
 
     'providers' => [
+        // Provider pour les étudiants (modèle User)
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
+        // Provider pour les Super Admins (modèle Admin → table super_admins)
         'admins' => [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
+        ],
+        // Provider pour les Chefs de Département (modèle ChefDepartement → table chefs_departement)
+        'chefs' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\ChefDepartement::class,
         ],
     ],
 

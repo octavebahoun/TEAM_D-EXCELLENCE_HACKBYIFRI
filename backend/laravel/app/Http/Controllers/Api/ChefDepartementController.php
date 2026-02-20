@@ -1,239 +1,174 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin;
+use App\Models\ChefDepartement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class ChefDepartementController extends Controller
 {
-    /**
-     * ---------------------------------------------------------------
-     * LISTE DES CHEFS DE DÉPARTEMENT
-     * GET /api/v1/admin/chefs-departement
-     * Accès : super_admin uniquement
-     * ---------------------------------------------------------------
-     *
-     * Retourne tous les admins avec role = 'chef_departement'.
-     * Charger la relation departement pour afficher à quel département ils sont affectés.
-     *
-     * Conseil :
-     *   Admin::with('departement')
-     *       ->where('role', 'chef_departement')
-     *       ->orderBy('nom')
-     *       ->get();
-     *
-     * Retour (200) : liste des chefs avec leur département
-     * ---------------------------------------------------------------
-     */
+    // ---------------------------------------------------------------
+    // LISTE DES CHEFS DE DÉPARTEMENT
+    // GET /api/v1/admin/chefs-departement
+    // Accès : super_admin uniquement (garanti par le middleware dans api.php)
+    // ---------------------------------------------------------------
     public function index(Request $request)
     {
-        // TODO: Vérifier rôle super_admin
-        // if ($request->user()->role !== 'super_admin') return response()->json(['error' => 'Accès refusé'], 403);
+        // Récupérer tous les chefs avec leur département chargé
+        // Note : le middleware 'super.admin' garantit déjà qu'on est un super admin
+        $chefs = ChefDepartement::with('departement')
+            ->orderBy('nom')
+            ->get();
 
-        // TODO: Récupérer les chefs de département
-        // $chefs = Admin::with('departement')
-        //     ->where('role', 'chef_departement')
-        //     ->orderBy('nom')
-        //     ->get();
-
-        // TODO: return response()->json($chefs);
+        return response()->json($chefs);
     }
 
-    /**
-     * ---------------------------------------------------------------
-     * CRÉER UN CHEF DE DÉPARTEMENT
-     * POST /api/v1/admin/chefs-departement
-     * Accès : super_admin uniquement
-     * ---------------------------------------------------------------
-     *
-     * Body attendu (JSON) :
-     *   - nom            (required|string|max:100)
-     *   - prenom         (required|string|max:100)
-     *   - email          (required|email|unique:admins,email)
-     *   - password       (required|string|min:8)
-     *   - telephone      (nullable|string|max:20)
-     *   - departement_id (required|integer|exists:departements,id)
-     *
-     * Logique :
-     *   1. Valider
-     *   2. Vérifier qu'il n'y a pas déjà un chef actif pour ce département
-     *      → Admin::where('departement_id', $deptId)->where('role', 'chef_departement')->where('is_active', true)->exists()
-     *   3. Hasher le password
-     *   4. Créer l'admin avec role = 'chef_departement'
-     *
-     * Retour : 201 Created + admin créé (sans le password)
-     * ---------------------------------------------------------------
-     */
+    // ---------------------------------------------------------------
+    // CRÉER UN CHEF DE DÉPARTEMENT
+    // POST /api/v1/admin/chefs-departement
+    // Accès : super_admin uniquement
+    //
+    // ⚠️ ORDRE LOGIQUE : Le département doit exister AVANT d'appeler cette route
+    //    Créer d'abord via POST /api/v1/admin/departements
+    // ---------------------------------------------------------------
     public function store(Request $request)
     {
-        // TODO: Valider les champs
-        // $validated = $request->validate([
-        //     'nom'            => 'required|string|max:100',
-        //     'prenom'         => 'required|string|max:100',
-        //     'email'          => 'required|email|unique:admins,email',
-        //     'password'       => 'required|string|min:8',
-        //     'telephone'      => 'nullable|string|max:20',
-        //     'departement_id' => 'required|integer|exists:departements,id',
-        // ]);
+        // 1. Validation - "exists:departements,id" garantit que le département existe
+        $validated = $request->validate([
+            'nom' => 'required|string|max:100',
+            'prenom' => 'required|string|max:100',
+            // Email unique dans la table chefs_departement (et non dans super_admins)
+            'email' => 'required|email|unique:chefs_departement,email',
+            'password' => 'required|string|min:8',
+            'telephone' => 'nullable|string|max:20',
+            // Le département DOIT exister en BDD (impossible de créer un chef sans département)
+            'departement_id' => 'required|integer|exists:departements,id',
+        ]);
 
-        // TODO: Vérifier unicité chef actif par département (optionnel selon règle métier)
-        // $dejaChef = Admin::where('departement_id', $validated['departement_id'])
-        //     ->where('role', 'chef_departement')
-        //     ->where('is_active', true)
-        //     ->exists();
-        // if ($dejaChef) {
-        //     return response()->json(['error' => 'Ce département a déjà un chef actif'], 409);
-        // }
+        // 2. Vérifier qu'il n'y a pas déjà un chef ACTIF pour ce département
+        $dejaChef = ChefDepartement::where('departement_id', $validated['departement_id'])
+            ->where('is_active', true)
+            ->exists();
 
-        // TODO: Hasher le password et créer
-        // $validated['password'] = Hash::make($validated['password']);
-        // $validated['role']     = 'chef_departement';
-        // $chef = Admin::create($validated);
+        if ($dejaChef) {
+            return response()->json([
+                'error' => 'Ce département a déjà un chef de département actif.'
+            ], 409);
+        }
 
-        // TODO: return response()->json($chef->load('departement'), 201);
+        // 3. Hasher le mot de passe (jamais stocker en clair)
+        $validated['password'] = Hash::make($validated['password']);
+
+        // 4. Traçabilité : enregistrer qui a créé ce chef
+        $validated['created_by_admin'] = $request->user()->id;
+
+        // 5. Création en base de données
+        $chef = ChefDepartement::create($validated);
+
+        return response()->json([
+            'message' => 'Chef de département créé avec succès !',
+            'chef' => $chef->load('departement'),
+        ], 201);
     }
 
-    /**
-     * ---------------------------------------------------------------
-     * DÉTAILS D'UN CHEF DE DÉPARTEMENT
-     * GET /api/v1/admin/chefs-departement/{id}
-     * Accès : super_admin
-     * ---------------------------------------------------------------
-     *
-     * Récupérer l'admin par $id, vérifier que c'est bien un chef_departement.
-     * Charger : departement, importLogs (derniers imports)
-     *
-     * Retour (200) : admin + département + historique imports
-     * Retour (404) : si $id inexistant ou pas un chef
-     * ---------------------------------------------------------------
-     */
+    // ---------------------------------------------------------------
+    // DÉTAILS D'UN CHEF DE DÉPARTEMENT
+    // GET /api/v1/admin/chefs-departement/{id}
+    // Accès : super_admin
+    // ---------------------------------------------------------------
     public function show($id)
     {
-        // TODO: Trouver le chef (s'assurer que c'est bien un chef_departement)
-        // $chef = Admin::where('id', $id)
-        //     ->where('role', 'chef_departement')
-        //     ->with(['departement', 'importLogs' => fn($q) => $q->latest()->take(10)])
-        //     ->firstOrFail();
+        // Trouver le chef par son ID dans la table chefs_departement
+        // findOrFail retourne automatiquement 404 si non trouvé
+        $chef = ChefDepartement::with(['departement', 'createdByAdmin'])
+            ->findOrFail($id);
 
-        // TODO: return response()->json($chef);
+        return response()->json($chef);
     }
 
-    /**
-     * ---------------------------------------------------------------
-     * MODIFIER UN CHEF DE DÉPARTEMENT
-     * PUT /api/v1/admin/chefs-departement/{id}
-     * Accès : super_admin uniquement
-     * ---------------------------------------------------------------
-     *
-     * Body attendu (tous optionnels via 'sometimes') :
-     *   - nom            (sometimes|string|max:100)
-     *   - prenom         (sometimes|string|max:100)
-     *   - email          (sometimes|email|unique:admins,email,{id})
-     *   - password       (sometimes|string|min:8)  ← hasher si fourni
-     *   - telephone      (nullable|string|max:20)
-     *   - departement_id (sometimes|integer|exists:departements,id)
-     *
-     * ⚠️  Si password est fourni, le hasher avant de sauvegarder.
-     * ---------------------------------------------------------------
-     */
+    // ---------------------------------------------------------------
+    // MODIFIER UN CHEF DE DÉPARTEMENT
+    // PUT /api/v1/admin/chefs-departement/{id}
+    // Accès : super_admin uniquement
+    // ---------------------------------------------------------------
     public function update(Request $request, $id)
     {
-        // TODO: Trouver le chef
-        // $chef = Admin::where('id', $id)->where('role', 'chef_departement')->firstOrFail();
+        // Trouver le chef dans la table chefs_departement
+        $chef = ChefDepartement::findOrFail($id);
 
-        // TODO: Valider les champs (ignorer email actuel pour l'unicité)
-        // $validated = $request->validate([
-        //     'nom'            => 'sometimes|string|max:100',
-        //     'prenom'         => 'sometimes|string|max:100',
-        //     'email'          => ['sometimes', 'email', Rule::unique('admins', 'email')->ignore($id)],
-        //     'password'       => 'sometimes|string|min:8',
-        //     'telephone'      => 'nullable|string|max:20',
-        //     'departement_id' => 'sometimes|integer|exists:departements,id',
-        // ]);
+        // Validation des champs (tous optionnels avec 'sometimes')
+        $validated = $request->validate([
+            'nom' => 'sometimes|string|max:100',
+            'prenom' => 'sometimes|string|max:100',
+            // Ignorer l'email actuel du même chef pour la règle d'unicité
+            'email' => ['sometimes', 'email', Rule::unique('chefs_departement', 'email')->ignore($id)],
+            'password' => 'sometimes|string|min:8',
+            'telephone' => 'nullable|string|max:20',
+            'departement_id' => 'sometimes|integer|exists:departements,id',
+        ]);
 
-        // TODO: Hasher le nouveau password si fourni
-        // if (isset($validated['password'])) {
-        //     $validated['password'] = Hash::make($validated['password']);
-        // }
+        // Hasher le nouveau password si fourni
+        if (isset($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
+        }
 
-        // TODO: Mettre à jour et retourner
-        // $chef->update($validated);
-        // return response()->json($chef->load('departement'));
+        $chef->update($validated);
+
+        return response()->json([
+            'message' => 'Chef de département mis à jour.',
+            'chef' => $chef->load('departement'),
+        ]);
     }
 
-    /**
-     * ---------------------------------------------------------------
-     * SUPPRIMER UN CHEF DE DÉPARTEMENT
-     * DELETE /api/v1/admin/chefs-departement/{id}
-     * Accès : super_admin uniquement
-     * ---------------------------------------------------------------
-     *
-     * ⚠️  Ne pas supprimer si le chef a des imports en cours (ImportLog::where statut='en_cours').
-     *     Sinon → supprimer le compte admin (et ses tokens Sanctum via cascade).
-     *
-     * Alternative recommandée : désactiver via toggle() plutôt que supprimer.
-     *
-     * Retour : 204 No Content
-     * ---------------------------------------------------------------
-     */
+    // ---------------------------------------------------------------
+    // SUPPRIMER UN CHEF DE DÉPARTEMENT
+    // DELETE /api/v1/admin/chefs-departement/{id}
+    // Accès : super_admin uniquement
+    // ✅ Recommandation : préférer toggle() pour désactiver plutôt que supprimer
+    // ---------------------------------------------------------------
     public function destroy($id)
     {
-        // TODO: Trouver le chef
-        // $chef = Admin::where('id', $id)->where('role', 'chef_departement')->firstOrFail();
+        $chef = ChefDepartement::findOrFail($id);
 
-        // TODO: Vérifier pas d'import en cours
-        // $importEnCours = $chef->importLogs()->where('statut', 'en_cours')->exists();
-        // if ($importEnCours) {
-        //     return response()->json(['error' => 'Import en cours, impossible de supprimer ce chef'], 409);
-        // }
+        // Révoquer tous les tokens Sanctum actifs avant suppression
+        // (pour invalider immédiatement les sessions en cours)
+        $chef->tokens()->delete();
 
-        // TODO: Supprimer les tokens Sanctum puis l'admin
-        // $chef->tokens()->delete();
-        // $chef->delete();
-        // return response()->noContent();
+        $chef->delete();
+
+        return response()->noContent(); // 204 No Content
     }
 
-    /**
-     * ---------------------------------------------------------------
-     * ACTIVER / DÉSACTIVER UN CHEF DE DÉPARTEMENT
-     * POST /api/v1/admin/chefs-departement/{id}/toggle
-     * Accès : super_admin uniquement
-     * ---------------------------------------------------------------
-     *
-     * Inverse la valeur de is_active :
-     *   - Si is_active = true  → passer à false (désactivation)
-     *   - Si is_active = false → passer à true  (réactivation)
-     *
-     * Si désactivation : révoquer tous les tokens actifs du chef
-     *   $chef->tokens()->delete()
-     *
-     * Retour (200) :
-     * {
-     *   "message": "Compte désactivé" | "Compte activé",
-     *   "is_active": false | true
-     * }
-     * ---------------------------------------------------------------
-     */
+    // ---------------------------------------------------------------
+    // ACTIVER / DÉSACTIVER UN CHEF DE DÉPARTEMENT
+    // POST /api/v1/admin/chefs-departement/{id}/toggle
+    // Accès : super_admin uniquement
+    //
+    // Si désactivation → révoque tous les tokens actifs du chef
+    // ---------------------------------------------------------------
     public function toggle($id)
     {
-        // TODO: Trouver le chef
-        // $chef = Admin::where('id', $id)->where('role', 'chef_departement')->firstOrFail();
+        $chef = ChefDepartement::findOrFail($id);
 
-        // TODO: Inverser is_active
-        // $chef->is_active = !$chef->is_active;
-        // $chef->save();
+        // Inverser l'état actif/inactif
+        $chef->is_active = !$chef->is_active;
+        $chef->save();
 
-        // TODO: Si désactivation, révoquer les tokens
-        // if (!$chef->is_active) {
-        //     $chef->tokens()->delete();
-        //     $message = 'Compte désactivé';
-        // } else {
-        //     $message = 'Compte activé';
-        // }
+        // Si le compte est désactivé, révoquer tous les tokens Sanctum actifs
+        // (le chef ne pourra plus faire de requêtes authentifiées)
+        if (!$chef->is_active) {
+            $chef->tokens()->delete();
+            $message = 'Compte désactivé. Sessions révoquées.';
+        } else {
+            $message = 'Compte réactivé.';
+        }
 
-        // TODO: return response()->json(['message' => $message, 'is_active' => $chef->is_active]);
+        return response()->json([
+            'message' => $message,
+            'is_active' => $chef->is_active,
+        ]);
     }
 }

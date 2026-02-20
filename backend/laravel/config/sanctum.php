@@ -34,6 +34,10 @@ return [
     |
     */
 
+    // Sanctum utilise 'web' pour les sessions SPA.
+    // Pour les Bearer Tokens (API), Sanctum retrouve automatiquement le bon modèle
+    // (Admin, ChefDepartement, User) via la colonne tokenable_type dans personal_access_tokens.
+    // ❌ NE PAS ajouter 'admin' ou 'chef' ici → causerait une récursion infinie (segfault)
     'guard' => ['web'],
 
     /*

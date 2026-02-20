@@ -502,6 +502,10 @@ const WhiteboardCanvas = ({
     if (!sessionId) return;
 
     const handleCodeUpdate = (data) => {
+      console.log(
+        `[Socket] Received code update for session ${sessionId}:`,
+        data.code.substring(0, 50) + "...",
+      );
       // Éviter de remplacer si c'est notre propre modification (optimiste)
       // Mais ici on simplifie : on met à jour si le timestamp est plus récent
       // Pour une vraie collab temps réel (OT/CRDT), utiliser Yjs.
@@ -511,6 +515,7 @@ const WhiteboardCanvas = ({
     };
 
     import("../services/sessionSocket").then((module) => {
+      console.log(`[Socket] Setting up listener for code-update`);
       module.default.onCodeUpdate(handleCodeUpdate);
     });
 
@@ -524,6 +529,9 @@ const WhiteboardCanvas = ({
     if (!sessionId) return;
 
     const timeoutId = setTimeout(() => {
+      console.log(
+        `[Socket] Emitting code update (debounced) for session ${sessionId}`,
+      );
       import("../services/sessionSocket").then((module) => {
         module.default.codeUpdate(sessionId, codeContent, "web"); // TODO: sync language
       });

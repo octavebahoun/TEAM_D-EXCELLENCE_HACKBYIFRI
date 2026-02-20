@@ -32,15 +32,20 @@ class DepartementController extends Controller
      */
     public function index(Request $request)
     {
-        // TODO: Vérifier rôle super_admin
-        // if ($request->user()->role !== 'super_admin') return response()->json(['error' => 'Accès refusé'], 403);
+        // ✅ Pas besoin de vérifier le rôle ici : le middleware 'super.admin' dans api.php
+        //    bloque automatiquement tout accès non autorisé avant d'arriver ici.
+        // ❌ NE PAS FAIRE : $request->user()->role !== 'super_admin'
+        //    → Il n'y a pas de colonne 'role' dans la table super_admins.
+        //    → Utiliser isSuperAdmin() si besoin de vérification manuelle.
 
         // TODO: Récupérer les départements avec compteurs
-        // $departements = Departement::withCount(['filieres', 'admins'])
+        // $departements = Departement::withCount(['filieres', 'chefs'])
         //     ->when($request->search, fn($q, $s) => $q->where('nom', 'like', "%$s%")
         //                                               ->orWhere('code', 'like', "%$s%"))
         //     ->orderBy('nom')
         //     ->get();
+        // ⚠️ Utiliser 'chefs' (et non 'admins') car les chefs sont dans la table
+        //    chefs_departement via le modèle ChefDepartement, pas dans super_admins.
 
         // TODO: return response()->json($departements);
     }
@@ -61,62 +66,42 @@ class DepartementController extends Controller
      * ---------------------------------------------------------------
      */
     public function store(Request $request)
-{
-    try {
-        // 🔹 Récupérer l'utilisateur authentifié
-        $admin = $request->user(); // ou Auth::guard('admin')->user()
-
-        // 🔹 Vérification existance de l'utilisateur
+    {
+        // 1. Vérifier que l'utilisateur est bien authentifié
+        // (même si la route est protégée, c'est une bonne habitude défensive)
+        $admin = $request->user();
         if (!$admin) {
-            return response()->json([
-                'message' => 'Non authentifié. Veuillez vous connecter.'
-            ], 401);
+            return response()->json(['message' => 'Non authentifié.'], 401);
         }
 
-        // 🔹 Vérification du rôle
-        if (!($admin->isSuperAdmin() || $admin->isChefDepartement())) {
+        // 2. Seul le Super Admin peut créer un département
+        // Les chefs de département ne peuvent pas créer de nouveaux départements
+        if (!$admin->isSuperAdmin()) {
             return response()->json([
-                'message' => 'Accès interdit. Vous n’avez pas les droits pour créer un département.'
+                'message' => 'Accès interdit. Seul un Super Administrateur peut créer un département.'
             ], 403);
         }
 
-        // 🔹 Validation sécurisée des données
+        // 3. Validation des données (alignées sur la vraie migration)
+        // La table departements a : nom, code, created_by — PAS de description
         $validated = $request->validate([
-            'nom'         => 'required|string|max:100',
-            'code'        => 'required|string|max:10|unique:departements,code',
+            'nom' => 'required|string|max:100',
+            'code' => 'required|string|max:10|unique:departements,code',
             'description' => 'nullable|string',
         ]);
 
-        // 🔹 Création sécurisée avec gestion des exceptions
+        // 4. Ajouter automatiquement l'ID du Super Admin créateur (champ obligatoire)
+        $validated['created_by'] = $admin->id;
+
+        // 5. Création du département en base de données
         $departement = Departement::create($validated);
 
+        // 6. On retourne le département créé avec un code HTTP 201 (Created)
         return response()->json([
             'message' => 'Département créé avec succès.',
             'data' => $departement
         ], 201);
-
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        // Gestion des erreurs de validation
-        return response()->json([
-            'message' => 'Données invalides.',
-            'errors' => $e->errors()
-        ], 422);
-
-    } catch (\Illuminate\Database\QueryException $e) {
-        // Gestion des erreurs liées à la base de données
-        return response()->json([
-            'message' => 'Erreur lors de la création en base de données.',
-            'error' => $e->getMessage()
-        ], 500);
-
-    } catch (\Exception $e) {
-        // Gestion de toutes les erreurs inattendues
-        return response()->json([
-            'message' => 'Une erreur inattendue est survenue.',
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
 
     /**
      * ---------------------------------------------------------------
@@ -136,8 +121,11 @@ class DepartementController extends Controller
     public function show($id)
     {
         // TODO: Récupérer le département avec ses relations
-        // $departement = Departement::with(['filieres', 'admins', 'statistiques'])
+        // $departement = Departement::with(['filieres', 'chefs', 'statistiques'])
         //     ->findOrFail($id);
+        // ⚠️ Utiliser 'chefs' (et non 'admins') : les chefs de département sont dans
+        //    la table chefs_departement via le modèle ChefDepartement.
+        //    'admins' ne fait PAS référence aux chefs dans notre architecture.
 
         // TODO: return response()->json($departement);
     }

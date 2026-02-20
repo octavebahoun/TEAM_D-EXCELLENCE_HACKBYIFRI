@@ -3,14 +3,18 @@
 namespace App\Models;
 
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\ImportLog;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Admin extends Authenticatable
 {
     use HasApiTokens;
+
+    // Nom de la table dans la base de données
     protected $table = 'super_admins';
+
+    // Champs que l'on peut remplir via Admin::create()
     protected $fillable = [
         'nom',
         'prenom',
@@ -18,41 +22,47 @@ class Admin extends Authenticatable
         'password',
         'telephone',
         'photo',
-        'departement_id', 
         'is_active',
         'last_login',
     ];
 
+    // Conversion automatique des types de données
     protected $casts = [
         'is_active' => 'boolean',
         'last_login' => 'datetime',
-        'departement_id' => 'integer', 
     ];
 
+    // Champs masqués lors de la conversion en JSON (sécurité)
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-
-
-    public function departement(): BelongsTo
-    {
-        return $this->belongsTo(Departement::class);
-    }
-
+    /**
+     * RELATION : Un Super Admin peut avoir créé plusieurs imports.
+     */
     public function importLogs(): HasMany
     {
         return $this->hasMany(ImportLog::class);
     }
 
+    /**
+     * SÉCURITÉ : Vérifie si c'est un Super Admin.
+     * Étant donné que ce modèle pointe sur la table 'super_admins', 
+     * il retournera toujours true.
+     */
     public function isSuperAdmin(): bool
     {
-        return is_null($this->departement_id);
+        return true;
     }
 
+    /**
+     * SÉCURITÉ : Vérifie si c'est un Chef de Département.
+     * Pour un admin de cette table, c'est toujours false.
+     * Les chefs utilisent le modèle ChefDepartement.
+     */
     public function isChefDepartement(): bool
     {
-        return !is_null($this->departement_id);
+        return false;
     }
 }
