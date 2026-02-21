@@ -85,11 +85,23 @@ Route::prefix('v1')->group(function () {
             'update' => 'admin.matieres.update',
             'destroy' => 'admin.matieres.destroy'
         ]);
-        
+
         // GESTION MANUELLE DES NOTES ET EMPLOI DU TEMPS
-        Route::apiResource('notes', NoteController::class);
-        Route::apiResource('emploi-temps', EmploiTempsController::class);
         Route::get('emploi-temps/filieres/{id}', [EmploiTempsController::class, 'index']);
+        Route::apiResource('notes', NoteController::class)->names([
+            'index' => 'admin.notes.index',
+            'store' => 'admin.notes.store',
+            'show' => 'admin.notes.show',
+            'update' => 'admin.notes.update',
+            'destroy' => 'admin.notes.destroy'
+        ]);
+        Route::apiResource('emploi-temps', EmploiTempsController::class)->names([
+            'index' => 'admin.emploi-temps.index',
+            'store' => 'admin.emploi-temps.store',
+            'show' => 'admin.emploi-temps.show',
+            'update' => 'admin.emploi-temps.update',
+            'destroy' => 'admin.emploi-temps.destroy'
+        ]);
     });
 
     Route::prefix('departement')->middleware(['auth:sanctum', 'admin', 'admin.departement.owner'])->group(function () {
@@ -113,7 +125,7 @@ Route::prefix('v1')->group(function () {
             // Assignation / Rétractation de matières à une filière
             Route::post('{id}/matieres', [MatiereController::class, 'assignToFiliere']);
             Route::delete('{id}/matieres/{matiere_id}', [MatiereController::class, 'removeFromFiliere']);
-            
+
             // Etudiants et Statistiques pour la Filiere
             Route::get('{id}/etudiants', [FiliereController::class, 'etudiants']);
             Route::get('{id}/stats', [StatistiqueController::class, 'filiere']);
@@ -124,10 +136,22 @@ Route::prefix('v1')->group(function () {
         Route::get('etudiants', [StudentController::class, 'index']);
         Route::post('import/etudiants', [ImportController::class, 'importEtudiants']);
         Route::post('import/notes', [ImportController::class, 'importNotes']);
-        
+
         // GESTION MANUELLE DES NOTES ET DE L'EMPLOI DU TEMPS (Chef de Département)
-        Route::apiResource('notes', NoteController::class);
-        Route::apiResource('emploi-temps', EmploiTempsController::class);
+        Route::apiResource('notes', NoteController::class)->names([
+            'index' => 'departement.notes.index',
+            'store' => 'departement.notes.store',
+            'show' => 'departement.notes.show',
+            'update' => 'departement.notes.update',
+            'destroy' => 'departement.notes.destroy'
+        ]);
+        Route::apiResource('emploi-temps', EmploiTempsController::class)->names([
+            'index' => 'departement.emploi-temps.index',
+            'store' => 'departement.emploi-temps.store',
+            'show' => 'departement.emploi-temps.show',
+            'update' => 'departement.emploi-temps.update',
+            'destroy' => 'departement.emploi-temps.destroy'
+        ]);
 
         //  TABLEAU DE BORD DU DÉPARTEMENT
         Route::get('dashboard', [StatistiqueController::class, 'dashboard']);
