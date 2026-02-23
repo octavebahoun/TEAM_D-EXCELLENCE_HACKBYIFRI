@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     
     # Configuration API
     API_HOST: str = Field(default="0.0.0.0")
-    API_PORT: int = Field(default=5000)
+    API_PORT: int = Field(default=int(os.environ.get("PORT", 5000)))
     API_RELOAD: bool = Field(default=True)
     API_KEY: str = Field(default="your_secret_api_key_change_this")
     

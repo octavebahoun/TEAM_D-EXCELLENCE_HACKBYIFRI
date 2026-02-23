@@ -15,6 +15,7 @@ import ChatPage from "./pages/ChatPage";
 import SessionsFeedPage from "./pages/SessionsFeedPage";
 import { authService } from "./services/authService";
 import { useState } from "react";
+import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 
 // Composant pour protéger les routes
@@ -124,6 +125,7 @@ const HomeLoader = () => {
 export default function App() {
   return (
     <Router>
+      <Toaster position="top-right" />
       <AppContent />
     </Router>
   );
