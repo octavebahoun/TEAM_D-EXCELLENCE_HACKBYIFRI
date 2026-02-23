@@ -1,32 +1,103 @@
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
+@theme {
+  --font-display: "Outfit", "Inter", sans-serif;
+  --font-body: "Manrope", "Inter", sans-serif;
+}
+
 :root {
-  --font-display: "Outfit", "Segoe UI", sans-serif;
-  --font-body: "Manrope", "Segoe UI", sans-serif;
-  --ink-900: #0f172a;
+  /* Brand Colors */
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --secondary: #0ea5e9;
+  --accent: #f59e0b;
+
+  /* Neutral Colors */
+  --background: #f8fafc;
   --surface: #ffffff;
-  --surface-muted: #f8fafc;
-  --accent: #2563eb;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+
+  /* Status Colors */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+
+  /* Shadows and Borders */
+  --border: #e2e8f0;
+  --ring: rgba(79, 70, 229, 0.2);
 }
 
-body {
-  font-family: var(--font-body);
-  background-color: var(--surface-muted);
-  color: var(--ink-900);
+.dark {
+  --background: #0f172a;
+  --surface: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border: #334155;
+  --ring: rgba(99, 102, 241, 0.3);
 }
 
-.font-display {
-  font-family: var(--font-display);
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    @apply transition-colors duration-300;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    @apply font-bold;
+  }
 }
 
-button,
-a,
-[role="button"] {
-  cursor: pointer;
+@layer components {
+  .btn-primary {
+    background-color: var(--primary);
+    @apply text-white px-6 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-indigo-500/20 hover:scale-[1.02] active:scale-95;
+  }
+
+  .glass-card {
+    background-color: var(--surface);
+    @apply backdrop-blur-md border border-[var(--border)] rounded-3xl shadow-xl transition-all duration-300;
+  }
+
+  .input-field {
+    background-color: var(--surface);
+    @apply w-full px-4 py-3 rounded-2xl border border-[var(--border)] focus:ring-4 focus:ring-[var(--ring)] focus:border-[var(--primary)] outline-none transition-all;
+  }
 }
 
-button:disabled,
-[role="button"][aria-disabled="true"] {
-  cursor: not-allowed;
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.3);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.5);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.4);
 }

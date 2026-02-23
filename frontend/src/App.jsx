@@ -3,10 +3,13 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import ChefDashboard from "./pages/ChefDashboard";
+import StudentDashboard from "./pages/StudentDashboard";
 import AIToolsPage from "./pages/AIToolsPage";
 import ChatPage from "./pages/ChatPage";
 import SessionsFeedPage from "./pages/SessionsFeedPage";
@@ -26,8 +29,13 @@ const PrivateRoute = ({ children, allowedRoles = [] }) => {
   return children;
 };
 
-function App() {
+function AppContent() {
   const [activeSession, setActiveSession] = useState(null);
+  const location = useLocation();
+  const hideGlobalNavbar =
+    location.pathname.startsWith("/chef") ||
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/etudiant"); // Added condition for /etudiant
 
   const handleJoinSession = (session) => {
     setActiveSession(session);
@@ -38,19 +46,39 @@ function App() {
   };
 
   return (
-    <Router>
-      <Navbar />
+    <>
+      {!hideGlobalNavbar && <Navbar />}
       <Routes>
         {/* Routes publiques */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* Routes protégées */}
+        {/* Dashboard Super Admin */}
         <Route
           path="/admin/*"
           element={
             <PrivateRoute allowedRoles={["super_admin"]}>
               <AdminDashboard />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Dashboard Chef de Département */}
+        <Route
+          path="/chef/*" // Changed path from /chef/dashboard to /chef/*
+          element={
+            <PrivateRoute allowedRoles={["chef_departement"]}>
+              <ChefDashboard />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Dashboard Étudiant */}
+        <Route
+          path="/etudiant/*"
+          element={
+            <PrivateRoute allowedRoles={["student"]}>
+              <StudentDashboard />
             </PrivateRoute>
           }
         />
@@ -80,7 +108,7 @@ function App() {
         {/* Redirection par défaut selon le rôle */}
         <Route path="/" element={<HomeLoader />} />
       </Routes>
-    </Router>
+    </>
   );
 }
 
@@ -88,7 +116,15 @@ const HomeLoader = () => {
   const role = authService.getRole();
   if (!role) return <Navigate to="/login" />;
   if (role === "super_admin") return <Navigate to="/admin" />;
+  if (role === "chef_departement") return <Navigate to="/chef" />;
+  if (role === "student") return <Navigate to="/etudiant" />;
   return <Navigate to="/ai-tools" />;
 };
 
-export default App;
+export default function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
+}

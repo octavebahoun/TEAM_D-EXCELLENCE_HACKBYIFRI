@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "remotion-best-practices": {
+      "source": "remotion-dev/skills",
+      "sourceType": "github",
+      "computedHash": "a2ebe92433006ce81bbdcfe24984663678bbbb20991a3686e34814de1097c44c"
+    },
+    "teacher": {
+      "source": "sebastiaanwouters/dotagents",
+      "sourceType": "github",
+      "computedHash": "5af326ae0abe41030e90a6bc4e9a0f15537628d31a4c1f8cab4211dbf7517842"
+    }
+  }
+}

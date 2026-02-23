@@ -25,7 +25,10 @@ const LoginPage = () => {
       else res = await authService.studentLogin({ email, password });
 
       if (res.token) {
-        navigate(role === "admin" ? "/admin" : "/ai-tools");
+        if (role === "admin") navigate("/admin");
+        else if (role === "chef") navigate("/chef");
+        else if (role === "student") navigate("/etudiant");
+        else navigate("/");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Erreur de connexion");

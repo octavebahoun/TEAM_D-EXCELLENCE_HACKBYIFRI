@@ -39,6 +39,11 @@ export const authService = {
         return response.data;
     },
 
+    studentActivate: async (payload) => {
+        const response = await laravelApiClient.post('/auth/student/activate', payload);
+        return response.data;
+    },
+
     studentRegister: async (data) => {
         const response = await laravelApiClient.post('/auth/student/register', data);
         if (response.data.token) {
@@ -71,5 +76,10 @@ export const authService = {
 
     getRole: () => {
         return localStorage.getItem('role');
-    }
+    },
+
+    me: async () => {
+        const response = await laravelApiClient.get('/auth/me');
+        return response.data;
+    },
 };
