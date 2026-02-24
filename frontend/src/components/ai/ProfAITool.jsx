@@ -41,8 +41,9 @@ export default function ProfAITool() {
     setLoading(true);
 
     try {
-      const historyMsg = messages.map((msg) => ({
-        role: msg.role === "user" ? "user" : "ai",
+      // Exclure le message d'accueil fictif (index 0) de l'historique
+      const historyMsg = messages.slice(1).map((msg) => ({
+        role: msg.role === "user" ? "user" : "assistant",
         content: msg.content,
       }));
       const response = await aiService.askChat(userMsg.content, historyMsg);

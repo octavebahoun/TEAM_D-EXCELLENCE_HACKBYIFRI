@@ -135,7 +135,7 @@ JSON DES EXERCICES:"""
         
         # 4. Générer les exercices
         chain = prompt | llm | StrOutputParser()
-        raw_response = chain.invoke({"document_content": document_text})
+        raw_response = await chain.ainvoke({"document_content": document_text})
         
         # 5. Parser le JSON
         exercise_data = self._parse_json(raw_response)

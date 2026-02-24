@@ -22,18 +22,26 @@ MODEL_MAP = {
     }
 }
 
+# Pool de connexion partagé (singleton)
+_db_pool = None
+
 async def get_db_pool():
-    """Crée un pool de connexion MySQL asynchrone."""
+    """Crée ou réutilise un pool de connexion MySQL asynchrone (singleton)."""
+    global _db_pool
+    if _db_pool is not None and not _db_pool._closed:
+        return _db_pool
     try:
-        pool = await aiomysql.create_pool(
+        _db_pool = await aiomysql.create_pool(
             host=settings.DB_HOST,
             port=settings.DB_PORT,
             user=settings.DB_USER,
             password=settings.DB_PASSWORD,
             db=settings.DB_NAME,
-            autocommit=True
+            autocommit=True,
+            minsize=1,
+            maxsize=10
         )
-        return pool
+        return _db_pool
     except Exception as e:
         print(f"Erreur de connexion MySQL : {e}")
         return None
@@ -72,7 +80,6 @@ async def get_current_user(authorization: str = Header(None)):
     async with pool.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cur:
             # 1. Vérifier le token dans la table personal_access_tokens
-            # MySQL compare des hashes hexadécimaux
             await cur.execute(
                 "SELECT id, tokenable_type, tokenable_id, expires_at FROM personal_access_tokens WHERE id = %s AND token = %s",
                 (token_id, hashed_token)
@@ -80,8 +87,6 @@ async def get_current_user(authorization: str = Header(None)):
             token_record = await cur.fetchone()
 
             if not token_record:
-                pool.close()
-                await pool.wait_closed()
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Token invalide ou expiré"
@@ -90,8 +95,6 @@ async def get_current_user(authorization: str = Header(None)):
             # 2. Vérifier l'utilisateur associé
             model_info = MODEL_MAP.get(token_record['tokenable_type'])
             if not model_info:
-                pool.close()
-                await pool.wait_closed()
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail=f"Type d'utilisateur non supporté : {token_record['tokenable_type']}"
@@ -102,22 +105,17 @@ async def get_current_user(authorization: str = Header(None)):
             user = await cur.fetchone()
 
             if not user:
-                pool.close()
-                await pool.wait_closed()
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Utilisateur introuvable"
                 )
             
-            # Mettre à jour last_used_at (optionnel)
+            # Mettre à jour last_used_at
             await cur.execute(
                 "UPDATE personal_access_tokens SET last_used_at = NOW() WHERE id = %s",
                 (token_id,)
             )
 
-    pool.close()
-    await pool.wait_closed()
-    
     # Ajouter le rôle au dictionnaire utilisateur
     user['role'] = model_info['role']
     return user

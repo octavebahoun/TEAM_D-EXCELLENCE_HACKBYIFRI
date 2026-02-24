@@ -26,6 +26,7 @@ const notificationsRoutes = require('./routes/notifications');
 // Import des services Socket.io
 const privateMessageSocket = require('./services/privateMessageSocket');
 const socketService = require('./services/socketService');
+const { socketAuth } = require('./middleware/auth');
 
 const app = express();
 const server = http.createServer(app);
@@ -57,6 +58,12 @@ const io = socketIo(server, {
     credentials: true
   }
 });
+
+// Authentification Socket.io — vérifie le token Sanctum à chaque connexion WebSocket
+if (process.env.SOCKET_AUTH_ENABLED !== 'false') {
+  io.use(socketAuth);
+  logger.info('WebSocket authentication enabled');
+}
 
 app.set('io', io);
 
@@ -151,17 +158,6 @@ app.use('/api/notifications', notificationsRoutes);
 // Initialisation des services Socket.io
 privateMessageSocket(io);
 socketService(io);
-
-// Socket.io - Connexion de base (pour compatibilité)
-io.on('connection', (socket) => {
-  logger.info(`Client connected: ${socket.id}`);
-  console.log('Client connected:', socket.id);
-
-  socket.on('disconnect', () => {
-    logger.info(`Client disconnected: ${socket.id}`);
-    console.log('Client disconnected:', socket.id);
-  });
-});
 
 // Gestion des erreurs
 app.use((err, req, res, next) => {

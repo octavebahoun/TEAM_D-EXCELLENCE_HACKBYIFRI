@@ -497,6 +497,12 @@ module.exports = (io) => {
           { $set: { last_activity: new Date() } }
         );
 
+        // Rafraîchir last_activity pour éviter l'expiration TTL de la présence
+        OnlineUser.updateOne(
+          { user_id: userInfo.id, status: 'online' },
+          { $set: { last_activity: new Date() } }
+        ).catch((err) => logger.error('Error refreshing OnlineUser activity:', err));
+
         io.to(sessionRoomName(sessionId)).emit('new-message', buildMessagePayload(newMessage));
 
         await emitMentionNotifications(io, mentionParticipants, newMessage, {
@@ -767,6 +773,24 @@ module.exports = (io) => {
           event_type: 'left'
         });
 
+        // Émettre un message système dans le chat
+        const chatRoom = await ChatRoom.findOne({ session_id: sessionObjectId });
+        if (chatRoom) {
+          const leaveLabel = safeUserLabel(socket.user || {});
+          const systemMessage = await Message.create({
+            chat_room_id: chatRoom._id,
+            session_id: sessionObjectId,
+            user_id: userId,
+            user_info: {
+              nom: socket.user?.nom || 'Utilisateur',
+              prenom: socket.user?.prenom || ''
+            },
+            type: 'system',
+            contenu: `${leaveLabel} a quitté la session`
+          });
+          io.to(sessionRoomName(sessionId)).emit('new-message', buildMessagePayload(systemMessage));
+        }
+
         const participantsPayload = await getParticipantsPayload(sessionObjectId);
         io.to(sessionRoomName(sessionId)).emit('participant-update', participantsPayload);
 
@@ -799,6 +823,24 @@ module.exports = (io) => {
           { session_id: sessionObjectId },
           { $pull: { active_users: { user_id: userId } } }
         );
+
+        // Émettre un message système de déconnexion dans le chat
+        const chatRoom = await ChatRoom.findOne({ session_id: sessionObjectId });
+        if (chatRoom) {
+          const disconnectLabel = safeUserLabel(socket.user || {});
+          const systemMessage = await Message.create({
+            chat_room_id: chatRoom._id,
+            session_id: sessionObjectId,
+            user_id: userId,
+            user_info: {
+              nom: socket.user?.nom || 'Utilisateur',
+              prenom: socket.user?.prenom || ''
+            },
+            type: 'system',
+            contenu: `${disconnectLabel} s'est déconnecté`
+          });
+          io.to(sessionRoomName(socket.currentSessionId)).emit('new-message', buildMessagePayload(systemMessage));
+        }
 
         const participantsPayload = await getParticipantsPayload(sessionObjectId);
         io.to(sessionRoomName(socket.currentSessionId)).emit('participant-update', participantsPayload);

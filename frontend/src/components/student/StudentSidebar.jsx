@@ -9,6 +9,8 @@ import {
   LogOut,
 } from "lucide-react";
 import { cn } from "../../utils/cn";
+import logoSvg from "../../assets/logo.svg";
+import logoDarkSvg from "../../assets/logo-dark.svg";
 
 export default function StudentSidebar({ activeTab, onTabChange, onLogout }) {
   const navItems = [
@@ -22,10 +24,13 @@ export default function StudentSidebar({ activeTab, onTabChange, onLogout }) {
 
   return (
     <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-screen fixed top-0 left-0 z-10">
-      <div className="p-8">
-        <h1 className="font-display text-2xl font-black text-emerald-500 tracking-tight italic">
-          ACADEMIX
-        </h1>
+      <div className="p-6 pb-2">
+        <img src={logoSvg} alt="AcademiX" className="h-14 w-auto dark:hidden" />
+        <img
+          src={logoDarkSvg}
+          alt="AcademiX"
+          className="h-14 w-auto hidden dark:block"
+        />
       </div>
 
       <nav className="flex-1 px-4 space-y-2 mt-4">

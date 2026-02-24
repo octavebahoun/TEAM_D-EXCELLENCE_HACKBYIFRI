@@ -1,13 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 import { authService } from "../services/authService";
-import {
-  LayoutGrid,
-  Users,
-  Cpu,
-  MessageSquare,
-  LogOut,
-  Shield,
-} from "lucide-react";
+import { LayoutGrid, Users, MessageSquare, LogOut, Shield } from "lucide-react";
+import logoSvg from "../assets/logo.svg";
+import logoDarkSvg from "../assets/logo-dark.svg";
 
 const Navbar = () => {
   const location = useLocation();
@@ -24,11 +19,8 @@ const Navbar = () => {
   return (
     <nav className="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
       <div className="flex items-center gap-8">
-        <Link
-          to="/"
-          className="text-xl font-black text-indigo-500 tracking-tighter uppercase"
-        >
-          AcademiX
+        <Link to="/" className="flex items-center">
+          <img src={logoDarkSvg} alt="AcademiX" className="h-10 w-auto" />
         </Link>
 
         <div className="flex gap-2">
@@ -40,13 +32,6 @@ const Navbar = () => {
               <Shield size={16} /> Admin
             </Link>
           )}
-
-          <Link
-            to="/ai-tools"
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${location.pathname === "/ai-tools" ? "bg-indigo-600 text-white" : "text-slate-500 hover:text-slate-300"}`}
-          >
-            <Cpu size={16} /> IA Tools
-          </Link>
 
           <Link
             to="/chat"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Headphones,
@@ -12,6 +12,7 @@ import {
   Volume2,
   Sparkles,
   Wand2,
+  Download,
 } from "lucide-react";
 import { aiService } from "../../services/aiService";
 import { PYTHON_API_URL } from "../../api/client";
@@ -21,13 +22,17 @@ export default function PodcastTool() {
   const [loading, setLoading] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [podcastData, setPodcastData] = useState(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   const [audioUrl, setAudioUrl] = useState(null);
-  const audioRef = React.useRef(null);
+  const audioRef = useRef(null);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
     setAudioUrl(null);
+    setPodcastData(null);
   };
 
   const handleGenerate = async () => {
@@ -35,7 +40,9 @@ export default function PodcastTool() {
     setLoading(true);
     try {
       const response = await aiService.generatePodcast({ file });
-      setAudioUrl(`${PYTHON_API_URL}${response.url}`);
+      const fullAudioUrl = `${PYTHON_API_URL}${response.url}`;
+      setAudioUrl(fullAudioUrl);
+      setPodcastData(response);
       setIsGenerated(true);
     } catch (e) {
       alert("Erreur lors de la génération du podcast.");
@@ -55,6 +62,56 @@ export default function PodcastTool() {
     }
   };
 
+  // Mettre à jour la progression du lecteur audio
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const updateTime = () => setCurrentTime(audio.currentTime);
+    const updateDuration = () => setDuration(audio.duration);
+
+    audio.addEventListener("timeupdate", updateTime);
+    audio.addEventListener("loadedmetadata", updateDuration);
+
+    return () => {
+      audio.removeEventListener("timeupdate", updateTime);
+      audio.removeEventListener("loadedmetadata", updateDuration);
+    };
+  }, [audioUrl]);
+
+  const formatTime = (seconds) => {
+    if (!seconds || isNaN(seconds)) return "00:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  const handleDownload = async () => {
+    if (!audioUrl) return;
+    try {
+      // Récupérer le token pour le téléchargement authentifié
+      const token = localStorage.getItem("token");
+      const response = await fetch(audioUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `podcast_${file?.name?.split(".")[0] || "academix"}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      alert("Erreur lors du téléchargement.");
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-12">
       {!isGenerated ? (
@@ -69,6 +126,9 @@ export default function PodcastTool() {
             <h2 className="text-3xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">
               Transformez vos cours en Audio
             </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-3">
+              L'IA résume intelligemment votre cours, puis le convertit en podcast audio.
+            </p>
           </div>
 
           <div className="relative group">
@@ -104,11 +164,16 @@ export default function PodcastTool() {
             className="w-full bg-rose-600 text-white font-black text-xs uppercase tracking-[0.2em] py-5 rounded-2xl hover:bg-rose-700 transition-all disabled:opacity-50 shadow-xl flex items-center justify-center gap-3"
           >
             {loading ? (
-              <Loader2 size={18} className="animate-spin" />
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                Résumé IA en cours, puis conversion audio...
+              </>
             ) : (
-              <Wand2 size={18} />
+              <>
+                <Wand2 size={18} />
+                Générer mon Podcast IA
+              </>
             )}
-            Générer mon Podcast IA
           </button>
         </div>
       ) : (
@@ -143,27 +208,42 @@ export default function PodcastTool() {
               Podcast : {file?.name.split(".")[0]}
             </h2>
             <p className="text-rose-400 font-bold text-xs uppercase tracking-widest mb-12">
-              Généré par AcademiX AI • 12:45 min
+              Généré par AcademiX AI • {formatTime(duration)}
             </p>
 
             {/* Player Controls */}
             <div className="flex flex-col gap-10 w-full max-w-sm">
               {/* Progress */}
               <div className="space-y-4">
-                <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-2 bg-slate-800 rounded-full overflow-hidden cursor-pointer"
+                  onClick={(e) => {
+                    if (audioRef.current && duration > 0) {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const pos = (e.clientX - rect.left) / rect.width;
+                      audioRef.current.currentTime = pos * duration;
+                    }
+                  }}
+                >
                   <motion.div
-                    animate={{ width: isPlaying ? "45%" : "45%" }}
-                    className="h-full bg-gradient-to-r from-rose-500 to-orange-500"
+                    style={{ width: `${progressPercent}%` }}
+                    className="h-full bg-gradient-to-r from-rose-500 to-orange-500 transition-all duration-200"
                   />
                 </div>
                 <div className="flex justify-between text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                  <span>05:42</span>
-                  <span>12:45</span>
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{formatTime(duration)}</span>
                 </div>
               </div>
 
               <div className="flex items-center justify-center gap-8">
-                <button className="text-slate-500 hover:text-white transition-colors">
+                <button
+                  className="text-slate-500 hover:text-white transition-colors"
+                  onClick={() => {
+                    if (audioRef.current) {
+                      audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 10);
+                    }
+                  }}
+                >
                   <SkipBack size={32} />
                 </button>
                 <button
@@ -176,7 +256,14 @@ export default function PodcastTool() {
                     <Play size={40} fill="currentColor" className="ml-2" />
                   )}
                 </button>
-                <button className="text-slate-500 hover:text-white transition-colors">
+                <button
+                  className="text-slate-500 hover:text-white transition-colors"
+                  onClick={() => {
+                    if (audioRef.current) {
+                      audioRef.current.currentTime = Math.min(duration, audioRef.current.currentTime + 10);
+                    }
+                  }}
+                >
                   <SkipForward size={32} />
                 </button>
               </div>
@@ -198,15 +285,30 @@ export default function PodcastTool() {
               </div>
             </div>
 
-            <button
-              onClick={() => {
-                setIsGenerated(false);
-                setIsPlaying(false);
-              }}
-              className="mt-16 text-slate-500 hover:text-slate-300 text-[10px] font-black uppercase tracking-widest transition-colors"
-            >
-              Générer un autre podcast
-            </button>
+            {/* Action Buttons */}
+            <div className="mt-12 flex flex-col items-center gap-4 w-full max-w-sm">
+              {/* Download Button */}
+              <button
+                onClick={handleDownload}
+                className="w-full bg-gradient-to-r from-rose-500 to-orange-500 text-white font-black text-xs uppercase tracking-[0.15em] py-4 rounded-2xl hover:from-rose-600 hover:to-orange-600 transition-all shadow-lg flex items-center justify-center gap-3"
+              >
+                <Download size={18} />
+                Télécharger le podcast MP3
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsGenerated(false);
+                  setIsPlaying(false);
+                  setCurrentTime(0);
+                  setDuration(0);
+                  setPodcastData(null);
+                }}
+                className="mt-4 text-slate-500 hover:text-slate-300 text-[10px] font-black uppercase tracking-widest transition-colors"
+              >
+                Générer un autre podcast
+              </button>
+            </div>
           </div>
         </motion.div>
       )}

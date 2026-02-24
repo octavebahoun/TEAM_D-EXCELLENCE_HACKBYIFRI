@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../services/authService";
 import { Shield, ArrowRight, Eye, EyeOff, Moon, Sun } from "lucide-react";
 import loginIllustration from "../assets/login_illustration.png";
+import logoSvg from "../assets/logo.svg";
+import logoDarkSvg from "../assets/logo-dark.svg";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -83,11 +85,11 @@ const RegisterPage = () => {
           </div>
           <div className="text-center z-10 w-full max-w-sm">
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight transition-colors">
-              Manage AcademiX
+              Gérer AcademiX
             </h2>
             <p className="text-slate-500 dark:text-slate-400 font-medium transition-colors">
-              Create your administrative account to orchestrate the limits of
-              learning.
+              Créez votre compte administrateur pour orchestrer la gestion de
+              l'apprentissage.
             </p>
           </div>
         </div>
@@ -95,25 +97,25 @@ const RegisterPage = () => {
         {/* Colonne Gauche - Formulaire */}
         <div className="w-full md:w-1/2 p-8 lg:p-12 flex flex-col justify-center bg-white dark:bg-slate-900 relative transition-colors duration-300">
           <div className="max-w-md w-full mx-auto relative z-10">
-            {/* Logo */}
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
-                <span className="text-white font-bold text-xl leading-none">
-                  A
-                </span>
-              </div>
-              <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight transition-colors">
-                Academi
-                <span className="text-indigo-600 dark:text-indigo-400">X</span>
-              </span>
+              <img
+                src={logoSvg}
+                alt="AcademiX"
+                className="h-16 w-auto dark:hidden"
+              />
+              <img
+                src={logoDarkSvg}
+                alt="AcademiX"
+                className="h-16 w-auto hidden dark:block"
+              />
             </div>
 
             <div className="mb-8">
               <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">
-                Create an account
+                Créer un compte
               </h1>
               <p className="text-slate-500 dark:text-slate-400 text-sm transition-colors">
-                Fill in your information to set up a Super Admin profile.
+                Remplissez vos informations pour créer un profil Super Admin.
               </p>
             </div>
 

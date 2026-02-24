@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import logoSvg from "../assets/logo.svg";
+import logoDarkSvg from "../assets/logo-dark.svg";
 
 const sidebarItems = [
   { icon: "📊", label: "Vue d'ensemble", route: "/chef/dashboard" },
@@ -15,7 +17,14 @@ export default function Sidebar({ active, onLogout }) {
       transition={{ type: "spring", stiffness: 60 }}
       className="bg-(--sidebar-bg) text-(--sidebar-text) w-64 min-h-screen flex flex-col p-6 shadow-lg"
     >
-      <div className="font-bold text-2xl mb-8">ACADEMIX</div>
+      <div className="mb-8">
+        <img src={logoSvg} alt="AcademiX" className="h-14 w-auto dark:hidden" />
+        <img
+          src={logoDarkSvg}
+          alt="AcademiX"
+          className="h-14 w-auto hidden dark:block"
+        />
+      </div>
       <nav className="flex-1">
         {sidebarItems.map((item, idx) => (
           <motion.div

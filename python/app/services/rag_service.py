@@ -30,7 +30,7 @@ class RagService:
         for msg in history:
             if msg.role == "user" or msg.role == "human":
                 messages.append(HumanMessage(content=msg.content))
-            else:
+            elif msg.role in ("assistant", "ai"):
                 messages.append(AIMessage(content=msg.content))
                 
         messages.append(HumanMessage(content=question))

@@ -16,6 +16,8 @@ import {
 } from "../api/notifications";
 import sessionSocketService from "../services/sessionSocket";
 import { authService } from "../services/authService";
+import logoSvg from "../assets/logo.svg";
+import logoDarkSvg from "../assets/logo-dark.svg";
 
 const AUTH_USER = authService.getCurrentUser();
 const CURRENT_USER = {
@@ -707,8 +709,17 @@ const ChatPage = ({ session, onLeave }) => {
 
       {/* Tête de contrôle */}
       <header className="relative z-50 w-full px-8 py-4 flex justify-between items-center bg-transparent">
-        <div className="text-xl font-black italic uppercase tracking-tighter text-emerald-500">
-          ACADEMIX
+        <div>
+          <img
+            src={logoSvg}
+            alt="AcademiX"
+            className="h-10 w-auto dark:hidden"
+          />
+          <img
+            src={logoDarkSvg}
+            alt="AcademiX"
+            className="h-10 w-auto hidden dark:block"
+          />
         </div>
         <div className="flex gap-4">
           <button

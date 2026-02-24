@@ -5,7 +5,7 @@ import os
 import base64
 import uuid
 import requests
-from fastapi import APIRouter, Query, Depends
+from fastapi import APIRouter, Query, Depends, HTTPException
 from fastapi.responses import FileResponse
 from app.core.config import settings
 from app.api.dependencies import get_current_user
@@ -24,7 +24,7 @@ async def generate_image(
     """Génère une image via OpenRouter + Gemini 2.5 Flash Image Preview."""
     api_key = settings.OPENROUTER_API_KEY
     if not api_key:
-        return {"error": "OPENROUTER_API_KEY non définie dans .env"}
+        raise HTTPException(status_code=503, detail="OPENROUTER_API_KEY non définie dans .env")
 
     response = requests.post(
         url="https://openrouter.ai/api/v1/chat/completions",
@@ -46,19 +46,22 @@ async def generate_image(
     )
 
     if response.status_code != 200:
-        return {"error": f"Erreur OpenRouter ({response.status_code})", "detail": response.text}
+        raise HTTPException(
+            status_code=502,
+            detail=f"Erreur OpenRouter ({response.status_code}): {response.text[:500]}"
+        )
 
     data = response.json()
 
     choices = data.get("choices", [])
     if not choices:
-        return {"error": "Pas de réponse du modèle", "raw": data}
+        raise HTTPException(status_code=502, detail="Pas de réponse du modèle")
 
     message = choices[0].get("message", {})
     content = message.get("content", [])
 
     if isinstance(content, str):
-        return {"message": "Réponse texte uniquement", "text": content, "raw": data}
+        return {"message": "Réponse texte uniquement", "text": content}
 
     image_id = str(uuid.uuid4())
     text_parts = []
@@ -88,7 +91,6 @@ async def generate_image(
     return {
         "message": "Pas d'image trouvée dans la réponse",
         "text": "\n".join(text_parts) if text_parts else None,
-        "raw": data,
     }
 
 
@@ -97,5 +99,5 @@ async def download_image(filename: str, current_user: dict = Depends(get_current
     """Télécharge une image générée."""
     file_path = os.path.join(OUTPUT_DIR, filename)
     if not os.path.exists(file_path):
-        return {"error": "Image introuvable"}
+        raise HTTPException(status_code=404, detail="Image introuvable")
     return FileResponse(file_path, media_type="image/png")

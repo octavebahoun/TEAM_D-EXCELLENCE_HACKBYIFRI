@@ -10,7 +10,7 @@ import RegisterPage from "./pages/RegisterPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import ChefDashboard from "./pages/ChefDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
-import AIToolsPage from "./pages/AIToolsPage";
+
 import ChatPage from "./pages/ChatPage";
 import SessionsFeedPage from "./pages/SessionsFeedPage";
 import { authService } from "./services/authService";
@@ -95,15 +95,6 @@ function AppContent() {
         />
 
         <Route
-          path="/ai-tools"
-          element={
-            <PrivateRoute>
-              <AIToolsPage />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
           path="/chat"
           element={
             <PrivateRoute>
@@ -129,7 +120,7 @@ const HomeLoader = () => {
   if (role === "super_admin") return <Navigate to="/admin" />;
   if (role === "chef_departement") return <Navigate to="/chef" />;
   if (role === "student") return <Navigate to="/etudiant" />;
-  return <Navigate to="/ai-tools" />;
+  return <Navigate to="/login" />;
 };
 
 export default function App() {

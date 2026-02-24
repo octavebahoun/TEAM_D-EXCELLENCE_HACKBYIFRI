@@ -124,7 +124,7 @@ JSON DU QUIZ:"""
         
         # 4. Générer le quiz
         chain = prompt | llm | StrOutputParser()
-        raw_response = chain.invoke({"document_content": document_text})
+        raw_response = await chain.ainvoke({"document_content": document_text})
         
         # 5. Parser le JSON de la réponse
         quiz_data = self._parse_quiz_json(raw_response)

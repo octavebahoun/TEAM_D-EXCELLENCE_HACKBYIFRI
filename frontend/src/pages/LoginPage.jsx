@@ -12,6 +12,8 @@ import {
   Sun,
 } from "lucide-react";
 import loginIllustration from "../assets/login_illustration.png";
+import logoSvg from "../assets/logo.svg";
+import logoDarkSvg from "../assets/logo-dark.svg";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("octave@gmail.com");
@@ -91,11 +93,11 @@ const LoginPage = () => {
           </div>
           <div className="text-center z-10 w-full max-w-sm">
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight transition-colors">
-              Learn without limits
+              Apprenez sans limites
             </h2>
             <p className="text-slate-500 dark:text-slate-400 font-medium transition-colors">
-              Join a community of students achieving their academic goals
-              together.
+              Rejoignez une communauté d'étudiants qui atteignent leurs
+              objectifs académiques ensemble.
             </p>
           </div>
         </div>
@@ -105,23 +107,24 @@ const LoginPage = () => {
           <div className="max-w-md w-full mx-auto">
             {/* Logo */}
             <div className="flex items-center justify-center gap-3 mb-10">
-              <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
-                <span className="text-white font-bold text-xl leading-none">
-                  A
-                </span>
-              </div>
-              <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight transition-colors">
-                Academi
-                <span className="text-indigo-600 dark:text-indigo-400">X</span>
-              </span>
+              <img
+                src={logoSvg}
+                alt="AcademiX"
+                className="h-16 w-auto dark:hidden"
+              />
+              <img
+                src={logoDarkSvg}
+                alt="AcademiX"
+                className="h-16 w-auto hidden dark:block"
+              />
             </div>
 
             <div className="text-center mb-10">
               <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">
-                Welcome back !
+                Bon retour !
               </h1>
               <p className="text-slate-500 dark:text-slate-400 text-sm transition-colors">
-                Please enter your details to sign in.
+                Veuillez entrer vos identifiants pour vous connecter.
               </p>
             </div>
 
@@ -194,7 +197,7 @@ const LoginPage = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl pl-11 pr-12 py-3.5 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-400/10 transition-all font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600 placeholder:font-normal"
-                    placeholder="Enter your password"
+                    placeholder="Entrez votre mot de passe"
                     required
                   />
                   <button

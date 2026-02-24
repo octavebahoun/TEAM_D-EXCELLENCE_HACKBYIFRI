@@ -6,6 +6,7 @@ from typing import Optional
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+import re
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from app.core.config import settings
 
@@ -134,7 +135,7 @@ GÉNÈRE LA FICHE DE RÉVISION:
         chain = prompt | llm | StrOutputParser()
         
         # 5. Générer la fiche
-        summary_content = chain.invoke({"document_content": document_text})
+        summary_content = await chain.ainvoke({"document_content": document_text})
         
         # 6. Extraire les métadonnées
         title = self._extract_title(summary_content)
@@ -202,7 +203,6 @@ GÉNÈRE LA FICHE DE RÉVISION:
                 if line.startswith("#"):  # Nouvelle section
                     break
                 # Extraire les mots entre backticks
-                import re
                 found = re.findall(r'`([^`]+)`', line)
                 keywords.extend(found)
         
