@@ -35,8 +35,8 @@ Vous pouvez tester l'application directement en ligne. Nous avons mis en place *
 ### 3️⃣ Flux Étudiant
 
 - **Lien de connexion** : [https://team-d-excellence-hackbyifri-2026.vercel.app/login](https://team-d-excellence-hackbyifri-2026.vercel.app/login)
-- **Identifiant** : `ETU001`
-- **Mot de passe** : `ETU001`
+- **Identifiant** : `ETU002`
+- **Mot de passe** : `ETU002`
   _(Ce flux donne l'accès au tableau de bord de l'étudiant, avec ses notes, son emploi du temps et les modules d'Intelligence Artificielle.)_
 
   https://github.com/user-attachments/assets/b5c4a33e-2e9b-41ad-b384-f3311012edd5
