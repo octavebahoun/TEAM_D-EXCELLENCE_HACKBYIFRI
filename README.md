@@ -1,6 +1,9 @@
 # 🚀 AcademiX Platform
 
-Plateforme académique intelligente avec IA générative pour gérer et optimiser la vie des établissements scolaires, des formateurs et des étudiants.
+AcademiX est une plateforme académique tout-en-un qui combine organisation intelligente, intelligence artificielle générative et collaboration sociale pour maximiser les chances de réussite académique des étudiants avec une faible ingérence administrative .
+Comment la solution répond au problème
+
+Notre vision : Devenir l'assistant académique indispensable de chaque étudiant en combinant les forces de l'IA générative, de l'analyse prédictive et de la collaboration sociale.
 
 ## 🌟 Démonstration en Ligne (Déploiement)
 
