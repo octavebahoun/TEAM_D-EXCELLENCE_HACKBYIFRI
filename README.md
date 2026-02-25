@@ -15,7 +15,11 @@ AcademiX est une plateforme académique tout-en-un qui combine organisation inte
 ##Présentation de notre Solution
 **Video de présentation de la solution**:
 
-https://github.com/user-attachments/assets/605575f4-60c2-4e1d-841c-1c5e182d0db6
+
+https://github.com/user-attachments/assets/5d93a74d-a360-4b94-b417-9fd0572b75d1
+
+
+
 - **Lien de la video** : https://drive.google.com/file/d/1v_0wWAZrGHXexBTI-7_gWSbs9kTB-yby/view?usp=sharing
 
 
