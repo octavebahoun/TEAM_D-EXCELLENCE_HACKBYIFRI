@@ -1,5 +1,3 @@
-
-https://github.com/user-attachments/assets/5d52b0b9-f747-48f3-8241-776be3f248c5
 <div align="center">
   <h1>🚀 AcademiX Platform</h1>
   <p><em>L'assistant académique indispensable propulsé par l'IA</em></p>
