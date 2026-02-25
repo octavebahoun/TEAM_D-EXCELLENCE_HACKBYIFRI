@@ -11,6 +11,16 @@ AcademiX est une plateforme académique tout-en-un qui combine organisation inte
 
 **Notre solution AcademiX :** Devenir l'assistant académique indispensable de chaque étudiant en combinant les forces de l'IA générative, de l'analyse prédictive et de la collaboration sociale.
 
+
+##Présentation de notre Solution
+**Video de présentation de la solution**:
+
+https://github.com/user-attachments/assets/605575f4-60c2-4e1d-841c-1c5e182d0db6
+- **Lien de connexion** : https://drive.google.com/file/d/1v_0wWAZrGHXexBTI-7_gWSbs9kTB-yby/view?usp=sharing
+
+
+
+
 ## 🌟 Démonstration en Ligne (Déploiement)
 
 Vous pouvez tester l'application directement en ligne. Nous avons mis en place **trois parcours (flux)** accessibles via le lien de connexion principal :
@@ -55,15 +65,23 @@ AcademiX intègre de puissants outils d'Intelligence Artificielle et de collabor
 
 Depuis l'espace AI Revision, l'étudiant peut sélectionner ses propres modules et cours pour générer du contenu pédagogique avancé et sur mesure.
 
+https://github.com/user-attachments/assets/e8252865-554e-44ed-8b85-dad4d6351c2b
+
 - **📄 Génération de Résumés (Smart Summary)** : Synthétisez instantanément de longs cours en fiches de révision structurées, mettant en évidence les concepts clés et formules importantes.
 - **🎙️ Création de Podcasts (Audio Learning)** : Générez des podcasts audio immersifs à partir de vos notes de cours (générés grâce à un modèle d'IA Text-To-Speech) pour réviser "les mains libres" dans les transports ou pendant le sport.
 - **✅ Génération de Quiz (Smart Testing)** : Testez vos connaissances et préparez vos examens grâce à la génération automatique de QCM pertinents basés sur le contexte précis de vos supports de cours.
 - **📝 Exercices d'Application** : L'IA analyse votre cours et génère des exercices pratiques inédits accompagnés de leurs corrigés détaillés étape par étape.
 - **👨‍🏫 Professeur IA** : Posez des questions directement à notre assistant IA spécialisé, qui agit comme votre tuteur personnel, et obtenez des réponses basées uniquement sur le contenu de votre base de connaissance validée.
 
+
+
+
 ### 🤝 Sessions Collaboratives en Temps Réel
 
 L'apprentissage n'est plus solitaire. Depuis l'onglet Sessions Collaboratives, les étudiants rejoignent des "salles d'étude virtuelles" connectées en direct par WebSocket :
+
+https://github.com/user-attachments/assets/da420c7b-e3dd-4847-bffb-a0fc7175dc6a
+
 
 - **💬 Chat de Groupe Temps Réel** : Discutez instantanément avec vos camarades connectés dans la même session de travail pour vous entraider.
 - **✏️ Tableau Blanc Partagé (Whiteboard)** : Dessinez des schémas, tracez des graphes ou expliquez visuellement des concepts à distance ; tous les participants voient les traits se dessiner en temps réel (synchronisation bidirectionnelle très basse latence).
