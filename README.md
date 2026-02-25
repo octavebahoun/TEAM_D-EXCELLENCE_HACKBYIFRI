@@ -277,7 +277,7 @@ Lors du hackathon, nous avons surmonté plusieurs défis majeurs :
 ## 👥 Équipe "Team D'excellence"
 
 - **Hanna BIAOU** - Frontend & Designer(React)
-- **Mourchid FOLARIN** - Backend (Laravel)
+- **Mourchid FOLARIN** - Backend (Laravel + Mysql)
 - **Octave BAHOUN-HOUTOUKPE** - Fullstack (Node.js + Python IA)
 
 ---
