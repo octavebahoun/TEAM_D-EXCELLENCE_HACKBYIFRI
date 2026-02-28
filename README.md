@@ -11,6 +11,20 @@ AcademiX est une plateforme académique tout-en-un qui combine organisation inte
 
 **Notre solution AcademiX :** Devenir l'assistant académique indispensable de chaque étudiant en combinant les forces de l'IA générative, de l'analyse prédictive et de la collaboration sociale.
 
+
+##Présentation de notre Solution
+**Video de présentation de la solution**:
+
+
+https://github.com/user-attachments/assets/5d93a74d-a360-4b94-b417-9fd0572b75d1
+
+
+
+- **Lien de la video** : https://drive.google.com/file/d/1v_0wWAZrGHXexBTI-7_gWSbs9kTB-yby/view?usp=sharing
+
+
+
+
 ## 🌟 Démonstration en Ligne (Déploiement)
 
 Vous pouvez tester l'application directement en ligne. Nous avons mis en place **trois parcours (flux)** accessibles via le lien de connexion principal :
@@ -22,8 +36,7 @@ Vous pouvez tester l'application directement en ligne. Nous avons mis en place *
 - **Mot de passe** : `admin2026`
   _(Ce flux permet la gestion globale de l'établissement: départements, configurations système, etc.)_
 
-  _🎬 Aperçu vidéo du parcours :_
-  https://github.com/user-attachments/assets/02cf5b8d-6dbd-422a-b796-31fe51bf401f
+https://github.com/user-attachments/assets/02cf5b8d-6dbd-422a-b796-31fe51bf401f
 
 ### 2️⃣ Flux Chef de Département
 
@@ -32,8 +45,7 @@ Vous pouvez tester l'application directement en ligne. Nous avons mis en place *
 - **Mot de passe** : `mourchid2026`
   _(Ce flux permet l'import et la gestion des étudiants d'une filière, ainsi que l'assignation des notes et emplois du temps.)_
 
-  _🎬 Aperçu vidéo du parcours :_
-  https://github.com/user-attachments/assets/2bca6ac0-dc22-40e8-a51d-d1c8c023d3f0
+https://github.com/user-attachments/assets/2bca6ac0-dc22-40e8-a51d-d1c8c023d3f0
 
 ### 3️⃣ Flux Étudiant
 
@@ -42,8 +54,7 @@ Vous pouvez tester l'application directement en ligne. Nous avons mis en place *
 - **Mot de passe** : `ETU002`
   _(Ce flux donne l'accès au tableau de bord de l'étudiant, avec ses notes, son emploi du temps et les modules d'Intelligence Artificielle.)_
 
-  _🎬 Aperçu vidéo du parcours :_
-  https://github.com/user-attachments/assets/b5c4a33e-2e9b-41ad-b384-f3311012edd5
+https://github.com/user-attachments/assets/b5c4a33e-2e9b-41ad-b384-f3311012edd5
 
 ---
 
@@ -55,15 +66,23 @@ AcademiX intègre de puissants outils d'Intelligence Artificielle et de collabor
 
 Depuis l'espace AI Revision, l'étudiant peut sélectionner ses propres modules et cours pour générer du contenu pédagogique avancé et sur mesure.
 
+https://github.com/user-attachments/assets/e8252865-554e-44ed-8b85-dad4d6351c2b
+
 - **📄 Génération de Résumés (Smart Summary)** : Synthétisez instantanément de longs cours en fiches de révision structurées, mettant en évidence les concepts clés et formules importantes.
 - **🎙️ Création de Podcasts (Audio Learning)** : Générez des podcasts audio immersifs à partir de vos notes de cours (générés grâce à un modèle d'IA Text-To-Speech) pour réviser "les mains libres" dans les transports ou pendant le sport.
 - **✅ Génération de Quiz (Smart Testing)** : Testez vos connaissances et préparez vos examens grâce à la génération automatique de QCM pertinents basés sur le contexte précis de vos supports de cours.
 - **📝 Exercices d'Application** : L'IA analyse votre cours et génère des exercices pratiques inédits accompagnés de leurs corrigés détaillés étape par étape.
 - **👨‍🏫 Professeur IA** : Posez des questions directement à notre assistant IA spécialisé, qui agit comme votre tuteur personnel, et obtenez des réponses basées uniquement sur le contenu de votre base de connaissance validée.
 
+
+
+
 ### 🤝 Sessions Collaboratives en Temps Réel
 
 L'apprentissage n'est plus solitaire. Depuis l'onglet Sessions Collaboratives, les étudiants rejoignent des "salles d'étude virtuelles" connectées en direct par WebSocket :
+
+https://github.com/user-attachments/assets/da420c7b-e3dd-4847-bffb-a0fc7175dc6a
+
 
 - **💬 Chat de Groupe Temps Réel** : Discutez instantanément avec vos camarades connectés dans la même session de travail pour vous entraider.
 - **✏️ Tableau Blanc Partagé (Whiteboard)** : Dessinez des schémas, tracez des graphes ou expliquez visuellement des concepts à distance ; tous les participants voient les traits se dessiner en temps réel (synchronisation bidirectionnelle très basse latence).
@@ -258,7 +277,7 @@ Lors du hackathon, nous avons surmonté plusieurs défis majeurs :
 ## 👥 Équipe "Team D'excellence"
 
 - **Hanna BIAOU** - Frontend & Designer(React)
-- **Mourchid FOLARIN** - Backend (Laravel)
+- **Mourchid FOLARIN** - Backend (Laravel + Mysql)
 - **Octave BAHOUN-HOUTOUKPE** - Fullstack (Node.js + Python IA)
 
 ---
