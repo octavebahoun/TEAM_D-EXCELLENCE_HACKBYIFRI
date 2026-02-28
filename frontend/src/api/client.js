@@ -40,9 +40,6 @@ const laravelApiClient = axios.create({
  */
 const pythonApiClient = axios.create({
     baseURL: PYTHON_API_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
 });
 
 // Fonction pour configurer les intercepteurs sur un client donné

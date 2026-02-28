@@ -71,33 +71,11 @@ const RegisterPage = () => {
         {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
       </button>
 
-      <div className="max-w-6xl w-full bg-white dark:bg-slate-900 rounded-[2rem] shadow-xl overflow-hidden flex flex-col md:flex-row min-h-[600px] flex-row-reverse border border-transparent dark:border-slate-800 transition-colors duration-300">
-        {/* Colonne Droite - Image et Texte (Inversé pour le registre) */}
-        <div className="w-full md:w-1/2 bg-blue-50/50 dark:bg-slate-950/50 p-8 lg:p-12 flex flex-col items-center justify-center relative border-l border-slate-100 dark:border-slate-800 transition-colors duration-300">
-          <div className="w-full max-w-md aspect-square bg-emerald-50 dark:bg-emerald-900/10 rounded-[3rem] overflow-hidden mb-8 p-4 flex items-center justify-center shadow-inner transition-colors duration-300">
-            <div className="w-full h-full bg-white/50 dark:bg-slate-900/50 rounded-[2rem] border-2 border-dashed border-emerald-200 dark:border-emerald-800/30 flex items-center justify-center relative overflow-hidden backdrop-blur-sm transition-colors duration-300">
-              <img
-                src={loginIllustration}
-                alt="Welcome abstract illustration"
-                className="absolute inset-0 w-full h-full object-cover dark:opacity-80 transition-opacity"
-              />
-            </div>
-          </div>
-          <div className="text-center z-10 w-full max-w-sm">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight transition-colors">
-              Gérer AcademiX
-            </h2>
-            <p className="text-slate-500 dark:text-slate-400 font-medium transition-colors">
-              Créez votre compte administrateur pour orchestrer la gestion de
-              l'apprentissage.
-            </p>
-          </div>
-        </div>
-
-        {/* Colonne Gauche - Formulaire */}
-        <div className="w-full md:w-1/2 p-8 lg:p-12 flex flex-col justify-center bg-white dark:bg-slate-900 relative transition-colors duration-300">
+      <div className="max-w-6xl w-full bg-white dark:bg-slate-900 rounded-[2rem] shadow-xl overflow-hidden flex flex-col-reverse md:flex-row min-h-[600px] border border-transparent dark:border-slate-800 transition-colors duration-300">
+        {/* Colonne Formulaire (mobile d'abord) */}
+        <div className="w-full md:w-1/2 p-4 sm:p-8 lg:p-12 flex flex-col justify-center bg-white dark:bg-slate-900 relative transition-colors duration-300">
           <div className="max-w-md w-full mx-auto relative z-10">
-            <div className="flex items-center gap-3 mb-8">
+            <div className="flex items-center gap-3 mb-8 justify-center md:justify-start">
               <img
                 src={logoSvg}
                 alt="AcademiX"
@@ -110,7 +88,7 @@ const RegisterPage = () => {
               />
             </div>
 
-            <div className="mb-8">
+            <div className="mb-8 text-center md:text-left">
               <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">
                 Créer un compte
               </h1>
@@ -126,7 +104,7 @@ const RegisterPage = () => {
             )}
 
             <form onSubmit={handleRegister} className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 transition-colors">
                     Nom
@@ -172,7 +150,7 @@ const RegisterPage = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="relative">
                   <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 transition-colors">
                     Mot de passe
@@ -253,6 +231,28 @@ const RegisterPage = () => {
                 .
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Colonne Illustration (mobile d'abord) */}
+        <div className="w-full md:w-1/2 bg-blue-50/50 dark:bg-slate-950/50 p-4 sm:p-8 lg:p-12 flex flex-col items-center justify-center relative border-l border-slate-100 dark:border-slate-800 transition-colors duration-300">
+          <div className="w-full max-w-md aspect-square bg-emerald-50 dark:bg-emerald-900/10 rounded-[3rem] overflow-hidden mb-8 p-4 flex items-center justify-center shadow-inner transition-colors duration-300">
+            <div className="w-full h-full bg-white/50 dark:bg-slate-900/50 rounded-[2rem] border-2 border-dashed border-emerald-200 dark:border-emerald-800/30 flex items-center justify-center relative overflow-hidden backdrop-blur-sm transition-colors duration-300">
+              <img
+                src={loginIllustration}
+                alt="Welcome abstract illustration"
+                className="absolute inset-0 w-full h-full object-cover dark:opacity-80 transition-opacity"
+              />
+            </div>
+          </div>
+          <div className="text-center z-10 w-full max-w-sm">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight transition-colors">
+              Gérer AcademiX
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 font-medium transition-colors">
+              Créez votre compte administrateur pour orchestrer la gestion de
+              l'apprentissage.
+            </p>
           </div>
         </div>
       </div>
