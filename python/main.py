@@ -6,6 +6,7 @@ from app.api.quiz_routes import router as quiz_router
 from app.api.exercise_routes import router as exercise_router
 from app.api.image_routes import router as image_router
 from app.api.podcast_routes import router as podcast_router
+from app.api.history_routes import router as history_router
 from app.core.config import settings
 
 # Création de l'application FastAPI
@@ -15,11 +16,12 @@ app = FastAPI(
     description="Backend Academix - Intelligence Artificielle Éducative"
 )
 
-# Configuration CORS (Indispensable pour que le Frontend puisse parler à l'API)
-# allow_origins=["*"] permet à tout le monde de se connecter (Utile en mode dev/hackathon)
+# Configuration CORS
+# Les origines sont lues depuis ALLOWED_ORIGINS dans .env (virgule-séparées).
+# IMPORTANT : allow_origins=["*"] est incompatible avec allow_credentials=True (rejeté par les navigateurs).
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.allowed_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,6 +33,7 @@ app.include_router(quiz_router, prefix="/api/v1/quiz", tags=["Quiz Service"])
 app.include_router(exercise_router, prefix="/api/v1/exercises", tags=["Exercise Service"])
 app.include_router(image_router, prefix="/api/v1/image", tags=["Image Generation"])
 app.include_router(podcast_router, prefix="/api/v1/podcast", tags=["Podcast Service"])
+app.include_router(history_router, prefix="/api/v1/history", tags=["History"])
 
 @app.get("/")
 def root():

@@ -23,4 +23,10 @@ return [
         ],
     ],
 
+    // Serveur Node.js — webhook interne pour les alertes temps réel
+    'node' => [
+        'url' => env('NODE_BACKEND_URL', 'http://localhost:3001'),
+        'webhook_secret' => env('WEBHOOK_SECRET', ''),
+    ],
+
 ];

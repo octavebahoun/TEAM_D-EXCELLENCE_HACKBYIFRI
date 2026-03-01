@@ -6,6 +6,7 @@ from app.core.config import settings
 from app.services.text_summarizer import text_summarizer
 from app.models.schemas import SummaryRequest, SummaryResponse, SummaryLevel, SummaryStyle, SummaryFormat
 from app.api.dependencies import get_current_user
+from app.services import history_service
 
 router = APIRouter()
 
@@ -60,6 +61,19 @@ async def generate_summary_endpoint(
         # Nettoyage du fichier temporaire
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
+        
+        # Sauvegarde dans l'historique
+        try:
+            history_service.save(
+                user_id=current_user["id"],
+                service_type="summary",
+                filename=file.filename,
+                matiere=matiere,
+                result_id=result["summary_id"],
+                meta={"title": result.get("title"), "level": level.value, "style": style.value, "word_count": result.get("word_count")},
+            )
+        except Exception:
+            pass  # L'historique ne bloque pas la réponse
         
         return SummaryResponse(**result)
         

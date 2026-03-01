@@ -8,6 +8,7 @@ from app.models.schemas import (
     QuizCorrectionRequest, CorrectionResponse
 )
 from app.api.dependencies import get_current_user
+from app.services import history_service
 
 router = APIRouter()
 
@@ -58,6 +59,19 @@ async def generate_quiz_endpoint(
         # Nettoyage
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
+        
+        # Sauvegarde dans l'historique
+        try:
+            history_service.save(
+                user_id=current_user["id"],
+                service_type="quiz",
+                filename=file.filename,
+                matiere=matiere,
+                result_id=result["quiz_id"],
+                meta={"title": result.get("title"), "nb_questions": result.get("total_questions", nb_questions), "difficulty": difficulty.value},
+            )
+        except Exception:
+            pass
         
         return QuizResponse(**result)
         

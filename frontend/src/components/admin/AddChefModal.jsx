@@ -85,10 +85,10 @@ export default function AddChefModal({ isOpen, onClose, onSuccess }) {
             <div className="p-8 pb-4 flex justify-between items-center">
               <div>
                 <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                  Assigner un Chef
+                  Assigner un Chef de département
                 </h3>
                 <p className="text-xs font-bold text-emerald-500 uppercase tracking-widest mt-1">
-                  Gestion des responsables de département
+                  Gestion des Chefs de départements
                 </p>
               </div>
               <button

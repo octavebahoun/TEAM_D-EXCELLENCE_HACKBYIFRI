@@ -9,6 +9,7 @@ from fastapi import APIRouter, Query, Depends, HTTPException
 from fastapi.responses import FileResponse
 from app.core.config import settings
 from app.api.dependencies import get_current_user
+from app.services import history_service
 
 router = APIRouter()
 
@@ -77,7 +78,7 @@ async def generate_image(
                     file_path = os.path.join(OUTPUT_DIR, f"{image_id}.{ext}")
                     with open(file_path, "wb") as f:
                         f.write(img_bytes)
-                    return {
+                    img_data = {
                         "image_id": image_id,
                         "prompt": prompt,
                         "image_url": f"/api/v1/image/download/{image_id}.{ext}",
@@ -85,6 +86,18 @@ async def generate_image(
                         "format": ext,
                         "text": "\n".join(text_parts) if text_parts else None,
                     }
+                    try:
+                        history_service.save(
+                            user_id=current_user["id"],
+                            service_type="image",
+                            filename=None,
+                            matiere=None,
+                            result_id=image_id,
+                            meta={"prompt": prompt[:200], "image_url": img_data["image_url"], "format": ext},
+                        )
+                    except Exception:
+                        pass
+                    return img_data
             elif part.get("type") == "text":
                 text_parts.append(part.get("text", ""))
 

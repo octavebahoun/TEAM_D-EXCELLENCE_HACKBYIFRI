@@ -62,7 +62,16 @@ function AppContent() {
       <Routes>
         {/* Routes publiques */}
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+
+        {/* Création d'un compte Admin — réservé à un Super Admin connecté */}
+        <Route
+          path="/register"
+          element={
+            <PrivateRoute allowedRoles={["super_admin"]}>
+              <RegisterPage />
+            </PrivateRoute>
+          }
+        />
 
         {/* Dashboard Super Admin */}
         <Route

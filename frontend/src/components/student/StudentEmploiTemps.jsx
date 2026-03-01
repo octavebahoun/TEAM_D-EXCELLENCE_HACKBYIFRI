@@ -9,20 +9,20 @@ const DAYS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 
 const TYPE_STYLES = {
   CM: {
-    card: "border-l-4 border-blue-400 bg-blue-50/80 dark:bg-blue-500/10",
+    card: " border-blue-400 bg-blue-50/80 dark:bg-blue-500/10",
     badge: "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300",
     dot: "bg-blue-400",
     icon: "text-blue-500",
   },
   TD: {
-    card: "border-l-4 border-emerald-400 bg-emerald-50/80 dark:bg-emerald-500/10",
+    card: " border-emerald-400 bg-emerald-50/80 dark:bg-emerald-500/10",
     badge:
       "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300",
     dot: "bg-emerald-400",
     icon: "text-emerald-500",
   },
   TP: {
-    card: "border-l-4 border-violet-400 bg-violet-50/80 dark:bg-violet-500/10",
+    card: " border-violet-400 bg-violet-50/80 dark:bg-violet-500/10",
     badge:
       "bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300",
     dot: "bg-violet-400",
@@ -31,7 +31,7 @@ const TYPE_STYLES = {
 };
 
 const DEFAULT_STYLE = {
-  card: "border-l-4 border-slate-300 bg-slate-50 dark:bg-slate-800/50",
+  card: " border-slate-300 bg-slate-50 dark:bg-slate-800/50",
   badge: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
   dot: "bg-slate-400",
   icon: "text-slate-400",

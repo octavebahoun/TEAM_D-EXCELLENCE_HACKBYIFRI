@@ -17,7 +17,7 @@ use App\Http\Controllers\Api\ChefDepartementController;
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
 
-        Route::post('admin/register', [AuthController::class, 'adminRegister']);
+        Route::post('admin/register', [AuthController::class, 'adminRegister'])->middleware(['auth:sanctum', 'super.admin']);
         Route::post('admin/login', [AuthController::class, 'adminLogin']);
         Route::post('admin/logout', [AuthController::class, 'adminLogout'])->middleware('auth:sanctum');
 
@@ -71,8 +71,7 @@ Route::prefix('v1')->group(function () {
             'update' => 'admin.notes.update',
             'destroy' => 'admin.notes.destroy'
         ]);
-        Route::apiResource('emploi-temps', EmploiTempsController::class)->names([
-            'index' => 'admin.emploi-temps.index',
+        Route::apiResource('emploi-temps', EmploiTempsController::class)->except(['index'])->names([
             'store' => 'admin.emploi-temps.store',
             'show' => 'admin.emploi-temps.show',
             'update' => 'admin.emploi-temps.update',
@@ -123,8 +122,7 @@ Route::prefix('v1')->group(function () {
             'update' => 'departement.notes.update',
             'destroy' => 'departement.notes.destroy'
         ]);
-        Route::apiResource('emploi-temps', EmploiTempsController::class)->names([
-            'index' => 'departement.emploi-temps.index',
+        Route::apiResource('emploi-temps', EmploiTempsController::class)->except(['index'])->names([
             'store' => 'departement.emploi-temps.store',
             'show' => 'departement.emploi-temps.show',
             'update' => 'departement.emploi-temps.update',

@@ -22,6 +22,7 @@ const privateMessagesRoutes = require('./routes/privateMessages');
 const sessionsRoutes = require('./routes/sessions');
 const chatRoutes = require('./routes/chat');
 const notificationsRoutes = require('./routes/notifications');
+const webhookRoutes = require('./routes/webhook');
 
 // Import des services Socket.io
 const privateMessageSocket = require('./services/privateMessageSocket');
@@ -154,6 +155,7 @@ app.use('/api/messages', privateMessagesRoutes);
 app.use('/api/sessions', sessionsRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/notifications', notificationsRoutes);
+app.use('/api/webhook', webhookRoutes); // Webhook interne Laravel → Node.js
 
 // Initialisation des services Socket.io
 privateMessageSocket(io);

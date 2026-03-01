@@ -28,11 +28,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import loginIllustration from "../assets/login_illustration.png";
 import logoSvg from "../assets/logo.svg";
@@ -137,10 +133,9 @@ const LoginPage = () => {
         className="w-full max-w-6xl relative z-10"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0 bg-white/70 dark:bg-slate-900/80 backdrop-blur-2xl shadow-2xl rounded-[2.5rem] overflow-hidden border border-white/20 dark:border-slate-800 transition-colors duration-300">
-          
           {/* Left Column: Illustration */}
           <div className="hidden md:flex flex-col items-center justify-center p-12 bg-slate-50/50 dark:bg-slate-950/20 border-r border-slate-100 dark:border-slate-800/50 transition-colors duration-300">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -155,31 +150,37 @@ const LoginPage = () => {
                 />
               </div>
               {/* Floating badges */}
-              <motion.div 
+              <motion.div
                 animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-4 -right-4 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700"
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute -top-6 -right-4 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700"
               >
                 <Shield className="text-primary h-6 w-6" />
               </motion.div>
-              <motion.div 
+              <motion.div
                 animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
                 className="absolute -bottom-6 -left-6 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700"
               >
                 <User className="text-emerald-500 h-6 w-6" />
               </motion.div>
             </motion.div>
-            
-            <motion.div 
-              variants={itemVariants}
-              className="mt-12 text-center"
-            >
+
+            <motion.div variants={itemVariants} className="mt-12 text-center">
               <h2 className="text-3xl font-display font-bold text-slate-900 dark:text-white mb-4 transition-colors">
                 L'excellence à portée de main
               </h2>
               <p className="text-slate-500 dark:text-slate-400 font-medium max-w-xs mx-auto transition-colors">
-                Accédez à vos ressources pédagogiques et gérez votre parcours académique en toute simplicité.
+                Accédez à vos ressources pédagogiques et gérez votre parcours
+                académique en toute simplicité.
               </p>
             </motion.div>
           </div>
@@ -188,7 +189,10 @@ const LoginPage = () => {
           <div className="flex flex-col justify-center p-8 sm:p-12 lg:p-16">
             <div className="max-w-md w-full mx-auto">
               <CardHeader className="p-0 mb-8 text-center md:text-left">
-                <motion.div variants={itemVariants} className="flex justify-center md:justify-start mb-6">
+                <motion.div
+                  variants={itemVariants}
+                  className="flex justify-center md:justify-start mb-6"
+                >
                   <img
                     src={theme === "light" ? logoSvg : logoDarkSvg}
                     alt="AcademiX"
@@ -220,19 +224,44 @@ const LoginPage = () => {
                   )}
                 </AnimatePresence>
 
-                <form onSubmit={handleLogin} className="flex flex-col gap-6">
-                  <motion.div variants={itemVariants}>
-                    <Tabs defaultValue={role} onValueChange={setRole} className="w-full">
-                      <TabsList className="grid grid-cols-3 h-12 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-2xl">
-                        <TabsTrigger value="admin" className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700">Admin</TabsTrigger>
-                        <TabsTrigger value="chef" className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700">Chef</TabsTrigger>
-                        <TabsTrigger value="student" className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700">Élève</TabsTrigger>
+                <form onSubmit={handleLogin} className="flex flex-col  gap-6">
+                  <motion.div
+                    variants={itemVariants}
+                    className="  flex w-full  items-center justify-center"
+                  >
+                    <Tabs
+                      defaultValue={role}
+                      onValueChange={setRole}
+                      className=" w-3/5 flex "
+                    >
+                      <TabsList className="grid grid-cols-3 h-12 bg-slate-100/80 dark:bg-slate-800/50 p-1 rounded-2xl gap-3.5">
+                        <TabsTrigger
+                          value="admin"
+                          className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700"
+                        >
+                          Admin
+                        </TabsTrigger>
+                        <TabsTrigger
+                          value="chef"
+                          className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700"
+                        >
+                          Chef
+                        </TabsTrigger>
+                        <TabsTrigger
+                          value="student"
+                          className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700"
+                        >
+                          Élève
+                        </TabsTrigger>
                       </TabsList>
                     </Tabs>
                   </motion.div>
 
                   <motion.div variants={itemVariants} className="space-y-2">
-                    <Label htmlFor="email" className="font-semibold text-slate-700 dark:text-slate-300 ml-1 transition-colors">
+                    <Label
+                      htmlFor="email"
+                      className="font-semibold text-slate-700 dark:text-slate-300 ml-1 transition-colors"
+                    >
                       Identifiant
                     </Label>
                     <div className="relative group">
@@ -242,7 +271,9 @@ const LoginPage = () => {
                         type={role === "student" ? "text" : "email"}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder={role === "student" ? "MAT-123456" : "votre@email.com"}
+                        placeholder={
+                          role === "student" ? "MAT-123456" : "votre@email.com"
+                        }
                         className="pl-11 h-12 rounded-2xl bg-white/50 dark:bg-slate-950/50 dark:border-slate-800 focus:ring-4 focus:ring-primary/10 transition-all font-medium"
                         required
                       />
@@ -251,13 +282,23 @@ const LoginPage = () => {
 
                   <motion.div variants={itemVariants} className="space-y-2">
                     <div className="flex items-center justify-between ml-1 transition-colors">
-                      <Label htmlFor="password" title="Password" className="font-semibold text-slate-700 dark:text-slate-300">
+                      <Label
+                        htmlFor="password"
+                        title="Password"
+                        className="font-semibold text-slate-700 dark:text-slate-300"
+                      >
                         Mot de passe
                       </Label>
-                      <Link to="/forgot-password" title="Password" className="text-xs text-primary hover:underline font-medium transition-colors">Oublié ?</Link>
+                      <Link
+                        to="/forgot-password"
+                        title="Password"
+                        className="text-xs text-primary hover:underline font-medium transition-colors"
+                      >
+                        Oublié ?
+                      </Link>
                     </div>
                     <div className="relative group">
-                      <Shield className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                      <Shield className="absolute left-4 top-2/3 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" />
                       <Input
                         id="password"
                         type={showPassword ? "text" : "password"}
@@ -272,14 +313,24 @@ const LoginPage = () => {
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                       >
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
                       </button>
                     </div>
                   </motion.div>
 
-                  <motion.div variants={itemVariants} className="flex items-center space-x-2 ml-1 transition-colors">
+                  <motion.div
+                    variants={itemVariants}
+                    className="flex items-center space-x-2 ml-1 transition-colors"
+                  >
                     <Checkbox id="remember" className="rounded-md" />
-                    <label htmlFor="remember" className="text-sm font-medium text-slate-500 dark:text-slate-400 cursor-pointer transition-colors">
+                    <label
+                      htmlFor="remember"
+                      className="text-sm font-medium text-slate-500 dark:text-slate-400 cursor-pointer transition-colors"
+                    >
                       Se souvenir de moi
                     </label>
                   </motion.div>
@@ -290,10 +341,15 @@ const LoginPage = () => {
                       disabled={loading}
                       className="w-full h-12 rounded-2xl bg-primary hover:bg-primary-hover text-white font-bold text-base transition-all shadow-lg shadow-primary/20 active:scale-[0.98] group"
                     >
-                      {loading ? "Connexion..." : (
+                      {loading ? (
+                        "Connexion..."
+                      ) : (
                         <>
                           Se connecter
-                          <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                          <ArrowRight
+                            size={18}
+                            className="ml-2 group-hover:translate-x-1 transition-transform"
+                          />
                         </>
                       )}
                     </Button>
@@ -302,15 +358,23 @@ const LoginPage = () => {
               </CardContent>
 
               <CardFooter className="p-0 mt-8 pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-4 transition-colors">
-                <motion.p variants={itemVariants} className="text-center md:text-left text-sm text-slate-500 dark:text-slate-400 transition-colors">
+                <motion.p
+                  variants={itemVariants}
+                  className="text-center md:text-left text-sm text-slate-500 dark:text-slate-400 transition-colors"
+                >
                   Vous n'avez pas de compte ?{" "}
-                  <Link to="/register" className="text-primary font-bold hover:underline transition-all">S'inscrire</Link>
+                  <Link
+                    to="/register"
+                    className="text-primary font-bold hover:underline transition-all"
+                  >
+                    S'inscrire
+                  </Link>
                 </motion.p>
               </CardFooter>
             </div>
           </div>
         </div>
-        
+
         {/* Brand Footer */}
         <motion.p
           variants={itemVariants}

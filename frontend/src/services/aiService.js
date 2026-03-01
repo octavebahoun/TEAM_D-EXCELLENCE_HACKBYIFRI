@@ -101,5 +101,38 @@ export const aiService = {
     generateImage: async (prompt) => {
         const response = await pythonApiClient.post(`/image/generate?prompt=${encodeURIComponent(prompt)}`);
         return response.data;
-    }
+    },
+
+    /**
+     * Récupère un quiz existant par ID
+     */
+    getQuiz: async (id) => {
+        const response = await pythonApiClient.get(`/quiz/${id}`);
+        return response.data;
+    },
+
+    /**
+     * Récupère des exercices existants par ID
+     */
+    getExercises: async (id) => {
+        const response = await pythonApiClient.get(`/exercises/${id}`);
+        return response.data;
+    },
+
+    // --- Méthodes historique ---
+    getHistory: async (type) => {
+        const url = type ? `/history?type=${type}` : '/history';
+        const response = await pythonApiClient.get(url);
+        return response.data;
+    },
+
+    deleteHistoryItem: async (historyId) => {
+        const response = await pythonApiClient.delete(`/history/${historyId}`);
+        return response.data;
+    },
+
+    clearHistory: async (type) => {
+        const response = await pythonApiClient.delete(`/history?type=${type}`);
+        return response.data;
+    },
 };

@@ -97,8 +97,9 @@ const RegisterPage = () => {
 
     try {
       await authService.adminRegister(formData);
-      alert("Compte Admin créé ! Veuillez vous connecter.");
-      navigate("/login");
+      navigate("/admin", {
+        state: { successMessage: "Nouveau compte Admin créé avec succès !" },
+      });
     } catch (err) {
       setError(
         err.response?.data?.message || "Erreur lors de l'enregistrement",
@@ -149,10 +150,10 @@ const RegisterPage = () => {
                 </motion.div>
                 <motion.div variants={itemVariants} className="space-y-2">
                   <CardTitle className="text-3xl font-display font-bold tracking-tight text-slate-900 dark:text-white transition-colors">
-                    Créer un compte Admin
+                    Nouveau compte Admin
                   </CardTitle>
                   <CardDescription className="text-slate-500 dark:text-slate-400 text-base transition-colors">
-                    Rejoignez l'élite de la gestion académique.
+                    Créez un compte Super Administrateur supplémentaire.
                   </CardDescription>
                 </motion.div>
               </CardHeader>
@@ -352,25 +353,23 @@ const RegisterPage = () => {
                   variants={itemVariants}
                   className="text-center md:text-left text-sm text-slate-500 dark:text-slate-400"
                 >
-                  Déjà administrateur ?{" "}
+                  Retour au tableau de bord ?{" "}
                   <Link
-                    to="/login"
+                    to="/admin"
                     className="text-primary font-bold hover:underline transition-all"
                   >
-                    Se connecter
+                    Dashboard Admin
                   </Link>
                 </motion.p>
 
                 <motion.div
                   variants={itemVariants}
-                  className="bg-slate-100/50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 text-center transition-colors"
+                  className="bg-amber-50/70 dark:bg-amber-900/20 p-4 rounded-2xl border border-amber-200/50 dark:border-amber-700/50 text-center transition-colors"
                 >
-                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                    <span className="font-bold text-slate-700 dark:text-slate-200">
-                      Étudiant ?
-                    </span>{" "}
-                    Votre compte est géré par votre département. Connectez-vous
-                    avec votre matricule.
+                  <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+                    <span className="font-bold">⚠️ Accès restreint.</span> Cette
+                    page est réservée aux Super Administrateurs connectés. Toute
+                    tentative d'accès non autorisé est bloquée.
                   </p>
                 </motion.div>
               </CardFooter>

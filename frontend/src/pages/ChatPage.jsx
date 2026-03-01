@@ -25,8 +25,9 @@ const CURRENT_USER = {
   id: AUTH_USER?.id || 1,
   nom: AUTH_USER?.nom || "Dupont",
   prenom: AUTH_USER?.prenom || "Jean",
+  // Laravel renvoie `photo`, pas `avatar_url` — on lit le bon champ
   avatar_url:
-    AUTH_USER?.avatar_url ||
+    AUTH_USER?.photo ||
     `https://api.dicebear.com/7.x/avataaars/svg?seed=${AUTH_USER?.prenom || "Jean"}`,
   role: authService.getRole() || "participant",
 };

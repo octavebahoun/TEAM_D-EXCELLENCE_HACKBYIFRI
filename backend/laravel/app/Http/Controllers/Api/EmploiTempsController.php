@@ -22,10 +22,10 @@ class EmploiTempsController extends Controller
 
         $edt = EmploiTempsFiliere::with('matiere')
             ->where('filiere_id', $filiereId)
-            ->when($request->semestre, function($query, $semestre) {
+            ->when($request->semestre, function ($query, $semestre) {
                 $query->where('semestre', $semestre);
             })
-            ->when($request->jour, function($query, $jour) {
+            ->when($request->jour, function ($query, $jour) {
                 $query->where('jour', $jour);
             })
             ->orderByRaw("FIELD(jour, 'Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi')")
@@ -38,15 +38,15 @@ class EmploiTempsController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'filiere_id'  => 'required|integer|exists:filieres,id',
-            'matiere_id'  => 'required|integer|exists:matieres,id',
-            'jour'        => 'required|in:Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi',
+            'filiere_id' => 'required|integer|exists:filieres,id',
+            'matiere_id' => 'required|integer|exists:matieres,id',
+            'jour' => 'required|in:Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi',
             'heure_debut' => 'required|date_format:H:i',
-            'heure_fin'   => 'required|date_format:H:i|after:heure_debut',
-            'salle'       => 'nullable|string|max:50',
-            'type_cours'  => 'required|in:CM,TD,TP',
-            'enseignant'  => 'nullable|string|max:100',
-            'semestre'    => 'required|in:S1,S2',
+            'heure_fin' => 'required|date_format:H:i|after:heure_debut',
+            'salle' => 'nullable|string|max:50',
+            'type_cours' => 'required|in:CM,TD,TP',
+            'enseignant' => 'nullable|string|max:100',
+            'semestre' => 'required|in:S1,S2',
         ]);
 
         $admin = $request->user();
@@ -83,6 +83,19 @@ class EmploiTempsController extends Controller
         return response()->json($cours->load('matiere'), 201);
     }
 
+    public function show(Request $request, $id)
+    {
+        $cours = EmploiTempsFiliere::with(['matiere', 'filiere'])->findOrFail($id);
+
+        $admin = $request->user();
+        $isChef = method_exists($admin, 'isChefDepartement') && $admin->isChefDepartement();
+        if ($isChef && $cours->filiere->departement_id !== $admin->departement_id) {
+            return response()->json(['message' => 'Accès refusé'], 403);
+        }
+
+        return response()->json($cours);
+    }
+
     public function update(Request $request, $id)
     {
         $cours = EmploiTempsFiliere::findOrFail($id);
@@ -95,14 +108,14 @@ class EmploiTempsController extends Controller
         }
 
         $validated = $request->validate([
-            'matiere_id'  => 'sometimes|integer|exists:matieres,id',
-            'jour'        => 'sometimes|in:Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi',
+            'matiere_id' => 'sometimes|integer|exists:matieres,id',
+            'jour' => 'sometimes|in:Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi',
             'heure_debut' => 'sometimes|date_format:H:i',
-            'heure_fin'   => 'sometimes|date_format:H:i|after:heure_debut',
-            'salle'       => 'nullable|string|max:50',
-            'type_cours'  => 'sometimes|in:CM,TD,TP',
-            'enseignant'  => 'nullable|string|max:100',
-            'semestre'    => 'sometimes|in:S1,S2',
+            'heure_fin' => 'sometimes|date_format:H:i|after:heure_debut',
+            'salle' => 'nullable|string|max:50',
+            'type_cours' => 'sometimes|in:CM,TD,TP',
+            'enseignant' => 'nullable|string|max:100',
+            'semestre' => 'sometimes|in:S1,S2',
         ]);
 
         if (isset($validated['matiere_id']) && $validated['matiere_id'] != $cours->matiere_id) {

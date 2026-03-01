@@ -5,6 +5,7 @@ from app.core.config import settings
 from app.services.rag_service import rag_service
 from app.models.schemas import ChatRequest, ChatResponse, FileUploadResponse
 from app.api.dependencies import get_current_user
+from app.services import history_service
 
 router = APIRouter()
 
@@ -14,6 +15,20 @@ async def chat_endpoint(request: ChatRequest, current_user: dict = Depends(get_c
     try:
         # On appelle le service RAG 
         answer_text = await rag_service.ask_question(request.question, request.history)
+        
+        # Sauvegarde dans l'historique
+        try:
+            import uuid
+            history_service.save(
+                user_id=current_user["id"],
+                service_type="chat",
+                filename=None,
+                matiere=None,
+                result_id=str(uuid.uuid4()),
+                meta={"question": request.question[:200], "answer_preview": answer_text[:300]},
+            )
+        except Exception:
+            pass
         
         # On renvoie la réponse formatée
         return ChatResponse(

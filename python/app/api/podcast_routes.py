@@ -10,6 +10,7 @@ from langchain_core.output_parsers import StrOutputParser
 from app.core.config import settings
 from app.api.dependencies import get_current_user
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
+from app.services import history_service
 
 router = APIRouter()
 
@@ -123,6 +124,19 @@ async def generate_podcast_endpoint(
         
         # Calculer la taille du fichier audio
         audio_size = os.path.getsize(audio_path)
+        
+        # Sauvegarde dans l'historique
+        try:
+            history_service.save(
+                user_id=current_user["id"],
+                service_type="podcast",
+                filename=file.filename,
+                matiere=None,
+                result_id=podcast_id,
+                meta={"audio_url": f"/api/v1/podcast/download/{podcast_id}", "audio_size_bytes": audio_size, "title": os.path.splitext(file.filename)[0]},
+            )
+        except Exception:
+            pass
         
         return {
             "podcast_id": podcast_id,

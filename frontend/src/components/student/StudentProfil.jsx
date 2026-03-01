@@ -89,7 +89,7 @@ export default function StudentProfil() {
         });
       }
 
-      // Appel API en best-effort (email & campus non supportés par le backend)
+      // Appel API en best-effort
       try {
         await studentService.updateProfil({});
       } catch {

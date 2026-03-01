@@ -14,10 +14,14 @@ export default function ChefDashboard() {
   const [initialFiliereId, setInitialFiliereId] = useState(null);
   const [theme, setTheme] = useState("light");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const deptId = 1; // Simulation
+
+  // Lecture du département depuis l'utilisateur connecté (stocké par authService au login)
+  const currentUser = authService.getCurrentUser();
+  const deptId = currentUser?.departement_id ?? null;
+
   const departmentState = useDepartementData(deptId);
   const { loading, error } = departmentState;
-  const data = departmentState; // This will now contain filieres, stats, etc.
+  const data = departmentState;
 
   // Initialisation du thème
   useEffect(() => {

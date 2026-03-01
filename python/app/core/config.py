@@ -9,8 +9,21 @@ class Settings(BaseSettings):
     # Configuration API
     API_HOST: str = Field(default="0.0.0.0")
     API_PORT: int = Field(default=int(os.environ.get("PORT", "5000")))
-    API_RELOAD: bool = Field(default=True)
+    API_RELOAD: bool = Field(default=os.environ.get("API_RELOAD", "false").lower() == "true")
     API_KEY: str = Field(default="your_secret_api_key_change_this")
+
+    # Origines CORS autorisées (séparées par des virgules dans .env)
+    # Ex : ALLOWED_ORIGINS=https://mon-app.vercel.app,http://localhost:5173
+    ALLOWED_ORIGINS: str = Field(
+        default=os.environ.get(
+            "ALLOWED_ORIGINS",
+            "https://team-d-excellence-hackbyifri-2026.vercel.app,http://localhost:5173,http://localhost:3000"
+        )
+    )
+
+    @property
+    def allowed_origins_list(self) -> list[str]:
+        return [o.strip() for o in self.ALLOWED_ORIGINS.split(",") if o.strip()]
     
     # Clés API - OBLIGATOIRES pour le fonctionnement
     GROQ_API_KEY: str | None = Field(default=(os.environ.get("GROQ_API_KEY")))
