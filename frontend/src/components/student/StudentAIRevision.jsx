@@ -125,8 +125,6 @@ const STATS = [
   },
 ];
 
-// ─── ToolView ────────────────────────────────────────────────────────────────
-
 const ToolView = ({ tool, onBack }) => {
   const renderTool = () => {
     switch (tool.id) {
@@ -215,11 +213,18 @@ const ToolView = ({ tool, onBack }) => {
   );
 };
 
-// ─── Main ────────────────────────────────────────────────────────────────────
-
-export default function StudentAIRevision() {
+export default function StudentAIRevision({ isOnline = true }) {
   const [activeToolId, setActiveToolId] = useState(null);
   const activeTool = TOOLS.find((t) => t.id === activeToolId);
+
+  const GENERATION_TOOLS = [
+    "summary",
+    "quiz",
+    "podcast",
+    "exercises",
+    "image",
+    "prof",
+  ];
 
   return (
     <div className="max-w-6xl mx-auto pb-20">
@@ -323,13 +328,24 @@ export default function StudentAIRevision() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.06 }}
-                  whileHover={{ y: -4, transition: { duration: 0.18 } }}
+                  whileHover={
+                    isOnline ? { y: -4, transition: { duration: 0.18 } } : {}
+                  }
                   onClick={() => setActiveToolId(tool.id)}
                   className={cn(
                     "group relative bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all border-t-4 border border-slate-100 dark:border-slate-800 text-left overflow-hidden flex flex-col justify-between min-h-52",
                     tool.accent,
+                    !isOnline && "opacity-60",
                   )}
                 >
+                  {/* Badge offline sur la carte */}
+                  {!isOnline && GENERATION_TOOLS.includes(tool.id) && (
+                    <div className="absolute top-3 right-3 z-10 flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-100 dark:bg-amber-500/20 border border-amber-200 dark:border-amber-500/30">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">
+                        Hors-ligne
+                      </span>
+                    </div>
+                  )}
                   {/* Glow bg */}
                   <div
                     className={`absolute -right-8 -bottom-8 w-32 h-32 bg-linear-to-br ${tool.gradient} opacity-0 group-hover:opacity-8 rounded-full transition-opacity duration-500 blur-2xl`}

@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\StatistiqueController;
 use App\Http\Controllers\Api\ChefDepartementController;
 use App\Http\Controllers\Api\StudentAnalysisController;
 use App\Http\Controllers\Api\GoogleAuthController;
+use App\Http\Controllers\Api\PushSubscriptionController;
 
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
@@ -33,9 +34,11 @@ Route::prefix('v1')->group(function () {
 
         Route::get('me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 
-        // Google OAuth Routes (Temporairement publiques pour test)
-        Route::get('google/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
-        Route::get('google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+        // Google OAuth Routes
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::get('google/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
+            Route::get('google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+        });
     });
 
     Route::prefix('admin')->middleware(['auth:sanctum', 'super.admin'])->group(function () {
@@ -151,8 +154,12 @@ Route::prefix('v1')->group(function () {
         Route::patch('alertes/{id}/read', [AlerteController::class, 'markAsRead']);
 
         // IA Analysis Routes
-        Route::get('analysis', [StudentAnalysisController::class, 'analyze']); 
+        Route::get('analysis', [StudentAnalysisController::class, 'analyze']);
         Route::get('analysis/history', [StudentAnalysisController::class, 'history']);
         Route::post('analysis/mark-sent/{id}', [StudentAnalysisController::class, 'markAsSent']);
+
+        // Push Notifications Routes
+        Route::post('push/subscribe', [PushSubscriptionController::class, 'store']);
+        Route::delete('push/subscribe', [PushSubscriptionController::class, 'destroy']);
     });
 });

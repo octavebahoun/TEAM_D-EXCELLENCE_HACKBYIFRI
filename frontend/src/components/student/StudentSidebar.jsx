@@ -5,6 +5,7 @@ import {
   FileText,
   Calendar,
   BrainCircuit,
+  Sparkles,
   User,
   LogOut,
   X,
@@ -22,6 +23,7 @@ const navItems = [
   { id: "notes", label: "Notes", icon: FileText },
   { id: "emploi-temps", label: "Emploi du temps", icon: Calendar },
   { id: "ai-revision", label: "AI Revision", icon: BrainCircuit },
+  { id: "bilan-ia", label: "Bilan IA", icon: Sparkles },
   { id: "profil", label: "Profil", icon: User },
 ];
 

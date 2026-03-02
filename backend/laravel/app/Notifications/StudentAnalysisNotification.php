@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\StudentAnalysis;
+use App\Services\WebPushService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -12,29 +13,36 @@ class StudentAnalysisNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new notification instance.
-     */
+
     public function __construct(public StudentAnalysis $analysis)
     {
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', 'webpush'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
+    public function toWebPush(object $notifiable, mixed $notification): void
+    {
+        $emoji = match ($this->analysis->niveau_alerte) {
+            'danger' => '⚠️',
+            'warning' => '📉',
+            default => '📊',
+        };
+
+        app(WebPushService::class)->sendToUser($notifiable->id, [
+            'title' => "{$emoji} Ton bilan académique",
+            'body' => $this->analysis->message_principal,
+            'url' => '/dashboard',
+            'tag' => 'analysis-' . $this->analysis->id, // évite les doublons
+        ]);
+    }
+
+
     public function toMail(object $notifiable): MailMessage
     {
-        $statusEmoji = match($this->analysis->niveau_alerte) {
+        $statusEmoji = match ($this->analysis->niveau_alerte) {
             'danger' => '⚠️',
             'warning' => '📉',
             default => '📊',
@@ -50,19 +58,15 @@ class StudentAnalysisNotification extends Notification implements ShouldQueue
             ->line('Ce message a été généré par notre IA pour t\'aider dans ta réussite.');
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
+
     public function toArray(object $notifiable): array
     {
         return [
-            'type'              => 'student_analysis',
-            'analysis_id'       => $this->analysis->id,
-            'niveau_alerte'     => $this->analysis->niveau_alerte,
+            'type' => 'student_analysis',
+            'analysis_id' => $this->analysis->id,
+            'niveau_alerte' => $this->analysis->niveau_alerte,
             'message_principal' => $this->analysis->message_principal,
-            'matieres'          => $this->analysis->matieres_prioritaires,
+            'matieres' => $this->analysis->matieres_prioritaires,
         ];
     }
 }

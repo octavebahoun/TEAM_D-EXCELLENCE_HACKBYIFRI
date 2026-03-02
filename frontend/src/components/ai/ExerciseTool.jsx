@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { aiService } from "../../services/aiService";
 import { useAIHistory } from "../../hooks/useAIHistory";
+import { offlineStorage } from "../../services/offlineStorage";
 import AIHistorySidebar from "./AIHistorySidebar";
 
 export default function ExerciseTool() {
@@ -35,18 +36,21 @@ export default function ExerciseTool() {
       const exList = res.exercises || res;
       setExercises(exList);
       setSelectedHistoryId(res.exercise_id);
-      addItem({
-        history_id: res.exercise_id,
-        service_type: "exercise",
-        filename: file.name,
-        result_id: res.exercise_id,
-        meta: {
-          title: file.name.replace(/\.[^.]+$/, ""),
-          nb_exercises: Array.isArray(exList) ? exList.length : 1,
-          difficulty: "progressive",
+      addItem(
+        {
+          history_id: res.exercise_id,
+          service_type: "exercise",
+          filename: file.name,
+          result_id: res.exercise_id,
+          meta: {
+            title: file.name.replace(/\.[^.]+$/, ""),
+            nb_exercises: Array.isArray(exList) ? exList.length : 1,
+            difficulty: "progressive",
+          },
+          created_at: new Date().toISOString(),
         },
-        created_at: new Date().toISOString(),
-      });
+        res, // ← résultat complet persisté dans IndexedDB
+      );
     } catch {
       alert("Erreur lors de la génération des exercices");
     } finally {
@@ -62,7 +66,15 @@ export default function ExerciseTool() {
       const res = await aiService.getExercises(entry.result_id);
       setExercises(res.exercises || res);
     } catch {
-      alert("Impossible de charger ces exercices");
+      // Fallback offline
+      const cached = await offlineStorage.get("exercise", entry.result_id);
+      if (cached) {
+        setExercises(cached.exercises || cached);
+      } else {
+        alert(
+          "Impossible de charger ces exercices (pas de version hors-ligne disponible)",
+        );
+      }
     } finally {
       setLoading(false);
     }

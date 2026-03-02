@@ -31,7 +31,8 @@ return [
 
     // Service IA Python (FastAPI)
     'python_ai' => [
-        'url' => env('PYTHON_AI_SERVICE_URL', 'http://localhost:8001'),
+        'url'          => env('PYTHON_AI_SERVICE_URL', 'http://localhost:8001'),
+        'internal_key' => env('PYTHON_AI_INTERNAL_KEY', ''),
     ],
 
     // Google API (Calendar & Tasks)

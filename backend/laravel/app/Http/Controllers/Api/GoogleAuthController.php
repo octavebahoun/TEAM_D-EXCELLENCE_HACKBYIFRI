@@ -35,11 +35,10 @@ class GoogleAuthController extends Controller
         try {
             $token = $this->googleService->fetchAccessTokenWithAuthCode($code);
             
-            // Pour le test : on prend l'utilisateur mourchidolawale@gmail.com s'il n'y a pas de session active
-            $user = $request->user() ?? \App\Models\User::where('email', 'mourchidolawale@gmail.com')->first();
+            $user = $request->user();
 
             if (!$user) {
-                return response()->json(['error' => "Utilisateur non authentifié (session Laravel expirée ?)"], 401);
+                return response()->json(['error' => 'Utilisateur non authentifié. Veuillez vous connecter avant de lier votre compte Google.'], 401);
             }
 
             // Mise à jour de l'utilisateur avec les jetons Google

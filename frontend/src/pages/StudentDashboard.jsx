@@ -8,9 +8,14 @@ import StudentSessions from "../components/student/StudentSessions";
 import StudentNotes from "../components/student/StudentNotes";
 import StudentEmploiTemps from "../components/student/StudentEmploiTemps";
 import StudentAIRevision from "../components/student/StudentAIRevision";
+import StudentAnalysis from "../components/student/StudentAnalysis";
 import StudentProfil from "../components/student/StudentProfil";
 import StudentOnboarding from "../components/student/StudentOnboarding";
 import { authService } from "../services/authService";
+import { useNetworkStatus } from "../hooks/useNetworkStatus";
+import { useSyncQueue } from "../hooks/useSyncQueue";
+import OfflineBanner from "../components/ui/OfflineBanner";
+import { PushNotificationButton } from "../components/ui/PushNotificationButton";
 
 export default function StudentDashboard() {
   const location = useLocation();
@@ -19,6 +24,10 @@ export default function StudentDashboard() {
   );
   const [theme, setTheme] = useState("light");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Surveillance de la connectivité réseau
+  const { isOnline, justReconnected } = useNetworkStatus();
+  const { pendingCount } = useSyncQueue();
 
   // Initialisation du thème
   useEffect(() => {
@@ -64,6 +73,11 @@ export default function StudentDashboard() {
         return { title: "Emploi du temps", subtitle: "" };
       case "ai-revision":
         return { title: "AI Revision Portal", subtitle: "" };
+      case "bilan-ia":
+        return {
+          title: "Bilan IA",
+          subtitle: "Analyse personnalisée de tes performances",
+        };
       case "profil":
         return { title: "Mon Profil", subtitle: "" };
       default:
@@ -95,6 +109,13 @@ export default function StudentDashboard() {
           theme={theme}
           onThemeToggle={handleThemeToggle}
           onMenuToggle={() => setIsMobileMenuOpen(true)}
+          rightAction={<PushNotificationButton />}
+        />
+
+        <OfflineBanner
+          isOnline={isOnline}
+          justReconnected={justReconnected}
+          pendingCount={pendingCount}
         />
 
         <main className="relative flex-1 overflow-y-auto">
@@ -119,7 +140,7 @@ export default function StudentDashboard() {
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.3 }}
               >
-                <StudentSessions />
+                <StudentSessions isOnline={isOnline} />
               </motion.div>
             )}
 
@@ -155,7 +176,19 @@ export default function StudentDashboard() {
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.3 }}
               >
-                <StudentAIRevision />
+                <StudentAIRevision isOnline={isOnline} />
+              </motion.div>
+            )}
+
+            {activeTab === "bilan-ia" && (
+              <motion.div
+                key="bilan-ia"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.3 }}
+              >
+                <StudentAnalysis />
               </motion.div>
             )}
 

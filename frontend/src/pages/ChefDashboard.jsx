@@ -20,7 +20,7 @@ export default function ChefDashboard() {
   const deptId = currentUser?.departement_id ?? null;
 
   const departmentState = useDepartementData(deptId);
-  const { loading, error } = departmentState;
+  // const { loading, error } = departmentState;
   const data = departmentState;
 
   // Initialisation du thème

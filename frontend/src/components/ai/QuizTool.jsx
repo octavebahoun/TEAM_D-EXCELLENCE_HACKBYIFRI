@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { aiService } from "../../services/aiService";
 import { useAIHistory } from "../../hooks/useAIHistory";
+import { offlineStorage } from "../../services/offlineStorage";
 import AIHistorySidebar from "./AIHistorySidebar";
 
 export default function QuizTool() {
@@ -38,18 +39,21 @@ export default function QuizTool() {
       setQuiz(res);
       setCurrentStep("playing");
       setSelectedHistoryId(res.quiz_id);
-      addItem({
-        history_id: res.quiz_id,
-        service_type: "quiz",
-        filename: file.name,
-        result_id: res.quiz_id,
-        meta: {
-          title: res.title || file.name.replace(/\.[^.]+$/, ""),
-          nb_questions: res.questions?.length,
-          difficulty: "medium",
+      addItem(
+        {
+          history_id: res.quiz_id,
+          service_type: "quiz",
+          filename: file.name,
+          result_id: res.quiz_id,
+          meta: {
+            title: res.title || file.name.replace(/\.[^.]+$/, ""),
+            nb_questions: res.questions?.length,
+            difficulty: "medium",
+          },
+          created_at: new Date().toISOString(),
         },
-        created_at: new Date().toISOString(),
-      });
+        res  // ← résultat complet persisté dans IndexedDB
+      );
     } catch {
       alert("Erreur lors de la génération du quiz");
     } finally {
@@ -69,7 +73,14 @@ export default function QuizTool() {
       setQuiz(res);
       setCurrentStep("playing");
     } catch {
-      alert("Impossible de charger ce quiz");
+      // 📴 Fallback offline
+      const cached = await offlineStorage.get("quiz", entry.result_id);
+      if (cached) {
+        setQuiz(cached);
+        setCurrentStep("playing");
+      } else {
+        alert("Impossible de charger ce quiz (pas de version hors-ligne disponible)");
+      }
     } finally {
       setLoading(false);
     }

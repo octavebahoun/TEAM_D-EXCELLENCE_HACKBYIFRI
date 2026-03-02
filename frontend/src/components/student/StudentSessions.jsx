@@ -11,14 +11,13 @@ import {
   Plus,
   Users,
   X,
+  WifiOff,
 } from "lucide-react";
 import { cn } from "../../utils/cn";
 import { createSession, getSessions, joinSession } from "../../api/sessions";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../../services/authService";
 import toast from "react-hot-toast";
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const isToday = (dateIso) => {
   if (!dateIso) return false;
@@ -57,8 +56,6 @@ const formatDateTime = (dateIso, duree = 90) => {
   });
   return `${dayLabel} · ${startTime} – ${endTime}`;
 };
-
-// ─── Constants ───────────────────────────────────────────────────────────────
 
 const FORMAT_STYLES = {
   chat: {
@@ -103,8 +100,6 @@ const BASE_FILTERS = [
   { id: "mine", label: "Mes sessions" },
 ];
 
-// ─── StatCard ────────────────────────────────────────────────────────────────
-
 function StatCard({ icon: Icon, label, value, color, bg }) {
   return (
     <motion.div
@@ -129,8 +124,6 @@ function StatCard({ icon: Icon, label, value, color, bg }) {
     </motion.div>
   );
 }
-
-// ─── SessionCard ─────────────────────────────────────────────────────────────
 
 function SessionCard({ session, onJoin, subjectColor }) {
   const fmt = FORMAT_STYLES[session.format] || DEFAULT_FORMAT;
@@ -280,9 +273,8 @@ function SessionCard({ session, onJoin, subjectColor }) {
   );
 }
 
-// ─── Main ────────────────────────────────────────────────────────────────────
-
-export default function StudentSessions() {
+//  Main
+export default function StudentSessions({ isOnline = true }) {
   const navigate = useNavigate();
   const authUser = authService.getCurrentUser();
 
@@ -304,7 +296,6 @@ export default function StudentSessions() {
     lien_visio: "",
   });
 
-  // ── Fetch ──────────────────────────────────────────────────────────────────
   useEffect(() => {
     const fetchSessions = async () => {
       setLoading(true);
@@ -322,7 +313,6 @@ export default function StudentSessions() {
     fetchSessions();
   }, []);
 
-  // ── Computed ───────────────────────────────────────────────────────────────
   const stats = useMemo(
     () => ({
       todayCount: sessions.filter((s) => isToday(s.date_debut)).length,
@@ -366,7 +356,6 @@ export default function StudentSessions() {
     }
   }, [sessions, activeFilter, subjects, authUser]);
 
-  // ── Handlers ───────────────────────────────────────────────────────────────
   const handleJoin = async (session) => {
     try {
       await joinSession(session.id || session._id);
@@ -406,7 +395,32 @@ export default function StudentSessions() {
     }
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  if (!isOnline) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col items-center justify-center py-32 text-center space-y-5"
+      >
+        <div className="w-20 h-20 rounded-3xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 flex items-center justify-center">
+          <WifiOff size={36} className="text-amber-500" />
+        </div>
+        <div>
+          <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight mb-2">
+            Sessions indisponibles hors-ligne
+          </h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 font-medium max-w-sm">
+            Les sessions collaboratives nécessitent une connexion active
+            (communication en temps réel via Socket.io).
+          </p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-3 font-medium">
+            Reconnectez-vous à Internet pour rejoindre ou créer une session.
+          </p>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}

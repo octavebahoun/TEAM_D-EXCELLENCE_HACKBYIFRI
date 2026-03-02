@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { aiService } from "../../services/aiService";
 import { useAIHistory } from "../../hooks/useAIHistory";
+import { offlineStorage } from "../../services/offlineStorage";
 import AIHistorySidebar from "./AIHistorySidebar";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -41,19 +42,22 @@ export default function SummaryTool() {
         style: options.style,
       });
       setResult(res);
-      addItem({
-        history_id: res.summary_id,
-        service_type: "summary",
-        filename: file.name,
-        result_id: res.summary_id,
-        meta: {
-          title: res.title,
-          level: options.level,
-          style: options.style,
-          word_count: res.word_count,
+      addItem(
+        {
+          history_id: res.summary_id,
+          service_type: "summary",
+          filename: file.name,
+          result_id: res.summary_id,
+          meta: {
+            title: res.title,
+            level: options.level,
+            style: options.style,
+            word_count: res.word_count,
+          },
+          created_at: new Date().toISOString(),
         },
-        created_at: new Date().toISOString(),
-      });
+        res, // ← résultat complet persisté dans IndexedDB par useAIHistory
+      );
       setSelectedHistoryId(res.summary_id);
     } catch {
       alert("Erreur lors de la génération du résumé");
@@ -70,7 +74,15 @@ export default function SummaryTool() {
       const res = await aiService.getSummary(entry.result_id);
       setResult(res);
     } catch {
-      alert("Impossible de charger cette fiche");
+      // Fallback offline : on tente IndexedDB avant d'afficher une erreur
+      const cached = await offlineStorage.get("summary", entry.result_id);
+      if (cached) {
+        setResult(cached);
+      } else {
+        alert(
+          "Impossible de charger cette fiche (pas de version hors-ligne disponible)",
+        );
+      }
     } finally {
       setLoading(false);
     }

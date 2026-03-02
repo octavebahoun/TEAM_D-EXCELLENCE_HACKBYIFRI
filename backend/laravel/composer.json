@@ -17,7 +17,8 @@
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^2.10.1",
         "league/csv": "^9.28",
-        "maatwebsite/excel": "^3.1"
+        "maatwebsite/excel": "^3.1",
+        "minishlink/web-push": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -79,7 +80,10 @@
     "extra": {
         "laravel": {
             "dont-discover": []
-        }
+        },
+        "google/apiclient-services": [
+            "Empty"
+        ]
     },
     "config": {
         "optimize-autoloader": true,

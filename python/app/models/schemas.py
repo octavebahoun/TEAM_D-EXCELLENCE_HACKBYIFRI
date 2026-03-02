@@ -133,3 +133,44 @@ class ExerciseResponse(BaseModel):
     nb_exercises: int
     difficulty: str
     download_url: Optional[str] = None
+
+
+# ── STUDENT ANALYSIS SCHEMAS ──────────────────────────────────────────────────
+
+class MatiereSummary(BaseModel):
+    nom: str
+    moyenne: float
+    nb_notes: int
+    coefficient: float
+
+
+class AnalysisContext(BaseModel):
+    etudiant_nom: str
+    filiere: str
+    niveau: str
+    moyenne_generale: float
+    nb_notes_total: int
+    matieres: List[MatiereSummary]
+    matieres_faibles: List[str]
+    matieres_excellentes: List[str]
+    nb_taches_total: int
+    taux_completion_taches: float
+    nb_taches_urgentes: int
+
+
+class AnalysisResult(BaseModel):
+    niveau_alerte: str = "info"        # info | warning | danger
+    message_principal: str
+    conseils: List[str]
+    matieres_prioritaires: List[str]
+    point_positif: Optional[str] = None
+
+
+class StudentAnalysisData(BaseModel):
+    analysis: AnalysisResult
+    context: AnalysisContext
+
+
+class StudentAnalysisResponse(BaseModel):
+    success: bool
+    data: StudentAnalysisData

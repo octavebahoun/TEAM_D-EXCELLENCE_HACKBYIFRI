@@ -20,6 +20,7 @@ import {
 import { aiService } from "../../services/aiService";
 import { pythonApiClient } from "../../api/client";
 import { useAIHistory } from "../../hooks/useAIHistory";
+import { offlineStorage } from "../../services/offlineStorage";
 import AIHistorySidebar from "./AIHistorySidebar";
 
 export default function PodcastTool() {
@@ -64,17 +65,23 @@ export default function PodcastTool() {
       setPodcastData(response);
       setIsGenerated(true);
       setSelectedHistoryId(response.podcast_id);
-      addItem({
-        history_id: response.podcast_id,
-        service_type: "podcast",
-        filename: file.name,
-        result_id: response.podcast_id,
-        meta: {
-          audio_url: response.url,
-          title: file.name.replace(/\.[^.]+$/, ""),
+      addItem(
+        {
+          history_id: response.podcast_id,
+          service_type: "podcast",
+          filename: file.name,
+          result_id: response.podcast_id,
+          meta: {
+            audio_url: response.url,
+            title: file.name.replace(/\.[^.]+$/, ""),
+          },
+          created_at: new Date().toISOString(),
         },
-        created_at: new Date().toISOString(),
-      });
+        // Pour les podcasts : on stocke les métadonnées (url, script).
+        // L'audio lui-même est mis en cache par la règle Workbox CacheFirst
+        // configurée dans vite.config.js (rangeRequests: true).
+        { ...response, _filename: file.name },
+      );
     } catch (e) {
       console.error(e);
       alert("Erreur lors de la génération du podcast.");
@@ -101,7 +108,19 @@ export default function PodcastTool() {
         setIsGenerated(true);
       }
     } catch {
-      alert("Impossible de charger ce podcast");
+      // Fallback offline : l'audio est peut-être dans le Cache API (Workbox).
+      // On reconstruit une URL directe depuis les métadonnées stockées en IndexedDB.
+      const cached = await offlineStorage.get("podcast", entry.result_id);
+      if (cached?.url) {
+        // La requête vers cette URL passera par le Service Worker → cache Workbox
+        setAudioUrl(cached.url);
+        setPodcastData({ url: cached.url, script: cached.script || null });
+        setIsGenerated(true);
+      } else {
+        alert(
+          "Impossible de charger ce podcast (pas de version hors-ligne disponible)",
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -161,7 +180,7 @@ export default function PodcastTool() {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-    } catch (e) {
+    } catch {
       alert("Erreur lors du téléchargement.");
     }
   };
