@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🤖 IA Suivi Étudiant — Guide d'Implémentation</title>
+    <style>
+        :root {
+            --bg: #0f1117;
+            --bg2: #1a1d2e;
+            --bg3: #232640;
+            --border: #2e3150;
+            --accent: #6c63ff;
+            --accent2: #00d4aa;
+            --accent3: #ff6b6b;
+            --accent4: #ffd166;
+            --text: #e2e8f0;
+            --text2: #94a3b8;
+            --green: #22c55e;
+            --orange: #f97316;
+            --red: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 24px 0;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .sidebar-logo span {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-logo p {
+            font-size: 11px;
+            color: var(--text2);
+            margin-top: 4px;
+        }
+
+        .sidebar nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 20px;
+            text-decoration: none;
+            color: var(--text2);
+            font-size: 13px;
+            border-left: 3px solid transparent;
+            transition: all .2s;
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.active {
+            color: var(--text);
+            background: var(--bg3);
+            border-left-color: var(--accent);
+        }
+
+        .sidebar nav .section-title {
+            padding: 16px 20px 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--text2);
+        }
+
+        /* ── MAIN ── */
+        main {
+            margin-left: 260px;
+            padding: 40px 48px;
+            max-width: 1000px;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 50%, #064e3b 100%);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: var(--text2);
+            font-size: 16px;
+            max-width: 600px;
+        }
+
+        .hero .meta {
+            display: flex;
+            gap: 16px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-purple {
+            background: #312e81;
+            color: #a5b4fc;
+        }
+
+        .badge-green {
+            background: #14532d;
+            color: #86efac;
+        }
+
+        .badge-orange {
+            background: #7c2d12;
+            color: #fdba74;
+        }
+
+        .badge-blue {
+            background: #1e3a5f;
+            color: #93c5fd;
+        }
+
+        /* ── SECTION ── */
+        section {
+            margin-bottom: 56px;
+            scroll-margin-top: 20px;
+        }
+
+        section h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent2);
+            margin: 24px 0 12px;
+        }
+
+        p {
+            color: var(--text2);
+            margin-bottom: 12px;
+        }
+
+        strong {
+            color: var(--text);
+        }
+
+        /* ── STEP CARDS ── */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .step {
+            display: flex;
+            gap: 24px;
+            position: relative;
+        }
+
+        .step:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 23px;
+            top: 52px;
+            bottom: -20px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+        }
+
+        .step-num {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            margin-top: 4px;
+            box-shadow: 0 0 20px rgba(108, 99, 255, .4);
+        }
+
+        .step-body {
+            flex: 1;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+
+        .step-body h4 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .step-body .file-path {
+            display: inline-block;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 3px 10px;
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--accent2);
+            margin-bottom: 12px;
+        }
+
+        /* ── CODE BLOCKS ── */
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+
+        .code-header {
+            background: var(--bg3);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-header span {
+            font-size: 12px;
+            color: var(--text2);
+            font-family: monospace;
+        }
+
+        .code-lang {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .lang-php {
+            background: #4f2c91;
+            color: #c4b5fd;
+        }
+
+        .lang-python {
+            background: #1e3a5f;
+            color: #93c5fd;
+        }
+
+        .lang-json {
+            background: #14532d;
+            color: #86efac;
+        }
+
+        .lang-bash {
+            background: #1f2937;
+            color: #9ca3af;
+        }
+
+        .lang-env {
+            background: #451a03;
+            color: #fcd34d;
+        }
+
+        pre {
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        /* ── FLOW DIAGRAM ── */
+        .flow {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            margin: 16px 0;
+        }
+
+        .flow-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 8px 0;
+        }
+
+        .flow-box {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .flow-box.php {
+            border-color: #7c3aed;
+            color: #c4b5fd;
+        }
+
+        .flow-box.python {
+            border-color: #2563eb;
+            color: #93c5fd;
+        }
+
+        .flow-box.llm {
+            border-color: #059669;
+            color: #6ee7b7;
+        }
+
+        .flow-box.db {
+            border-color: #d97706;
+            color: #fcd34d;
+        }
+
+        .flow-arrow {
+            color: var(--accent);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* ── TABLES ── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        th {
+            background: var(--bg3);
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--text2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 11px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text2);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: var(--bg3);
+        }
+
+        td code {
+            background: var(--bg3);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 12px;
+            color: var(--accent2);
+            font-family: monospace;
+        }
+
+        /* ── ALERTS ── */
+        .alert {
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 13px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .alert-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .alert-info {
+            background: #1e3a5f33;
+            border: 1px solid #2563eb55;
+        }
+
+        .alert-warning {
+            background: #78350f33;
+            border: 1px solid #d9770655;
+        }
+
+        .alert-success {
+            background: #14532d33;
+            border: 1px solid #15803d55;
+        }
+
+        /* ── CHECKLIST ── */
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text2);
+        }
+
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+
+        .check-icon {
+            flex-shrink: 0;
+            font-size: 16px;
+            margin-top: 2px;
+        }
+
+        /* ── JSON VIEW ── */
+        .json-key {
+            color: #93c5fd;
+        }
+
+        .json-str {
+            color: #86efac;
+        }
+
+        .json-num {
+            color: #fcd34d;
+        }
+
+        .json-bool {
+            color: #f87171;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            main {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span>AcademiX AI</span>
+            <p>Guide d'Implémentation Backend</p>
+        </div>
+        <nav>
+            <div class="section-title">Vue d'ensemble</div>
+            <a href="#overview">🎯 Objectif</a>
+            <a href="#architecture">🏗️ Architecture</a>
+            <a href="#prereqs">📦 Prérequis</a>
+
+            <div class="section-title">Étape par Étape</div>
+            <a href="#step1">① Migration DB</a>
+            <a href="#step2">② Service Python</a>
+            <a href="#step3">③ LangChain + OpenRouter</a>
+            <a href="#step4">④ Endpoints FastAPI</a>
+            <a href="#step5">⑤ Controller Laravel</a>
+            <a href="#step6">⑥ Service HTTP Laravel</a>
+            <a href="#step7">⑦ Routes Laravel</a>
+            <a href="#step8">⑧ Notifications</a>
+
+            <div class="section-title">Référence</div>
+            <a href="#contracts">📄 Contrats JSON</a>
+            <a href="#env">🔑 Variables ENV</a>
+            <a href="#checklist">✅ Checklist</a>
+        </nav>
+    </aside>
+
+    <!-- ═══════════════════════ MAIN ═══════════════════════ -->
+    <main>
+
+        <!-- HERO -->
+        <div class="hero">
+            <h1>🤖 IA de Suivi Personnalisé des Étudiants</h1>
+            <p>Guide complet d'implémentation pour le développeur backend — de la base de données au message
+                personnalisé généré par IA.</p>
+            <div class="meta">
+                <span class="badge badge-purple">📅 Mars 2026</span>
+                <span class="badge badge-blue">🏗️ Laravel + Python FastAPI</span>
+                <span class="badge badge-green">🤖 LangChain + OpenRouter</span>
+                <span class="badge badge-orange">⚡ 8 étapes</span>
+            </div>
+        </div>
+
+        <!-- ════════════ SECTION 1 : OBJECTIF ════════════ -->
+        <section id="overview">
+            <h2>🎯 Objectif de la Fonctionnalité</h2>
+            <p>Cette fonctionnalité ajoute une <strong>intelligence artificielle de suivi personnalisé</strong> qui :
+            </p>
+            <ul style="color:var(--text2); padding-left:20px; margin-bottom:16px;">
+                <li>📊 Récupère les notes de chaque étudiant en base de données</li>
+                <li>🧮 Calcule les moyennes par matière et la moyenne générale</li>
+                <li>🔍 Identifie automatiquement les <strong>matières faibles</strong> (en dessous du seuil)</li>
+                <li>📈 Détecte la <strong>tendance</strong> (progression ou régression)</li>
+                <li>✉️ Génère un <strong>message personnalisé, empathique et actionnable</strong> via un LLM</li>
+                <li>🔔 Envoie ce message en notification / email à l'étudiant</li>
+            </ul>
+            <div class="alert alert-info">
+                <span class="alert-icon">💡</span>
+                <div><strong>Philosophie :</strong> On n'entraîne pas un modèle ML maison. On construit un contexte
+                    structuré (notes, tendances, profil) et on l'envoie à un LLM via OpenRouter qui génère le message.
+                    C'est léger, maintenable et immédiatement opérationnel.</div>
+            </div>
+        </section>
+
+        <!-- ════════════ SECTION 2 : ARCHITECTURE ════════════ -->
+        <section id="architecture">
+            <h2>🏗️ Architecture Globale</h2>
+            <div class="flow">
+                <div class="flow-row">
+                    <div class="flow-box php">Client / Frontend</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box php">Laravel API<br><small style="font-weight:400;font-size:11px">GET
+                            /api/v1/students/{id}/analysis</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box db">MySQL<br><small style="font-weight:400;font-size:11px">notes,
+                            étudiants</small></div>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px; margin: 8px 0 8px 80px;">
+                    <div class="flow-arrow" style="transform:rotate(90deg)">→</div>
+                </div>
+                <div class="flow-row">
+                    <div style="width:80px"></div>
+                    <div class="flow-box python">Python FastAPI<br><small
+                            style="font-weight:400;font-size:11px">student_analysis_service.py</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box python">Calcul contexte<br><small
+                            style="font-weight:400;font-size:11px">moyennes, faiblesses, tendance</small></div>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px; margin: 8px 0 8px 80px;">
+                    <div class="flow-arrow" style="transform:rotate(90deg)">→</div>
+                </div>
+                <div class="flow-row">
+                    <div style="width:80px"></div>
+                    <div class="flow-box llm">LangChain Chain<br><small
+                            style="font-weight:400;font-size:11px">PromptTemplate + OutputParser</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box llm">OpenRouter LLM<br><small
+                            style="font-weight:400;font-size:11px">mistral-7b-instruct</small></div>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px; margin: 8px 0 8px 80px;">
+                    <div class="flow-arrow" style="transform:rotate(90deg)">→</div>
+                </div>
+                <div class="flow-row">
+                    <div style="width:80px"></div>
+                    <div class="flow-box php">JSON structuré<br><small style="font-weight:400;font-size:11px">message,
+                            conseils, alerte</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box php">Laravel<br><small style="font-weight:400;font-size:11px">Notification /
+                            Email</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box php">Étudiant 🎓</div>
+                </div>
+            </div>
+
+            <h3>Répartition des responsabilités</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Composant</th>
+                        <th>Rôle</th>
+                        <th>Port</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Laravel</strong></td>
+                        <td>Authentification, CRUD notes, routing, notifications</td>
+                        <td>8000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Python FastAPI</strong></td>
+                        <td>Calculs, orchestration LangChain, appel OpenRouter</td>
+                        <td>5000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MySQL</strong></td>
+                        <td>Stockage notes, étudiants, historique analyses</td>
+                        <td>3306</td>
+                    </tr>
+                    <tr>
+                        <td><strong>OpenRouter</strong></td>
+                        <td>LLM externe (Mistral/LLaMA) — génération du message</td>
+                        <td>HTTPS</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- ════════════ PRÉREQUIS ════════════ -->
+        <section id="prereqs">
+            <h2>📦 Prérequis & Installation</h2>
+
+            <h3>Variables d'environnement Python (.env)</h3>
+            <div class="code-block">
+                <div class="code-header"><span>.env (python/)</span><span class="code-lang lang-env">ENV</span></div>
+                <pre>OPENROUTER_API_KEY=sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxxx
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_MODEL=mistralai/mistral-7b-instruct
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=academix
+DB_USER=root
+DB_PASSWORD=secret
+PYTHON_AI_URL=http://localhost:5000   # utilisé côté Laravel</pre>
+            </div>
+
+            <h3>Installation des dépendances Python</h3>
+            <div class="code-block">
+                <div class="code-header"><span>Terminal</span><span class="code-lang lang-bash">BASH</span></div>
+                <pre>cd python
+pip install langchain langchain-openai openai pydantic pymysql python-dotenv fastapi uvicorn</pre>
+            </div>
+
+            <div class="alert alert-warning">
+                <span class="alert-icon">⚠️</span>
+                <div><strong>Note :</strong> Utilise <code>langchain-openai</code> (et non
+                    <code>langchain-community</code>) car OpenRouter est compatible avec l'API OpenAI standard. Il
+                    suffit de changer la <code>base_url</code>.</div>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════
+        ÉTAPES D'IMPLÉMENTATION
+  ════════════════════════════════════════════ -->
+
+        <!-- ÉTAPE 1 -->
+        <section id="step1">
+            <h2>① Migration Base de Données</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-body">
+                        <h4>Créer la table <code>student_analyses</code></h4>
+                        <span
+                            class="file-path">backend/laravel/database/migrations/xxxx_create_student_analyses_table.php</span>
+                        <p>Cette table stocke l'historique de chaque analyse générée pour éviter le spam et permettre un
+                            suivi dans le temps.</p>
+                        <div class="code-block">
+                            <div class="code-header"><span>Migration Laravel</span><span
+                                    class="code-lang lang-php">PHP</span></div>
+                            <pre>Schema::create('student_analyses', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained()->onDelete('cascade');
+    $table->float('moyenne_generale');
+    $table->string('niveau_alerte')->default('info'); // info | warning | danger
+    $table->text('message_principal');
+    $table->json('conseils');                  // tableau de conseils
+    $table->json('matieres_prioritaires');     // matières à travailler
+    $table->text('point_positif')->nullable();
+    $table->json('contexte_raw')->nullable();  // contexte envoyé au LLM (debug)
+    $table->timestamp('sent_at')->nullable();  // date d'envoi notification
+    $table->timestamps();
+});</pre>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-header"><span>Lancer la migration</span><span
+                                    class="code-lang lang-bash">BASH</span></div>
+                            <pre>cd backend/laravel
+php artisan migrate</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ÉTAPE 2 -->
+        <section id="step2">
+            <h2>② Service Python — Calcul du Contexte</h2>
+            <div class="alert alert-info">
+                <span class="alert-icon">📁</span>
+                <div>Fichier à créer : <code>python/app/services/student_analysis_service.py</code></div>
+            </div>
+            <p>Ce service est le cœur de la fonctionnalité. Il récupère les données depuis MySQL, calcule tout, puis
+                appelle la chain LangChain.</p>
+
+            <div class="code-block">
+                <div class="code-header"><span>python/app/services/student_analysis_service.py</span><span
+                        class="code-lang lang-python">PYTHON</span></div>
+                <pre>import os
+import pymysql
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from langchain.prompts import PromptTemplate
+from langchain_core.output_parsers import JsonOutputParser
+
+load_dotenv()
+
+# ──────────────────────────────────────────────
+# 1. CONNEXION BASE DE DONNÉES
+# ──────────────────────────────────────────────
+def get_db_connection():
+    return pymysql.connect(
+        host=os.getenv("DB_HOST", "127.0.0.1"),
+        port=int(os.getenv("DB_PORT", 3306)),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME"),
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
+# ──────────────────────────────────────────────
+# 2. RÉCUPÉRATION DES NOTES
+# ──────────────────────────────────────────────
+def get_student_grades(student_id: int) -> dict:
+    """
+    Récupère les notes de l'étudiant groupées par matière.
+    Retourne : { nom, filiere, objectif_moyenne, notes_par_matiere, absences }
+    """
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            # Infos de base de l'étudiant
+            cursor.execute("""
+                SELECT u.name, u.email, p.filiere, p.niveau,
+                       p.objectif_moyenne, p.absences
+                FROM users u
+                JOIN student_profiles p ON p.user_id = u.id
+                WHERE u.id = %s
+            """, (student_id,))
+            student = cursor.fetchone()
+
+            # Notes par matière (plusieurs évaluations possibles par matière)
+            cursor.execute("""
+                SELECT m.nom AS matiere, n.valeur, n.created_at
+                FROM notes n
+                JOIN matieres m ON m.id = n.matiere_id
+                WHERE n.student_id = %s
+                ORDER BY m.nom, n.created_at DESC
+            """, (student_id,))
+            notes = cursor.fetchall()
+
+        return {"student": student, "notes": notes}
+    finally:
+        conn.close()
+
+# ──────────────────────────────────────────────
+# 3. CALCUL DES MOYENNES ET FAIBLESSES
+# ──────────────────────────────────────────────
+def build_student_context(student_id: int) -> dict:
+    """
+    Construit le contexte complet à envoyer au LLM.
+    """
+    data = get_student_grades(student_id)
+    student = data["student"]
+    notes = data["notes"]
+
+    # Grouper les notes par matière
+    matieres_dict = {}
+    for note in notes:
+        nom = note["matiere"]
+        if nom not in matieres_dict:
+            matieres_dict[nom] = []
+        matieres_dict[nom].append(float(note["valeur"]))
+
+    # Calculer les moyennes par matière
+    matieres = []
+    toutes_moyennes = []
+    for nom, valeurs in matieres_dict.items():
+        moyenne = round(sum(valeurs) / len(valeurs), 2)
+        toutes_moyennes.append(moyenne)
+
+        if moyenne < 8:
+            statut = "critique"
+        elif moyenne < 10:
+            statut = "faible"
+        elif moyenne < 13:
+            statut = "moyen"
+        else:
+            statut = "fort"
+
+        matieres.append({"nom": nom, "moyenne": moyenne, "statut": statut})
+
+    moyenne_generale = round(sum(toutes_moyennes) / len(toutes_moyennes), 2) if toutes_moyennes else 0
+
+    # Tendance : comparer les 3 dernières notes avec les 3 précédentes
+    tendance = detect_trend(notes)
+
+    return {
+        "nom": student["name"],
+        "filiere": f"{student['filiere']} {student.get('niveau', '')}".strip(),
+        "moyenne_generale": moyenne_generale,
+        "matieres": sorted(matieres, key=lambda x: x["moyenne"]),
+        "tendance": tendance,
+        "absences": student.get("absences", 0),
+        "objectif_moyenne": float(student.get("objectif_moyenne", 12.0))
+    }
+
+# ──────────────────────────────────────────────
+# 4. DÉTECTION DE TENDANCE
+# ──────────────────────────────────────────────
+def detect_trend(notes: list) -> str:
+    """
+    Compare les 3 notes les plus récentes aux 3 précédentes.
+    """
+    if len(notes) < 4:
+        return "insuffisant"  # pas assez de données
+
+    recentes = [float(n["valeur"]) for n in notes[:3]]
+    precedentes = [float(n["valeur"]) for n in notes[3:6]]
+
+    moy_rec = sum(recentes) / len(recentes)
+    moy_prec = sum(precedentes) / len(precedentes)
+
+    diff = moy_rec - moy_prec
+    if diff > 1.5:
+        return "en_hausse"
+    elif diff < -1.5:
+        return "en_baisse"
+    else:
+        return "stable"
+
+# ──────────────────────────────────────────────
+# 5. GÉNÉRATION DU MESSAGE VIA LANGCHAIN
+# ──────────────────────────────────────────────
+def generate_personalized_message(context: dict) -> dict:
+    """
+    Envoie le contexte structuré au LLM via LangChain + OpenRouter.
+    Retourne un JSON structuré.
+    """
+    llm = ChatOpenAI(
+        model=os.getenv("OPENROUTER_MODEL", "mistralai/mistral-7b-instruct"),
+        openai_api_key=os.getenv("OPENROUTER_API_KEY"),
+        openai_api_base=os.getenv("OPENROUTER_BASE_URL"),
+        temperature=0.7,
+    )
+
+    template = PromptTemplate(
+        input_variables=["nom", "filiere", "moyenne_generale", "matieres",
+                         "tendance", "absences", "objectif_moyenne"],
+        template="""
+Tu es un tuteur académique bienveillant de la plateforme AcademiX.
+Analyse les données suivantes d'un étudiant et génère un retour personnalisé.
+
+DONNÉES ÉTUDIANT :
+- Nom : {nom}
+- Filière : {filiere}
+- Moyenne générale : {moyenne_generale}/20
+- Objectif de moyenne : {objectif_moyenne}/20
+- Tendance : {tendance}
+- Absences : {absences}
+- Matières : {matieres}
+
+CONSIGNES :
+1. Rédige un message d'introduction chaleureux et personnalisé (3-4 phrases max)
+2. Identifie les matières prioritaires à travailler (statut critique ou faible)
+3. Donne 2-3 conseils concrets et actionnables
+4. Termine sur une note positive en valorisant un point fort
+5. Adapte le ton à la situation (encourageant si en hausse, mobilisateur si en baisse)
+
+IMPORTANT : Réponds UNIQUEMENT en JSON valide avec cette structure exacte :
+{{
+  "message_principal": "...",
+  "niveau_alerte": "info|warning|danger",
+  "conseils": ["conseil1", "conseil2", "conseil3"],
+  "matieres_prioritaires": ["matiere1", "matiere2"],
+  "point_positif": "..."
+}}
+"""
+    )
+
+    chain = template | llm | JsonOutputParser()
+    
+    result = chain.invoke({
+        "nom": context["nom"],
+        "filiere": context["filiere"],
+        "moyenne_generale": context["moyenne_generale"],
+        "matieres": str(context["matieres"]),
+        "tendance": context["tendance"],
+        "absences": context["absences"],
+        "objectif_moyenne": context["objectif_moyenne"]
+    })
+
+    return result
+
+# ──────────────────────────────────────────────
+# 6. POINT D'ENTRÉE PRINCIPAL
+# ──────────────────────────────────────────────
+def run_analysis(student_id: int) -> dict:
+    """
+    Fonction principale appelée par l'endpoint FastAPI.
+    Retourne l'analyse complète.
+    """
+    context = build_student_context(student_id)
+    message = generate_personalized_message(context)
+    return {
+        "student_id": student_id,
+        "context": context,
+        "analysis": message
+    }</pre>
+            </div>
+        </section>
+
+        <!-- ÉTAPE 3 -->
+        <section id="step3">
+            <h2>③ Configuration LangChain + OpenRouter</h2>
+            <div class="alert alert-success">
+                <span class="alert-icon">✅</span>
+                <div><strong>Bonne nouvelle :</strong> OpenRouter est 100% compatible avec le client
+                    <code>ChatOpenAI</code> de LangChain. Il suffit de changer la <code>base_url</code> et d'utiliser ta
+                    clé OpenRouter. Aucune librairie supplémentaire.</div>
+            </div>
+
+            <h3>Obtenir une clé API OpenRouter</h3>
+            <ol style="color:var(--text2); padding-left:20px; line-height:2;">
+                <li>Aller sur <strong>openrouter.ai</strong></li>
+                <li>Créer un compte gratuit</li>
+                <li>Aller dans <strong>Keys</strong> → créer une clé</li>
+                <li>Copier la clé dans <code>.env</code> → <code>OPENROUTER_API_KEY</code></li>
+            </ol>
+
+            <h3>Modèles recommandés (gratuits)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Modèle</th>
+                        <th>Identifiant OpenRouter</th>
+                        <th>Qualité</th>
+                        <th>Vitesse</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Mistral 7B</strong> ⭐</td>
+                        <td><code>mistralai/mistral-7b-instruct</code></td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>⚡⚡⚡</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LLaMA 3 8B</strong></td>
+                        <td><code>meta-llama/llama-3-8b-instruct</code></td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>⚡⚡⚡</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gemma 7B</strong></td>
+                        <td><code>google/gemma-7b-it</code></td>
+                        <td>⭐⭐⭐</td>
+                        <td>⚡⚡⚡⚡</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- ÉTAPE 4 -->
+        <section id="step4">
+            <h2>④ Endpoint FastAPI (Python)</h2>
+            <div class="alert alert-info">
+                <span class="alert-icon">📁</span>
+                <div>Fichier à créer : <code>python/app/api/routes/analysis.py</code></div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header"><span>python/app/api/routes/analysis.py</span><span
+                        class="code-lang lang-python">PYTHON</span></div>
+                <pre>from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from app.services.student_analysis_service import run_analysis, build_student_context
+
+router = APIRouter(prefix="/analysis", tags=["AI Analysis"])
+
+# ── GET /analysis/{student_id} ──────────────────
+@router.get("/{student_id}")
+async def get_analysis(student_id: int):
+    """
+    Lance une analyse complète pour un étudiant.
+    Retourne le contexte + le message IA généré.
+    """
+    try:
+        result = run_analysis(student_id)
+        return {"success": True, "data": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ── GET /analysis/{student_id}/context ──────────
+@router.get("/{student_id}/context")
+async def get_context_only(student_id: int):
+    """
+    Retourne uniquement le contexte calculé (sans appeler le LLM).
+    Utile pour debug / aperçu des données.
+    """
+    try:
+        context = build_student_context(student_id)
+        return {"success": True, "data": context}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))</pre>
+            </div>
+
+            <h3>Enregistrer le router dans l'application principale</h3>
+            <p>Dans le fichier principal FastAPI (<code>python/app/main.py</code> ou similaire), ajouter :</p>
+            <div class="code-block">
+                <div class="code-header"><span>python/app/main.py (ajout)</span><span
+                        class="code-lang lang-python">PYTHON</span></div>
+                <pre>from app.api.routes.analysis import router as analysis_router
+
+app.include_router(analysis_router, prefix="/api")</pre>
+            </div>
+        </section>
+
+        <!-- ÉTAPE 5 -->
+        <section id="step5">
+            <h2>⑤ Controller Laravel</h2>
+            <div class="alert alert-info">
+                <span class="alert-icon">📁</span>
+                <div>Fichier à créer : <code>backend/laravel/app/Http/Controllers/StudentAnalysisController.php</code>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header"><span>StudentAnalysisController.php</span><span
+                        class="code-lang lang-php">PHP</span></div>
+                <pre>&lt;?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use App\Models\StudentAnalysis;
+use App\Services\PythonAIService;
+use Illuminate\Http\Request;
+
+class StudentAnalysisController extends Controller
+{
+    public function __construct(protected PythonAIService $aiService) {}
+
+    /**
+     * Lancer une analyse IA pour un étudiant.
+     * GET /api/v1/students/{id}/analysis
+     */
+    public function analyze(int $id)
+    {
+        $student = User::findOrFail($id);
+
+        // Anti-spam : 1 analyse maximum toutes les 24h
+        $lastAnalysis = StudentAnalysis::where('user_id', $id)
+            ->where('created_at', '>=', now()->subHours(24))
+            ->first();
+
+        if ($lastAnalysis) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Une analyse a déjà été effectuée il y a moins de 24h.',
+                'data'    => $lastAnalysis
+            ], 429);
+        }
+
+        // Appel au service Python
+        $result = $this->aiService->analyzeStudent($id);
+
+        if (!$result['success']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur du service IA : ' . $result['error']
+            ], 500);
+        }
+
+        $analysis = $result['data']['analysis'];
+        $context  = $result['data']['context'];
+
+        // Sauvegarder en base
+        $record = StudentAnalysis::create([
+            'user_id'              => $id,
+            'moyenne_generale'     => $context['moyenne_generale'],
+            'niveau_alerte'        => $analysis['niveau_alerte'],
+            'message_principal'    => $analysis['message_principal'],
+            'conseils'             => $analysis['conseils'],
+            'matieres_prioritaires'=> $analysis['matieres_prioritaires'],
+            'point_positif'        => $analysis['point_positif'] ?? null,
+            'contexte_raw'         => $context,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data'    => $record
+        ]);
+    }
+
+    /**
+     * Envoyer le message IA à l'étudiant par notification.
+     * POST /api/v1/students/{id}/analysis/send
+     */
+    public function send(int $id)
+    {
+        $latestAnalysis = StudentAnalysis::where('user_id', $id)
+            ->latest()
+            ->firstOrFail();
+
+        // TODO : envoyer via Email / Notification Laravel
+        // $student->notify(new StudentAnalysisNotification($latestAnalysis));
+
+        $latestAnalysis->update(['sent_at' => now()]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Message envoyé avec succès.',
+            'sent_at' => $latestAnalysis->sent_at
+        ]);
+    }
+
+    /**
+     * Historique des analyses d'un étudiant.
+     * GET /api/v1/students/{id}/analysis/history
+     */
+    public function history(int $id)
+    {
+        $analyses = StudentAnalysis::where('user_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data'    => $analyses
+        ]);
+    }
+}</pre>
+            </div>
+
+            <h3>Modèle Eloquent à créer</h3>
+            <div class="code-block">
+                <div class="code-header"><span>app/Models/StudentAnalysis.php</span><span
+                        class="code-lang lang-php">PHP</span></div>
+                <pre>&lt;?php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class StudentAnalysis extends Model
+{
+    protected $fillable = [
+        'user_id', 'moyenne_generale', 'niveau_alerte',
+        'message_principal', 'conseils', 'matieres_prioritaires',
+        'point_positif', 'contexte_raw', 'sent_at'
+    ];
+
+    protected $casts = [
+        'conseils'              => 'array',
+        'matieres_prioritaires' => 'array',
+        'contexte_raw'          => 'array',
+        'sent_at'               => 'datetime',
+    ];
+
+    public function student()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+}</pre>
+            </div>
+        </section>
+
+        <!-- ÉTAPE 6 -->
+        <section id="step6">
+            <h2>⑥ Service HTTP Laravel → Python</h2>
+            <div class="alert alert-info">
+                <span class="alert-icon">📁</span>
+                <div>Fichier à créer : <code>backend/laravel/app/Services/PythonAIService.php</code></div>
+            </div>
+            <p>Ce service est le <strong>client HTTP</strong> qui fait le pont entre Laravel et le service Python
+                FastAPI.</p>
+
+            <div class="code-block">
+                <div class="code-header"><span>app/Services/PythonAIService.php</span><span
+                        class="code-lang lang-php">PHP</span></div>
+                <pre>&lt;?php
+
+namespace App\Services;
+
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class PythonAIService
+{
+    private string $baseUrl;
+
+    public function __construct()
+    {
+        $this->baseUrl = config('services.python_ai.url', 'http://localhost:5000');
+    }
+
+    /**
+     * Lance l'analyse IA pour un étudiant.
+     */
+    public function analyzeStudent(int $studentId): array
+    {
+        try {
+            $response = Http::timeout(30)
+                ->get("{$this->baseUrl}/api/analysis/{$studentId}");
+
+            if ($response->successful()) {
+                return ['success' => true, 'data' => $response->json('data')];
+            }
+
+            Log::error("PythonAIService error", [
+                'status' => $response->status(),
+                'body'   => $response->body()
+            ]);
+
+            return ['success' => false, 'error' => 'Service IA indisponible'];
+
+        } catch (\Exception $e) {
+            Log::error("PythonAIService exception: " . $e->getMessage());
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+}</pre>
+            </div>
+
+            <h3>Ajouter dans config/services.php</h3>
+            <div class="code-block">
+                <div class="code-header"><span>config/services.php (ajout)</span><span
+                        class="code-lang lang-php">PHP</span></div>
+                <pre>'python_ai' => [
+    'url' => env('PYTHON_AI_URL', 'http://localhost:5000'),
+],</pre>
+            </div>
+        </section>
+
+        <!-- ÉTAPE 7 -->
+        <section id="step7">
+            <h2>⑦ Routes Laravel</h2>
+            <p>Ajouter dans <code>routes/api.php</code> :</p>
+            <div class="code-block">
+                <div class="code-header"><span>routes/api.php (ajout)</span><span class="code-lang lang-php">PHP</span>
+                </div>
+                <pre>use App\Http\Controllers\StudentAnalysisController;
+
+// ── IA ANALYSIS ROUTES ──────────────────────────────
+Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
+
+    // Lancer une analyse pour un étudiant
+    Route::get('/students/{id}/analysis',         [StudentAnalysisController::class, 'analyze']);
+
+    // Envoyer le dernier message généré à l'étudiant
+    Route::post('/students/{id}/analysis/send',   [StudentAnalysisController::class, 'send']);
+
+    // Historique des analyses
+    Route::get('/students/{id}/analysis/history', [StudentAnalysisController::class, 'history']);
+
+});</pre>
+            </div>
+
+            <h3>Résumé des endpoints</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>URL</th>
+                        <th>Description</th>
+                        <th>Auth</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-blue">GET</span></td>
+                        <td><code>/api/v1/students/{id}/analysis</code></td>
+                        <td>Lance une analyse IA complète</td>
+                        <td>✅ Sanctum</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-green">POST</span></td>
+                        <td><code>/api/v1/students/{id}/analysis/send</code></td>
+                        <td>Envoie le message à l'étudiant</td>
+                        <td>✅ Sanctum</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-blue">GET</span></td>
+                        <td><code>/api/v1/students/{id}/analysis/history</code></td>
+                        <td>Historique des analyses</td>
+                        <td>✅ Sanctum</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-blue">GET</span></td>
+                        <td><code>/api/analysis/{id}</code></td>
+                        <td>Endpoint Python interne (pas exposé)</td>
+                        <td>❌ Interne</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- ÉTAPE 8 -->
+        <section id="step8">
+            <h2>⑧ Notifications (optionnel mais recommandé)</h2>
+            <div class="code-block">
+                <div class="code-header"><span>Terminal — Créer la notification</span><span
+                        class="code-lang lang-bash">BASH</span></div>
+                <pre>php artisan make:notification StudentAnalysisNotification</pre>
+            </div>
+            <div class="code-block">
+                <div class="code-header"><span>app/Notifications/StudentAnalysisNotification.php</span><span
+                        class="code-lang lang-php">PHP</span></div>
+                <pre>&lt;?php
+namespace App\Notifications;
+
+use App\Models\StudentAnalysis;
+use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\MailMessage;
+
+class StudentAnalysisNotification extends Notification
+{
+    public function __construct(public StudentAnalysis $analysis) {}
+
+    public function via($notifiable): array
+    {
+        return ['mail', 'database'];
+    }
+
+    public function toMail($notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject('📊 Ton bilan académique personnalisé — AcademiX')
+            ->greeting('Bonjour ' . $notifiable->name . ' !')
+            ->line($this->analysis->message_principal)
+            ->line('**Matières à prioriser :** ' . implode(', ', $this->analysis->matieres_prioritaires))
+            ->line('💪 ' . $this->analysis->point_positif)
+            ->action('Voir mon tableau de bord', url('/dashboard'));
+    }
+
+    public function toArray($notifiable): array
+    {
+        return [
+            'type'              => 'student_analysis',
+            'niveau_alerte'     => $this->analysis->niveau_alerte,
+            'message_principal' => $this->analysis->message_principal,
+            'matieres'          => $this->analysis->matieres_prioritaires,
+        ];
+    }
+}</pre>
+            </div>
+        </section>
+
+        <!-- CONTRATS JSON -->
+        <section id="contracts">
+            <h2>📄 Contrats JSON</h2>
+
+            <h3>Input envoyé au LLM (contexte étudiant)</h3>
+            <div class="code-block">
+                <div class="code-header"><span>Exemple de contexte structuré</span><span
+                        class="code-lang lang-json">JSON</span></div>
+                <pre>{
+  "nom": "Koffi Amavi",
+  "filiere": "Génie Informatique L1",
+  "moyenne_generale": 9.5,
+  "objectif_moyenne": 12.0,
+  "tendance": "en_baisse",
+  "absences": 3,
+  "matieres": [
+    { "nom": "Algorithmes",   "moyenne": 6.0,  "statut": "critique" },
+    { "nom": "Mathématiques", "moyenne": 8.0,  "statut": "faible"   },
+    { "nom": "Réseau",        "moyenne": 12.5, "statut": "moyen"    },
+    { "nom": "Anglais",       "moyenne": 15.0, "statut": "fort"     }
+  ]
+}</pre>
+            </div>
+
+            <h3>Output retourné par le LLM</h3>
+            <div class="code-block">
+                <div class="code-header"><span>Réponse JSON générée par le LLM</span><span
+                        class="code-lang lang-json">JSON</span></div>
+                <pre>{
+  "message_principal": "Bonjour Koffi ! Je voulais faire le point avec toi sur ta progression ce mois-ci. Ta moyenne générale de 9.5 montre qu'il y a du potentiel, mais quelques matières nécessitent ton attention urgente pour atteindre ton objectif de 12.",
+  "niveau_alerte": "warning",
+  "conseils": [
+    "Consacre 30 min/jour aux Algorithmes cette semaine — revois la récursivité et les tris",
+    "Pour les Maths, refais les exercices du chapitre 4 et n'hésite pas à demander de l'aide au tuteur",
+    "Essaie de planifier tes révisions le dimanche soir pour la semaine à venir"
+  ],
+  "matieres_prioritaires": ["Algorithmes", "Mathématiques"],
+  "point_positif": "Ton niveau en Anglais (15/20) est vraiment impressionnant — tu peux t'appuyer sur cette force pour rester confiant !"
+}</pre>
+            </div>
+        </section>
+
+        <!-- ENV -->
+        <section id="env">
+            <h2>🔑 Variables d'Environnement</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Service</th>
+                        <th>Description</th>
+                        <th>Exemple</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>OPENROUTER_API_KEY</code></td>
+                        <td>Python</td>
+                        <td>Clé API OpenRouter</td>
+                        <td><code>sk-or-v1-xxx</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>OPENROUTER_BASE_URL</code></td>
+                        <td>Python</td>
+                        <td>URL de base OpenRouter</td>
+                        <td><code>https://openrouter.ai/api/v1</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>OPENROUTER_MODEL</code></td>
+                        <td>Python</td>
+                        <td>Modèle LLM à utiliser</td>
+                        <td><code>mistralai/mistral-7b-instruct</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>PYTHON_AI_URL</code></td>
+                        <td>Laravel</td>
+                        <td>URL du service Python</td>
+                        <td><code>http://localhost:5000</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>DB_HOST</code> / <code>DB_NAME</code></td>
+                        <td>Python</td>
+                        <td>Connexion MySQL</td>
+                        <td><code>127.0.0.1</code> / <code>academix</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- CHECKLIST -->
+        <section id="checklist">
+            <h2>✅ Checklist d'Implémentation</h2>
+            <ul class="checklist">
+                <li><span class="check-icon">⬜</span> <strong>Étape 1 :</strong> Créer et lancer la migration
+                    <code>student_analyses</code></li>
+                <li><span class="check-icon">⬜</span> <strong>Étape 2 :</strong> Créer
+                    <code>student_analysis_service.py</code> avec les 6 fonctions</li>
+                <li><span class="check-icon">⬜</span> <strong>Étape 3 :</strong> Créer le compte OpenRouter, obtenir la
+                    clé API, configurer <code>.env</code></li>
+                <li><span class="check-icon">⬜</span> <strong>Étape 4 :</strong> Créer <code>analysis.py</code> FastAPI
+                    et enregistrer le router</li>
+                <li><span class="check-icon">⬜</span> <strong>Étape 5 :</strong> Créer
+                    <code>StudentAnalysisController.php</code> + modèle <code>StudentAnalysis.php</code></li>
+                <li><span class="check-icon">⬜</span> <strong>Étape 6 :</strong> Créer <code>PythonAIService.php</code>
+                    + config <code>services.php</code></li>
+                <li><span class="check-icon">⬜</span> <strong>Étape 7 :</strong> Ajouter les 3 routes dans
+                    <code>routes/api.php</code></li>
+                <li><span class="check-icon">⬜</span> <strong>Étape 8 :</strong> (Optionnel) Créer la notification email
+                </li>
+                <li><span class="check-icon">⬜</span> <strong>Test :</strong> Tester l'endpoint
+                    <code>GET /api/v1/students/1/analysis</code></li>
+                <li><span class="check-icon">⬜</span> <strong>Test :</strong> Vérifier la structure JSON retournée par
+                    le LLM</li>
+            </ul>
+
+            <div class="alert alert-success" style="margin-top:24px">
+                <span class="alert-icon">🚀</span>
+                <div><strong>Ordre recommandé :</strong> Commence par les étapes Python (2, 3, 4) et teste d'abord
+                    l'endpoint FastAPI directement avant de connecter Laravel. Cela simplifie le debug.</div>
+            </div>
+        </section>
+
+        <footer
+            style="margin-top:60px; padding-top:24px; border-top:1px solid var(--border); color:var(--text2); font-size:12px; text-align:center; padding-bottom:40px;">
+            AcademiX Platform — HackByIFRI 2026 · Guide généré le 2 mars 2026
+        </footer>
+
+    </main>
+
+    <script>
+        // Highlight active sidebar link on scroll
+        const sections = document.querySelectorAll('section[id], div[id]');
+        const links = document.querySelectorAll('.sidebar nav a');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    links.forEach(l => l.classList.remove('active'));
+                    const active = document.querySelector(`.sidebar nav a[href="#${entry.target.id}"]`);
+                    if (active) active.classList.add('active');
+                }
+            });
+        }, { threshold: 0.4 });
+
+        sections.forEach(s => observer.observe(s));
+    </script>
+
+</body>
+
+</html>
