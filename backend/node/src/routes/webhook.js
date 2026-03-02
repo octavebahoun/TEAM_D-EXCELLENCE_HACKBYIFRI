@@ -21,6 +21,7 @@ const ALERTE_TYPE_MAP = {
     moyenne_faible: 'alerte',
     deadline_proche: 'rappel',
     absence: 'alerte',
+    felicitation: 'succes',
 };
 
 /**

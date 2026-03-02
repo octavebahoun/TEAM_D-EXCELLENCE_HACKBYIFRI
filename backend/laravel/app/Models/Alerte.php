@@ -8,6 +8,7 @@ class Alerte extends Model
 {
     protected $fillable = [
         'user_id',
+        'reference_id',
         'type_alerte',
         'niveau_severite',
         'titre',
