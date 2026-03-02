@@ -25,11 +25,18 @@ class User extends Authenticatable
         'is_active',
         'email_verified_at',
         'last_login',
+        'google_access_token',
+        'google_refresh_token',
+        'google_id',
+        'google_calendar_id',
+        'google_task_list_id',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'google_access_token',
+        'google_refresh_token',
     ];
 
     protected $casts = [

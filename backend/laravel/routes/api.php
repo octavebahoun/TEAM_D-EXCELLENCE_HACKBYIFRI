@@ -13,6 +13,8 @@ use App\Http\Controllers\Api\DepartementController;
 use App\Http\Controllers\Api\EmploiTempsController;
 use App\Http\Controllers\Api\StatistiqueController;
 use App\Http\Controllers\Api\ChefDepartementController;
+use App\Http\Controllers\Api\StudentAnalysisController;
+use App\Http\Controllers\Api\GoogleAuthController;
 
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
@@ -30,6 +32,10 @@ Route::prefix('v1')->group(function () {
         Route::post('student/logout', [AuthController::class, 'studentLogout'])->middleware('auth:sanctum');
 
         Route::get('me', [AuthController::class, 'me'])->middleware('auth:sanctum');
+
+        // Google OAuth Routes (Temporairement publiques pour test)
+        Route::get('google/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
+        Route::get('google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
     });
 
     Route::prefix('admin')->middleware(['auth:sanctum', 'super.admin'])->group(function () {
@@ -131,6 +137,7 @@ Route::prefix('v1')->group(function () {
 
         Route::get('dashboard', [StatistiqueController::class, 'dashboard']);
     });
+
     Route::prefix('student')->middleware(['auth:sanctum', 'student'])->group(function () {
         Route::get('profil', [StudentController::class, 'profil']);
         Route::get('moyennes', [StudentController::class, 'moyennes']);
@@ -142,5 +149,10 @@ Route::prefix('v1')->group(function () {
 
         Route::get('alertes', [AlerteController::class, 'index']);
         Route::patch('alertes/{id}/read', [AlerteController::class, 'markAsRead']);
+
+        // IA Analysis Routes
+        Route::get('analysis', [StudentAnalysisController::class, 'analyze']); 
+        Route::get('analysis/history', [StudentAnalysisController::class, 'history']);
+        Route::post('analysis/mark-sent/{id}', [StudentAnalysisController::class, 'markAsSent']);
     });
 });

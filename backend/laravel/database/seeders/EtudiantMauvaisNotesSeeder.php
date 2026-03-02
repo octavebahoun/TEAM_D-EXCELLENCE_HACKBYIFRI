@@ -96,7 +96,10 @@ class EtudiantMauvaisNotesSeeder extends Seeder
             $n['updated_at'] = $now;
         }
 
-        DB::table('notes')->insert($notes);
+        // Utilisation d'Eloquent pour déclencher les Observers d'alertes
+        foreach ($notes as $n) {
+            \App\Models\Note::create($n);
+        }
 
         $this->command->info(count($notes) . " notes insérées (toutes < 10/20).");
         $this->command->line('');

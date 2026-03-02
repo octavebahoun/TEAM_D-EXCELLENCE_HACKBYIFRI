@@ -14,6 +14,7 @@ class Tache extends Model
         'date_limite',
         'priorite',
         'statut',
+        'google_task_id',
     ];
 
     protected $casts = [

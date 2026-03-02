@@ -137,7 +137,6 @@ class EmploiTempsController extends Controller
     {
         $cours = EmploiTempsFiliere::findOrFail($id);
         $cours->load('filiere');
-
         $admin = $request->user();
         $isChef = method_exists($admin, 'isChefDepartement') && $admin->isChefDepartement();
         if ($isChef && $cours->filiere->departement_id !== $admin->departement_id) {

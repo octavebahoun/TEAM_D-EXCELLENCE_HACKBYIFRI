@@ -29,4 +29,16 @@ return [
         'webhook_secret' => env('WEBHOOK_SECRET', ''),
     ],
 
+    // Service IA Python (FastAPI)
+    'python_ai' => [
+        'url' => env('PYTHON_AI_SERVICE_URL', 'http://localhost:8001'),
+    ],
+
+    // Google API (Calendar & Tasks)
+    'google' => [
+        'client_id'     => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect_uri'  => env('GOOGLE_REDIRECT_URL', env('GOOGLE_REDIRECT_URI')),
+    ],
+
 ];

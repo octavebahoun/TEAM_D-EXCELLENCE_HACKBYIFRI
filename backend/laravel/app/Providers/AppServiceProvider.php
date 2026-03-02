@@ -17,6 +17,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Déclenche le webhook Socket.io dès qu'une alerte est créée dans MySQL
-        Alerte::observe(AlerteObserver::class);
+        \App\Models\Alerte::observe(\App\Observers\AlerteObserver::class);
+
+        // Détecte les performances (seuil 12) dès qu'une note est saisie
+        \App\Models\Note::observe(\App\Observers\NoteObserver::class);
+
+        \App\Models\Tache::observe(\App\Observers\TacheObserver::class);
+        \App\Models\EmploiTempsFiliere::observe(\App\Observers\EmploiTempsObserver::class);
     }
 }
