@@ -164,7 +164,7 @@ export default function StudentDashboard() {
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.3 }}
               >
-                <StudentEmploiTemps />
+                <StudentEmploiTemps onNavigate={setActiveTab} />
               </motion.div>
             )}
 

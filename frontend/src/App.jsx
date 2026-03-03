@@ -10,6 +10,7 @@ import RegisterPage from "./pages/RegisterPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import ChefDashboard from "./pages/ChefDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
+import GoogleCallbackPage from "./pages/GoogleCallbackPage";
 
 import ChatPage from "./pages/ChatPage";
 import SessionsFeedPage from "./pages/SessionsFeedPage";
@@ -62,6 +63,8 @@ function AppContent() {
       <Routes>
         {/* Routes publiques */}
         <Route path="/login" element={<LoginPage />} />
+        {/* Callback OAuth Google — accessible sans auth (token lu depuis localStorage) */}
+        <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />
 
         {/* Création d'un compte Admin — réservé à un Super Admin connecté */}
         <Route

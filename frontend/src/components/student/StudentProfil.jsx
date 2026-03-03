@@ -11,6 +11,10 @@ import {
   Camera,
   X,
   Save,
+  Calendar,
+  Link2,
+  Link2Off,
+  RefreshCw,
 } from "lucide-react";
 import { cn } from "../../utils/cn";
 import { studentService } from "../../services/studentService";
@@ -40,6 +44,13 @@ export default function StudentProfil() {
   });
   const fileInputRef = useRef(null);
 
+  // — Google Calendar states ————————————————————————————————————
+  const [googleStatus, setGoogleStatus] = useState(null);
+  const [googleLoading, setGoogleLoading] = useState(true);
+  const [connecting, setConnecting] = useState(false);
+  const [disconnecting, setDisconnecting] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -57,6 +68,62 @@ export default function StudentProfil() {
     };
     fetchData();
   }, []);
+
+  // Chargement du statut Google
+  useEffect(() => {
+    const fetchGoogleStatus = async () => {
+      try {
+        const data = await studentService.getGoogleStatus();
+        setGoogleStatus(data);
+      } catch {
+        setGoogleStatus({ connected: false, calendar_id: null });
+      } finally {
+        setGoogleLoading(false);
+      }
+    };
+    fetchGoogleStatus();
+  }, []);
+
+  const handleConnectGoogle = async () => {
+    setConnecting(true);
+    try {
+      const data = await studentService.getGoogleAuthUrl();
+      if (data?.auth_url) {
+        // Redirige vers Google OAuth — le retour arrivera sur /auth/google/callback
+        window.location.href = data.auth_url;
+      }
+    } catch {
+      toast.error("Impossible de récupérer le lien Google.");
+      setConnecting(false);
+    }
+  };
+
+  const handleDisconnectGoogle = async () => {
+    setDisconnecting(true);
+    try {
+      await studentService.disconnectGoogle();
+      setGoogleStatus({ connected: false, calendar_id: null });
+      toast.success("Compte Google déconnecté.");
+    } catch {
+      toast.error("Erreur lors de la déconnexion.");
+    } finally {
+      setDisconnecting(false);
+    }
+  };
+
+  const handleSyncCalendar = async () => {
+    setSyncing(true);
+    try {
+      await studentService.syncGoogleCalendar();
+      toast.success("Emploi du temps synchronisé !");
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.error || "Erreur lors de la synchronisation.",
+      );
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const openEdit = () => {
     setEditForm({
@@ -400,6 +467,130 @@ export default function StudentProfil() {
           </div>
         </motion.div>
       </div>
+
+      {/* ── Google Calendar Section ─────────────────────────────────── */}
+      <motion.div
+        variants={itemVariants}
+        className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 shadow-sm"
+      >
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center shrink-0">
+            <Calendar size={16} />
+          </div>
+          <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">
+            Google Calendar
+          </h3>
+        </div>
+
+        {googleLoading ? (
+          <div className="flex items-center gap-3 text-sm text-slate-400">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-slate-300" />
+            Vérification du statut…
+          </div>
+        ) : googleStatus?.connected ? (
+          <div className="space-y-6">
+            {/* Statut connecté */}
+            <div className="flex items-center justify-between p-4 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-black shrink-0">
+                  ✓
+                </div>
+                <div>
+                  <p className="text-sm font-black text-emerald-700 dark:text-emerald-400">
+                    Compte connecté
+                  </p>
+                  {googleStatus.calendar_id && (
+                    <p className="text-[10px] font-bold text-emerald-600/70 dark:text-emerald-400/60 mt-0.5 font-mono">
+                      {googleStatus.calendar_id.length > 28
+                        ? googleStatus.calendar_id.substring(0, 28) + "…"
+                        : googleStatus.calendar_id}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/20 px-2 py-1 rounded-full uppercase tracking-wider">
+                Actif
+              </span>
+            </div>
+
+            {/* Boutons d'action */}
+            <div className="flex gap-3 flex-wrap">
+              <button
+                onClick={handleSyncCalendar}
+                disabled={syncing}
+                className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm"
+              >
+                <RefreshCw
+                  size={14}
+                  className={syncing ? "animate-spin" : ""}
+                />
+                {syncing ? "Synchronisation…" : "Synchroniser maintenant"}
+              </button>
+              <button
+                onClick={handleDisconnectGoogle}
+                disabled={disconnecting}
+                className="flex items-center gap-2 px-5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-500/30 disabled:opacity-60 disabled:cursor-not-allowed text-xs font-black uppercase tracking-wider transition-all active:scale-95"
+              >
+                <Link2Off size={14} />
+                {disconnecting ? "Déconnexion…" : "Déconnecter"}
+              </button>
+            </div>
+
+            {/* Info sur la synchronisation automatique */}
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+              <span className="text-emerald-500">✓</span>
+              L'emploi du temps se synchronise automatiquement à chaque mise à
+              jour.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {/* Statut non connecté */}
+            <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
+              <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-400 shrink-0">
+                <Calendar size={18} />
+              </div>
+              <div>
+                <p className="text-sm font-black text-slate-900 dark:text-white">
+                  Google Calendar non lié
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Synchronisez votre emploi du temps et vos tâches
+                  automatiquement
+                </p>
+              </div>
+            </div>
+
+            {/* Avantages */}
+            <ul className="space-y-2">
+              {[
+                "Emploi du temps synchronisé en temps réel",
+                "Rappels de cours sur votre téléphone",
+                "Tâches synchronisées dans Google Tasks",
+              ].map((item) => (
+                <li
+                  key={item}
+                  className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400"
+                >
+                  <span className="text-emerald-500 shrink-0">✓</span> {item}
+                </li>
+              ))}
+            </ul>
+
+            {/* Bouton connexion */}
+            <button
+              onClick={handleConnectGoogle}
+              disabled={connecting}
+              className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-slate-900 dark:bg-white hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed text-white dark:text-slate-900 text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm"
+            >
+              <Link2 size={14} />
+              {connecting
+                ? "Redirection vers Google…"
+                : "Connecter Google Calendar"}
+            </button>
+          </div>
+        )}
+      </motion.div>
 
       {/* ── Modal Modifier le profil ── */}
       <AnimatePresence>

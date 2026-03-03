@@ -37,7 +37,8 @@ Route::prefix('v1')->group(function () {
         // Google OAuth Routes
         Route::middleware('auth:sanctum')->group(function () {
             Route::get('google/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
-            Route::get('google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+            // Le code OAuth est envoyé en POST depuis le frontend callback page
+            Route::post('google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
         });
     });
 
@@ -161,5 +162,13 @@ Route::prefix('v1')->group(function () {
         // Push Notifications Routes
         Route::post('push/subscribe', [PushSubscriptionController::class, 'store']);
         Route::delete('push/subscribe', [PushSubscriptionController::class, 'destroy']);
+
+        // Profil update
+        Route::put('profil', [StudentController::class, 'updateProfil']);
+
+        // Google Calendar Routes
+        Route::get('google/status', [GoogleAuthController::class, 'googleStatus']);
+        Route::delete('google/disconnect', [GoogleAuthController::class, 'googleDisconnect']);
+        Route::post('google/sync', [GoogleAuthController::class, 'googleSync']);
     });
 });

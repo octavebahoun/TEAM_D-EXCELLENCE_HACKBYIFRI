@@ -108,6 +108,30 @@ export const studentService = {
         return response.data;
     },
 
+    // Envoie le code OAuth reçu depuis Google au backend (appelé depuis GoogleCallbackPage)
+    handleGoogleCallback: async (code) => {
+        const response = await laravelApiClient.post('/auth/google/callback', { code });
+        return response.data;
+    },
+
+    // Vérifie si le compte Google est connecté
+    getGoogleStatus: async () => {
+        const response = await laravelApiClient.get('/student/google/status');
+        return response.data;
+    },
+
+    // Déconnecte le compte Google
+    disconnectGoogle: async () => {
+        const response = await laravelApiClient.delete('/student/google/disconnect');
+        return response.data;
+    },
+
+    // Déclenche une synchronisation manuelle de l'emploi du temps
+    syncGoogleCalendar: async () => {
+        const response = await laravelApiClient.post('/student/google/sync');
+        return response.data;
+    },
+
     updateProfil: async (data) => {
         const response = await laravelApiClient.put('/student/profil', data);
         return response.data;
