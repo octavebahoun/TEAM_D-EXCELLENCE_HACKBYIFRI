@@ -87,13 +87,13 @@ export const studentService = {
     },
 
     // Analyse IA
-    triggerAnalysis: async () => {
-        const response = await laravelApiClient.post('/student/analysis');
+    triggerAnalysis: async ({ signal } = {}) => {
+        const response = await laravelApiClient.post('/student/analysis', null, { signal });
         return response.data;
     },
 
-    getAnalysisHistory: async () => {
-        const response = await laravelApiClient.get('/student/analysis/history');
+    getAnalysisHistory: async ({ signal } = {}) => {
+        const response = await laravelApiClient.get('/student/analysis/history', { signal });
         return response.data;
     },
 

@@ -2,7 +2,7 @@
 
 **Date :** Mars 2026  
 **Portée :** Flux complet Laravel → Python → Frontend  
-**Score global :** 4.3 / 5 ⭐ _(après corrections)_
+**Score global :** 4.5 / 5 ⭐ _(après corrections fonctionnelles + latence)_
 
 ---
 
@@ -182,20 +182,21 @@
 
 ## 5. Matrice de couverture
 
-| Aspect                     | Couvert | Commentaire                                                                    |
-| -------------------------- | ------- | ------------------------------------------------------------------------------ |
-| Authentification Sanctum   | ✅      | Bearer token transmis Laravel → Python                                         |
-| Autorisation (self-only)   | ❌      | Un étudiant peut analyser n'importe qui                                        |
-| Validation entrée (ID)     | ⚠️      | Type-hint `int` côté Python, pas de check `> 0` côté Laravel                   |
-| Validation sortie LLM      | ❌      | JSON parsé mais pas validé contre un schéma                                    |
-| Anti-spam / Rate limit     | ⚠️      | 24h via DB, mais sur GET (cacheable)                                           |
-| Notifications (mail+push)  | ✅      | `StudentAnalysisNotification` dispatchée après `create()`                      |
-| Gestion d'erreur LLM       | ✅      | `json.loads` dans try/except, nettoyage backticks robuste, validation Pydantic |
-| Pool connexion DB (Python) | ✅      | Utilise le pool singleton de `dependencies.py`                                 |
-| Schemas Pydantic           | ✅      | `AnalysisResult` avec `field_validator`, `response_model` sur la route         |
-| Frontend error handling    | ✅      | Gestion 429 affiche l'analyse existante, mountedRef anti-leak                  |
-| Frontend cleanup           | ✅      | `mountedRef` empêche les set state sur composant démonté                       |
-| Tests automatisés          | ✅      | `test_18_python_analysis.py` couvre les cas de base                            |
+| Aspect                     | Couvert | Commentaire                                                                              |
+| -------------------------- | ------- | ---------------------------------------------------------------------------------------- |
+| Authentification Sanctum   | ✅      | Bearer token transmis Laravel → Python                                                   |
+| Autorisation (self-only)   | ❌      | Un étudiant peut analyser n'importe qui                                                  |
+| Validation entrée (ID)     | ⚠️      | Type-hint `int` côté Python, pas de check `> 0` côté Laravel                             |
+| Validation sortie LLM      | ❌      | JSON parsé mais pas validé contre un schéma                                              |
+| Anti-spam / Rate limit     | ⚠️      | 24h via DB, mais sur GET (cacheable)                                                     |
+| Notifications (mail+push)  | ✅      | `StudentAnalysisNotification` dispatchée après `create()`                                |
+| Gestion d'erreur LLM       | ✅      | `json.loads` dans try/except, nettoyage backticks robuste, validation Pydantic           |
+| Pool connexion DB (Python) | ✅      | Utilise le pool singleton de `dependencies.py`                                           |
+| Schemas Pydantic           | ✅      | `AnalysisResult` avec `field_validator`, `response_model` sur la route                   |
+| Frontend error handling    | ✅      | Gestion 429 affiche l'analyse existante, AbortController anti-leak                       |
+| Frontend cleanup           | ✅      | `AbortController` annule les requêtes HTTP + empêche les set state après démontage       |
+| Performance / Latence      | ✅      | SQL parallélisé (asyncio.gather), index composite, singleton ChatGroq, after_commit=true |
+| Tests automatisés          | ✅      | `test_18_python_analysis.py` couvre les cas de base                                      |
 
 ---
 
@@ -206,40 +207,46 @@
 | Sécurité / Autorisation | 1/5   | 4.5/5 | Auth self-only Laravel + Python, `markAsSent` sécurisé              |
 | Fiabilité / Robustesse  | 2/5   | 4.5/5 | JSON validé Pydantic, pool singleton, try/except, validation retour |
 | Architecture REST       | 2/5   | 4.5/5 | POST pour analyse, double router supprimé, notification branchée    |
-| UX Frontend             | 3/5   | 4/5   | Gestion 429, mountedRef, studentService centralisé                  |
+| UX Frontend             | 3/5   | 4.5/5 | Gestion 429, AbortController, studentService centralisé             |
 | Maintenabilité          | 3.5/5 | 4.5/5 | Scopes model, schemas utilisés, code centralisé                     |
 | Prompt IA               | 2/5   | 4/5   | Seuils stricts info/warning/danger, interdictions explicites        |
+| Performance / Latence   | 2.5/5 | 4.5/5 | SQL parallélisé, index composite, singleton ChatGroq, after_commit  |
 | Tests                   | 4/5   | 4/5   | Tests Python couvrent les cas de base                               |
 
-**Score global : 4.3 / 5** ⭐ _(avant : 2.8/5)_
+**Score global : 4.5 / 5** ⭐ _(avant : 2.8/5)_
 
 ---
 
 ## 7. Corrections appliquées
 
-| ID         | Issue                                       | Correction                                                                        | Fichier(s)                           |
-| ---------- | ------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------ |
-| L1.1       | Route `GET` pour effet de bord              | `Route::post('analysis', ...)`                                                    | `routes/api.php`                     |
-| L1.2       | Faille IDOR                                 | `analyze()` utilise `$request->user()` uniquement (self-only)                     | `StudentAnalysisController.php`      |
-| L1.3       | Notification jamais dispatchée              | `$student->notify(new StudentAnalysisNotification($analysis))`                    | `StudentAnalysisController.php`      |
-| L1.4       | Pas de validation retour Python             | Vérification `$analysisData`, `$contextData`, champs requis → 502 si invalide     | `StudentAnalysisController.php`      |
-| L1.5       | `$e->getMessage()` exposé                   | Supprimé du JSON de réponse, log seulement                                        | `StudentAnalysisController.php`      |
-| L1.6       | `markAsSent` ambiguïté + IDOR               | `WHERE id = $id AND user_id = auth()->id()`                                       | `StudentAnalysisController.php`      |
-| L2.1       | `internal_key` inutilisée                   | ⏭️ Ignoré (voulu par l'utilisateur — auth par token Sanctum)                      | —                                    |
-| L3.1       | Pas de scopes                               | Ajout `scopeForUser()`, `scopeRecent()`                                           | `StudentAnalysis.php`                |
-| P1.1       | Double router                               | Supprimé le doublon `include_router`                                              | `main.py`                            |
-| P2.1       | Pas de `response_model`                     | Ajout `response_model=StudentAnalysisResponse`                                    | `analysis_routes.py`                 |
-| P2.2       | Pas de contrôle d'autorisation              | Check `current_user.id != student_id` pour rôle student → 403                     | `analysis_routes.py`                 |
-| P2.3       | Exception exposée                           | Log serveur + message générique au client                                         | `analysis_routes.py`                 |
-| P3.1       | Pool DB créé/fermé à chaque appel           | Utilise `get_db_pool()` singleton de `dependencies.py`                            | `student_analyzer.py`                |
-| P3.2       | `json.loads` sans try/except                | `try/except JSONDecodeError` → `ValueError` explicite                             | `student_analyzer.py`                |
-| P3.3       | Nettoyage backticks fragile                 | Boucle sur parties + fallback regex `\{[\s\S]*\}`                                 | `student_analyzer.py`                |
-| P3.4       | JSON LLM non validé                         | Validation via `AnalysisResult(**analysis)` avec `field_validator`                | `student_analyzer.py` + `schemas.py` |
-| P3.5       | Données sensibles au LLM                    | ⏭️ Ignoré (voulu par l'utilisateur)                                               | —                                    |
-| **PROMPT** | LLM ne distingue pas bons/mauvais résultats | Seuils stricts danger/warning/info + interdictions explicites + exemples concrets | `student_analyzer.py`                |
-| F1.1       | Pas d'AbortController                       | `mountedRef` empêche set state après démontage                                    | `StudentAnalysis.jsx`                |
-| F1.2       | Pas de gestion 429                          | Si 429 + data → affiche l'analyse existante avec toast horloge                    | `StudentAnalysis.jsx`                |
-| F1.3       | Composant n'utilise pas studentService      | Remplacé `laravelApiClient` par `studentService`                                  | `StudentAnalysis.jsx`                |
+| ID         | Issue                                       | Correction                                                                                  | Fichier(s)                                  |
+| ---------- | ------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| L1.1       | Route `GET` pour effet de bord              | `Route::post('analysis', ...)`                                                              | `routes/api.php`                            |
+| L1.2       | Faille IDOR                                 | `analyze()` utilise `$request->user()` uniquement (self-only)                               | `StudentAnalysisController.php`             |
+| L1.3       | Notification jamais dispatchée              | `$student->notify(new StudentAnalysisNotification($analysis))`                              | `StudentAnalysisController.php`             |
+| L1.4       | Pas de validation retour Python             | Vérification `$analysisData`, `$contextData`, champs requis → 502 si invalide               | `StudentAnalysisController.php`             |
+| L1.5       | `$e->getMessage()` exposé                   | Supprimé du JSON de réponse, log seulement                                                  | `StudentAnalysisController.php`             |
+| L1.6       | `markAsSent` ambiguïté + IDOR               | `WHERE id = $id AND user_id = auth()->id()`                                                 | `StudentAnalysisController.php`             |
+| L2.1       | `internal_key` inutilisée                   | ⏭️ Ignoré (voulu par l'utilisateur — auth par token Sanctum)                                | —                                           |
+| L3.1       | Pas de scopes                               | Ajout `scopeForUser()`, `scopeRecent()`                                                     | `StudentAnalysis.php`                       |
+| P1.1       | Double router                               | Supprimé le doublon `include_router`                                                        | `main.py`                                   |
+| P2.1       | Pas de `response_model`                     | Ajout `response_model=StudentAnalysisResponse`                                              | `analysis_routes.py`                        |
+| P2.2       | Pas de contrôle d'autorisation              | Check `current_user.id != student_id` pour rôle student → 403                               | `analysis_routes.py`                        |
+| P2.3       | Exception exposée                           | Log serveur + message générique au client                                                   | `analysis_routes.py`                        |
+| P3.1       | Pool DB créé/fermé à chaque appel           | Utilise `get_db_pool()` singleton de `dependencies.py`                                      | `student_analyzer.py`                       |
+| P3.2       | `json.loads` sans try/except                | `try/except JSONDecodeError` → `ValueError` explicite                                       | `student_analyzer.py`                       |
+| P3.3       | Nettoyage backticks fragile                 | Boucle sur parties + fallback regex `\{[\s\S]*\}`                                           | `student_analyzer.py`                       |
+| P3.4       | JSON LLM non validé                         | Validation via `AnalysisResult(**analysis)` avec `field_validator`                          | `student_analyzer.py` + `schemas.py`        |
+| P3.5       | Données sensibles au LLM                    | ⏭️ Ignoré (voulu par l'utilisateur)                                                         | —                                           |
+| **PROMPT** | LLM ne distingue pas bons/mauvais résultats | Seuils stricts danger/warning/info + interdictions explicites + exemples concrets           | `student_analyzer.py`                       |
+| F1.1       | Pas d'AbortController                       | `AbortController` avec `signal` passé aux appels axios, annulation réelle des requêtes HTTP | `StudentAnalysis.jsx` + `studentService.js` |
+| F1.2       | Pas de gestion 429                          | Si 429 + data → affiche l'analyse existante avec toast horloge                              | `StudentAnalysis.jsx`                       |
+| F1.3       | Composant n'utilise pas studentService      | Remplacé `laravelApiClient` par `studentService`                                            | `StudentAnalysis.jsx`                       |
+| **LAT-1**  | 3 requêtes SQL séquentielles                | Parallélisé via `asyncio.gather()` avec 3 connexions pool indépendantes                     | `student_analyzer.py`                       |
+| **LAT-2**  | Pas d'index composite anti-spam             | Migration ajout index `(user_id, created_at)` sur `student_analyses`                        | nouvelle migration                          |
+| **LAT-3**  | `ChatGroq` instancié à chaque appel         | Singleton `self._llm` dans `__init__` (réutilise connexion TCP/TLS)                         | `student_analyzer.py`                       |
+| **LAT-4**  | `usleep(500ms)` bloquant dans retry PHP     | Réduit à 200ms pour libérer le worker PHP plus vite                                         | `PythonAIService.php`                       |
+| **LAT-5**  | `after_commit => false` sur queue database  | Passé à `true` — notifications dispatchées après commit DB                                  | `config/queue.php`                          |
 
 ---
 

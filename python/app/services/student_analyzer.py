@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import re
@@ -22,6 +23,11 @@ class StudentAnalyzer:
     def __init__(self):
         if settings.GROQ_API_KEY:
             os.environ["GROQ_API_KEY"] = settings.GROQ_API_KEY
+        self._llm = ChatGroq(
+            model=settings.LLM_MODEL,
+            temperature=0.3,
+            max_tokens=1024,
+        )
 
     # ─── Accès base de données ────────────────────────────────────────────────
 
@@ -29,56 +35,68 @@ class StudentAnalyzer:
         """
         Récupère toutes les données académiques de l'étudiant depuis MySQL.
         Utilise le pool singleton de dependencies.py.
+        Les 3 requêtes sont parallélisées via asyncio.gather() pour réduire la latence.
         """
         pool = await get_db_pool()
         if not pool:
             raise ValueError("Connexion à la base de données impossible")
 
-        async with pool.acquire() as conn:
-            async with conn.cursor(aiomysql.DictCursor) as cur:
+        async def _query_student():
+            async with pool.acquire() as conn:
+                async with conn.cursor(aiomysql.DictCursor) as cur:
+                    await cur.execute(
+                        """
+                        SELECT u.id, u.nom, u.prenom, u.email, u.annee_admission,
+                               f.nom AS filiere_nom
+                        FROM users u
+                        LEFT JOIN filieres f ON f.id = u.filiere_id
+                        WHERE u.id = %s
+                        """,
+                        (student_id,),
+                    )
+                    return await cur.fetchone()
 
-                # 1. Infos étudiant + filière
-                await cur.execute(
-                    """
-                    SELECT u.id, u.nom, u.prenom, u.email, u.annee_admission,
-                           f.nom AS filiere_nom
-                    FROM users u
-                    LEFT JOIN filieres f ON f.id = u.filiere_id
-                    WHERE u.id = %s
-                    """,
-                    (student_id,),
-                )
-                student = await cur.fetchone()
-                if not student:
-                    return {}
+        async def _query_notes():
+            async with pool.acquire() as conn:
+                async with conn.cursor(aiomysql.DictCursor) as cur:
+                    await cur.execute(
+                        """
+                        SELECT n.note, n.note_max, n.coefficient, n.type_evaluation,
+                               n.date_evaluation, m.nom AS matiere_nom
+                        FROM notes n
+                        LEFT JOIN matieres m ON m.id = n.matiere_id
+                        WHERE n.user_id = %s
+                        ORDER BY n.date_evaluation DESC
+                        LIMIT 30
+                        """,
+                        (student_id,),
+                    )
+                    return await cur.fetchall()
 
-                # 2. Notes avec matière (seulement les 30 dernières)
-                await cur.execute(
-                    """
-                    SELECT n.note, n.note_max, n.coefficient, n.type_evaluation,
-                           n.date_evaluation, m.nom AS matiere_nom
-                    FROM notes n
-                    LEFT JOIN matieres m ON m.id = n.matiere_id
-                    WHERE n.user_id = %s
-                    ORDER BY n.date_evaluation DESC
-                    LIMIT 30
-                    """,
-                    (student_id,),
-                )
-                notes = await cur.fetchall()
+        async def _query_taches():
+            async with pool.acquire() as conn:
+                async with conn.cursor(aiomysql.DictCursor) as cur:
+                    await cur.execute(
+                        """
+                        SELECT titre, priorite, statut, date_limite
+                        FROM taches
+                        WHERE user_id = %s
+                        ORDER BY date_limite ASC
+                        LIMIT 20
+                        """,
+                        (student_id,),
+                    )
+                    return await cur.fetchall()
 
-                # 3. Tâches (statut + priorité)
-                await cur.execute(
-                    """
-                    SELECT titre, priorite, statut, date_limite
-                    FROM taches
-                    WHERE user_id = %s
-                    ORDER BY date_limite ASC
-                    LIMIT 20
-                    """,
-                    (student_id,),
-                )
-                taches = await cur.fetchall()
+        # Exécution parallèle des 3 requêtes indépendantes
+        student, notes, taches = await asyncio.gather(
+            _query_student(),
+            _query_notes(),
+            _query_taches(),
+        )
+
+        if not student:
+            return {}
 
         return {
             "student": dict(student),
@@ -218,18 +236,12 @@ RÉPONDS UNIQUEMENT en JSON valide, sans texte avant ou après :
 
     async def generate_analysis(self, context: dict) -> dict:
         """Appelle le LLM Groq et retourne le JSON d'analyse validé."""
-        llm = ChatGroq(
-            model=settings.LLM_MODEL,
-            temperature=0.3,
-            max_tokens=1024,
-        )
-
         prompt = ChatPromptTemplate.from_messages([
             ("system", "Tu es un conseiller pédagogique expert. Tu réponds TOUJOURS en JSON valide uniquement, sans texte autour."),
             ("human", self._build_prompt()),
         ])
 
-        chain = prompt | llm | StrOutputParser()
+        chain = prompt | self._llm | StrOutputParser()
         context_str = json.dumps(context, ensure_ascii=False, default=str)
         raw_output = await chain.ainvoke({"context_json": context_str})
 

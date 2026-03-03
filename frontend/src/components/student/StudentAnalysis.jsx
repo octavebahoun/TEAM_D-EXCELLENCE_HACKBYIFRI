@@ -85,36 +85,46 @@ export default function StudentAnalysis() {
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState([]);
-  const mountedRef = useRef(true);
+  const abortRef = useRef(null);
 
   // Chargement de la dernière analyse au montage
   useEffect(() => {
-    fetchHistory();
+    const ctrl = new AbortController();
+    fetchHistory(ctrl.signal);
     return () => {
-      mountedRef.current = false;
+      ctrl.abort();
+      // Annuler aussi une éventuelle analyse en cours
+      abortRef.current?.abort();
     };
   }, []);
 
-  const fetchHistory = async () => {
+  const fetchHistory = async (signal) => {
     setLoadingHistory(true);
     try {
-      const result = await studentService.getAnalysisHistory();
-      if (!mountedRef.current) return;
+      const result = await studentService.getAnalysisHistory({ signal });
       const items = result?.data?.data ?? [];
       setHistory(items);
       if (items.length > 0) setAnalysis(items[0]);
-    } catch {
+    } catch (err) {
+      if (err?.name === "CanceledError" || err?.code === "ERR_CANCELED") return;
       // Pas d'analyse existante, c'est normal
     } finally {
-      if (mountedRef.current) setLoadingHistory(false);
+      if (!signal?.aborted) setLoadingHistory(false);
     }
   };
 
   const triggerAnalysis = async () => {
+    // Annuler une précédente requête si l'utilisateur re-clique
+    abortRef.current?.abort();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
+
     setLoading(true);
     try {
-      const result = await studentService.triggerAnalysis();
-      if (!mountedRef.current) return;
+      const result = await studentService.triggerAnalysis({
+        signal: ctrl.signal,
+      });
+      if (ctrl.signal.aborted) return;
       if (result?.success) {
         const newAnalysis = result.data;
         setAnalysis(newAnalysis);
@@ -124,7 +134,7 @@ export default function StudentAnalysis() {
         toast.error(result?.message || "Impossible de générer le bilan.");
       }
     } catch (err) {
-      if (!mountedRef.current) return;
+      if (err?.name === "CanceledError" || err?.code === "ERR_CANCELED") return;
       // Si anti-spam 429, afficher l'analyse existante
       if (err.response?.status === 429 && err.response?.data?.data) {
         setAnalysis(err.response.data.data);
@@ -136,7 +146,7 @@ export default function StudentAnalysis() {
         toast.error(msg);
       }
     } finally {
-      if (mountedRef.current) setLoading(false);
+      if (!ctrl.signal.aborted) setLoading(false);
     }
   };
 

@@ -58,7 +58,7 @@ class PythonAIService
             }
 
             if ($attempt < $maxAttempts) {
-                usleep(500_000); // 500ms avant retry
+                usleep(200_000); // 200ms avant retry
             }
         }
 
