@@ -426,7 +426,7 @@ export default function StudentProfil() {
                         </div>
                       </td>
                       <td className="py-4 pr-6">
-                        <span className="font-bold text-sm text-slate-900 dark:text-white whitespace-nowrap block">
+                        <span className="font-bold text-sm text-slate-900 dark:text-white block truncate max-w-50 sm:max-w-none sm:whitespace-normal">
                           {matiere.nom}
                         </span>
                         <span className="text-[10px] font-bold text-slate-400">

@@ -11,7 +11,7 @@ export default function StatsCards({ data }) {
   // data = { filieres, etudiants, matieres, moyenne }
   const cards = data || stats;
   return (
-    <div className="grid grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
       {cards.map((stat, idx) => (
         <motion.div
           key={stat.label}

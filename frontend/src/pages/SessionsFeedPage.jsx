@@ -353,7 +353,7 @@ const SessionsFeedPage = ({ onJoinSession }) => {
               </button>
 
               {notificationsOpen && (
-                <div className="absolute right-0 top-12 z-20 w-80 rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl">
+                <div className="absolute right-0 top-12 z-20 w-[calc(100vw-2rem)] sm:w-80 max-w-sm rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl">
                   <div className="mb-2 flex items-center justify-between">
                     <p className="text-sm font-semibold text-slate-800">
                       Notifications

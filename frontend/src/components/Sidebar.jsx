@@ -15,7 +15,7 @@ export default function Sidebar({ active, onLogout }) {
       initial={{ x: -60, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 60 }}
-      className="bg-(--sidebar-bg) text-(--sidebar-text) w-64 min-h-screen flex flex-col p-6 shadow-lg"
+      className="bg-(--sidebar-bg) text-(--sidebar-text) w-64 min-h-screen hidden md:flex flex-col p-6 shadow-lg"
     >
       <div className="mb-8">
         <img src={logoSvg} alt="AcademiX" className="h-14 w-auto dark:hidden" />

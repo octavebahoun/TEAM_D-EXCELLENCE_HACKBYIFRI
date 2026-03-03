@@ -104,7 +104,7 @@ export default function AdminChefs() {
         {/* Main Table */}
         <motion.div
           variants={itemVariants}
-          className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[32px] p-8 shadow-sm overflow-hidden"
+          className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[32px] p-4 md:p-8 shadow-sm overflow-hidden"
         >
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
@@ -122,112 +122,195 @@ export default function AdminChefs() {
               <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
             </div>
           ) : (
-            <div className="overflow-x-auto -mx-8 px-8">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    <th className="pb-4 pr-6">Chef</th>
-                    <th className="pb-4 pr-6">Département</th>
-                    <th className="pb-4 pr-6">Contact</th>
-                    <th className="pb-4 pr-6">Statut</th>
-                    <th className="pb-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {chefs.map((chef) => (
-                    <tr
-                      key={chef.id}
-                      className="border-b border-slate-50 dark:border-slate-800/50 last:border-0 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
-                    >
-                      <td className="py-6 pr-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center font-black text-sm shrink-0">
-                            {chef.prenom.charAt(0)}
-                            {chef.nom.charAt(0)}
-                          </div>
-                          <div>
-                            <span className="font-black text-sm text-slate-900 dark:text-white whitespace-nowrap block">
-                              {chef.prenom} {chef.nom}
-                            </span>
-                            <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">
-                              ID: #{chef.id}
-                            </span>
-                          </div>
+            <>
+              {/* Mobile: Card layout */}
+              <div className="md:hidden space-y-4">
+                {chefs.map((chef) => (
+                  <div
+                    key={`mobile-${chef.id}`}
+                    className="bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-4 space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center font-black text-xs shrink-0">
+                          {chef.prenom.charAt(0)}
+                          {chef.nom.charAt(0)}
                         </div>
-                      </td>
-                      <td className="py-6 pr-6">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center font-black text-[10px] shrink-0">
-                            {chef.departement?.code || "??"}
-                          </div>
-                          <span className="font-bold text-sm text-slate-900 dark:text-white whitespace-nowrap">
-                            {chef.departement?.nom || "Non assigné"}
-                          </span>
+                        <div>
+                          <p className="font-black text-sm text-slate-900 dark:text-white">
+                            {chef.prenom} {chef.nom}
+                          </p>
+                          <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">
+                            ID: #{chef.id}
+                          </p>
                         </div>
-                      </td>
-                      <td className="py-6 pr-6">
-                        <div className="space-y-1">
-                          <span className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400">
-                            {chef.email}
-                          </span>
-                          <span className="flex items-center gap-2 text-[10px] font-medium text-slate-400 uppercase">
-                            {chef.telephone || "N/A"}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-6 pr-6">
-                        <span
-                          className={cn(
-                            "text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full inline-block",
-                            chef.is_active
-                              ? "text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10"
-                              : "text-rose-600 bg-rose-50 dark:bg-rose-500/10",
-                          )}
-                        >
-                          {chef.is_active ? "Actif" : "Inactif"}
-                        </span>
-                      </td>
-                      <td className="py-6 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => {
-                              setChefToEdit(chef);
-                              setIsEditChefOpen(true);
-                            }}
-                            className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 hover:text-amber-500 transition-all border border-transparent hover:border-amber-100"
-                            title="Modifier"
-                          >
-                            <Edit3 size={18} />
-                          </button>
-                          <button
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  `Voulez-vous vraiment révoquer le chef ${chef.prenom} ${chef.nom} ?`,
-                                )
-                              ) {
-                                laravelApiClient
-                                  .delete(`/admin/chefs-departement/${chef.id}`)
-                                  .then(() => fetchChefs())
-                                  .catch((err) =>
-                                    alert(
-                                      "Erreur lors de la révocation du chef",
-                                    ),
-                                  );
-                              }
-                            }}
-                            className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-500 transition-all border border-transparent hover:border-rose-100"
-                            title="Révoquer"
-                          >
-                            <UserMinus size={18} />
-                          </button>
-                        </div>
-                      </td>
+                      </div>
+                      <span
+                        className={cn(
+                          "text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full",
+                          chef.is_active
+                            ? "text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10"
+                            : "text-rose-600 bg-rose-50 dark:bg-rose-500/10",
+                        )}
+                      >
+                        {chef.is_active ? "Actif" : "Inactif"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center font-black text-[8px] shrink-0">
+                        {chef.departement?.code || "??"}
+                      </div>
+                      <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
+                        {chef.departement?.nom || "Non assigné"}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                      {chef.email}
+                    </p>
+                    <div className="flex items-center gap-2 pt-1">
+                      <button
+                        onClick={() => {
+                          setChefToEdit(chef);
+                          setIsEditChefOpen(true);
+                        }}
+                        className="flex-1 py-2 rounded-xl text-xs font-bold text-amber-600 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 transition-colors text-center"
+                      >
+                        Modifier
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              `Voulez-vous vraiment révoquer le chef ${chef.prenom} ${chef.nom} ?`,
+                            )
+                          ) {
+                            laravelApiClient
+                              .delete(`/admin/chefs-departement/${chef.id}`)
+                              .then(() => fetchChefs())
+                              .catch(() =>
+                                alert("Erreur lors de la révocation du chef"),
+                              );
+                          }
+                        }}
+                        className="flex-1 py-2 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 transition-colors text-center"
+                      >
+                        Révoquer
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop: Table layout */}
+              <div className="hidden md:block overflow-x-auto -mx-4 md:-mx-8 px-4 md:px-8">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      <th className="pb-4 pr-6">Chef</th>
+                      <th className="pb-4 pr-6">Département</th>
+                      <th className="pb-4 pr-6">Contact</th>
+                      <th className="pb-4 pr-6">Statut</th>
+                      <th className="pb-4 text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {chefs.map((chef) => (
+                      <tr
+                        key={chef.id}
+                        className="border-b border-slate-50 dark:border-slate-800/50 last:border-0 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
+                      >
+                        <td className="py-6 pr-6">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center font-black text-sm shrink-0">
+                              {chef.prenom.charAt(0)}
+                              {chef.nom.charAt(0)}
+                            </div>
+                            <div>
+                              <span className="font-black text-sm text-slate-900 dark:text-white whitespace-nowrap block">
+                                {chef.prenom} {chef.nom}
+                              </span>
+                              <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">
+                                ID: #{chef.id}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-6 pr-6">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center font-black text-[10px] shrink-0">
+                              {chef.departement?.code || "??"}
+                            </div>
+                            <span className="font-bold text-sm text-slate-900 dark:text-white whitespace-nowrap">
+                              {chef.departement?.nom || "Non assigné"}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-6 pr-6">
+                          <div className="space-y-1">
+                            <span className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400">
+                              {chef.email}
+                            </span>
+                            <span className="flex items-center gap-2 text-[10px] font-medium text-slate-400 uppercase">
+                              {chef.telephone || "N/A"}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-6 pr-6">
+                          <span
+                            className={cn(
+                              "text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full inline-block",
+                              chef.is_active
+                                ? "text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10"
+                                : "text-rose-600 bg-rose-50 dark:bg-rose-500/10",
+                            )}
+                          >
+                            {chef.is_active ? "Actif" : "Inactif"}
+                          </span>
+                        </td>
+                        <td className="py-6 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => {
+                                setChefToEdit(chef);
+                                setIsEditChefOpen(true);
+                              }}
+                              className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 hover:text-amber-500 transition-all border border-transparent hover:border-amber-100"
+                              title="Modifier"
+                            >
+                              <Edit3 size={18} />
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (
+                                  window.confirm(
+                                    `Voulez-vous vraiment révoquer le chef ${chef.prenom} ${chef.nom} ?`,
+                                  )
+                                ) {
+                                  laravelApiClient
+                                    .delete(
+                                      `/admin/chefs-departement/${chef.id}`,
+                                    )
+                                    .then(() => fetchChefs())
+                                    .catch((err) =>
+                                      alert(
+                                        "Erreur lors de la révocation du chef",
+                                      ),
+                                    );
+                                }
+                              }}
+                              className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-500 transition-all border border-transparent hover:border-rose-100"
+                              title="Révoquer"
+                            >
+                              <UserMinus size={18} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </motion.div>
       </motion.div>

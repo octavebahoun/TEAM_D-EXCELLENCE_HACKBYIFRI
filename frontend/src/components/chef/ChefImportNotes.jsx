@@ -182,7 +182,7 @@ export default function ChefImportNotes() {
                           )}
                         </div>
                         <div>
-                          <h4 className="font-black text-slate-900 dark:text-white text-sm uppercase tracking-tight italic">
+                          <h4 className="font-black text-slate-900 dark:text-white text-sm uppercase tracking-tight italic truncate max-w-50 sm:max-w-none">
                             {log.fichier_nom}
                           </h4>
                           <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-widest">

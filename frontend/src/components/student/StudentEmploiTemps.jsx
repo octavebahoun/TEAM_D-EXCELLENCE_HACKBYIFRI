@@ -434,7 +434,7 @@ function AddTaskModal({ isOpen, onClose, onCreated, defaultDay }) {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Date limite */}
                 <div>
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">
@@ -757,7 +757,7 @@ export default function StudentEmploiTemps({ onNavigate }) {
         </div>
 
         {/* Légende */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
           {Object.entries(TYPE_STYLES).map(([type, styles]) => (
             <div key={type} className="flex items-center gap-1.5">
               <div className={cn("w-2.5 h-2.5 rounded-full", styles.dot)} />
@@ -769,11 +769,108 @@ export default function StudentEmploiTemps({ onNavigate }) {
         </div>
       </motion.div>
 
-      {/* ── Weekly Grid ───────────────────────────────────────────────────── */}
+      {/* ── Mobile: List View by Day (visible < md) ───────────────────── */}
+      <motion.div variants={itemVariants} className="md:hidden space-y-4">
+        {DAYS.map((day) => {
+          const isDayToday = day === today;
+          const dayCours = filtered
+            .filter((c) => c.day === day)
+            .sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime));
+          const dayTaches = taches.filter(
+            (t) => getDayFR(t.date_limite) === day,
+          );
+          const isEmpty = dayCours.length === 0 && dayTaches.length === 0;
+
+          return (
+            <div
+              key={day}
+              className={cn(
+                "bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden",
+                isDayToday && "ring-2 ring-emerald-400 ring-offset-1",
+              )}
+            >
+              {/* Day header */}
+              <div
+                className={cn(
+                  "px-4 py-3 flex items-center justify-between border-b border-slate-100 dark:border-slate-800",
+                  isDayToday && "bg-emerald-50/60 dark:bg-emerald-500/5",
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <p
+                    className={cn(
+                      "text-sm font-black uppercase tracking-wide",
+                      isDayToday
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-slate-700 dark:text-slate-200",
+                    )}
+                  >
+                    {day}
+                  </p>
+                  {isDayToday && (
+                    <span className="text-[9px] font-black bg-emerald-500 text-white px-2 py-0.5 rounded-full uppercase">
+                      Aujourd'hui
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  {dayCours.length > 0 && (
+                    <span className="text-[10px] font-bold text-slate-400">
+                      {dayCours.length} cours
+                    </span>
+                  )}
+                  {dayTaches.length > 0 && (
+                    <span className="text-[10px] font-bold text-orange-400">
+                      {dayTaches.length} tâche{dayTaches.length > 1 ? "s" : ""}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Day content */}
+              <div className="p-3 space-y-3">
+                {dayCours.map((item) => {
+                  const startMin = toMinutes(item.startTime);
+                  const endMin = toMinutes(item.endTime);
+                  const isNow =
+                    isDayToday && nowMinutes >= startMin && nowMinutes < endMin;
+                  return <CourseCard key={item.id} item={item} isNow={isNow} />;
+                })}
+                {dayTaches.map((task) => (
+                  <TaskCard
+                    key={`task-${task.id}`}
+                    task={task}
+                    onComplete={handleCompleteTask}
+                    onDelete={handleDeleteTask}
+                  />
+                ))}
+                {isEmpty && (
+                  <button
+                    onClick={() => openAddModal(day)}
+                    className="w-full flex items-center justify-center gap-2 py-4 text-[10px] font-black text-slate-300 dark:text-slate-700 hover:text-orange-500 uppercase tracking-wider transition-colors"
+                  >
+                    <Plus size={12} /> Ajouter une tâche
+                  </button>
+                )}
+                {!isEmpty && (
+                  <button
+                    onClick={() => openAddModal(day)}
+                    className="w-full flex items-center justify-center gap-1 py-2 rounded-xl text-[9px] font-black text-slate-300 dark:text-slate-700 hover:text-orange-500 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-500/10 transition-all uppercase tracking-wider"
+                  >
+                    <Plus size={10} /> Tâche
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </motion.div>
+
+      {/* ── Desktop: Weekly Grid (hidden on mobile, visible >= md) ─────── */}
       <motion.div
         variants={itemVariants}
         id="tour-schedule-grid"
-        className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden"
+        className="hidden md:block bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden"
       >
         <div className="overflow-x-auto">
           <div className="min-w-175">

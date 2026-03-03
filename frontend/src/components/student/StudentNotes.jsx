@@ -324,7 +324,7 @@ export default function StudentNotes() {
         className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden"
       >
         {/* Header */}
-        <div className="px-8 pt-8 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between flex-wrap gap-4">
+        <div className="px-4 md:px-8 pt-6 md:pt-8 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between flex-wrap gap-4">
           <div>
             <h2 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight">
               Relevé de Notes
@@ -370,22 +370,22 @@ export default function StudentNotes() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                <th className="px-8 py-4 border-b border-slate-50 dark:border-slate-800/50">
+                <th className="px-4 md:px-8 py-4 border-b border-slate-50 dark:border-slate-800/50">
                   Module
                 </th>
                 <th className="px-4 py-4 border-b border-slate-50 dark:border-slate-800/50">
                   Type
                 </th>
-                <th className="px-4 py-4 border-b border-slate-50 dark:border-slate-800/50 text-center">
+                <th className="px-4 py-4 border-b border-slate-50 dark:border-slate-800/50 text-center hidden sm:table-cell">
                   Semestre
                 </th>
-                <th className="px-4 py-4 border-b border-slate-50 dark:border-slate-800/50 text-center">
+                <th className="px-4 py-4 border-b border-slate-50 dark:border-slate-800/50 text-center hidden sm:table-cell">
                   Coeff.
                 </th>
                 <th className="px-4 py-4 border-b border-slate-50 dark:border-slate-800/50 text-center">
                   Date
                 </th>
-                <th className="px-8 py-4 border-b border-slate-50 dark:border-slate-800/50 text-right">
+                <th className="px-4 md:px-8 py-4 border-b border-slate-50 dark:border-slate-800/50 text-right">
                   Note
                 </th>
               </tr>
@@ -422,7 +422,7 @@ export default function StudentNotes() {
                       className="border-b border-slate-50 dark:border-slate-800/50 last:border-0 hover:bg-slate-50/80 dark:hover:bg-slate-800/20 transition-colors group"
                     >
                       {/* Matière */}
-                      <td className="px-8 py-5 w-1/3">
+                      <td className="px-4 md:px-8 py-5 w-1/3">
                         <div className="flex items-center gap-4">
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-all">
                             <BookOpen size={16} />
@@ -454,14 +454,14 @@ export default function StudentNotes() {
                       </td>
 
                       {/* Semestre */}
-                      <td className="px-4 py-5 text-center">
+                      <td className="px-4 py-5 text-center hidden sm:table-cell">
                         <span className="text-xs font-black text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
                           {note.semestre || "—"}
                         </span>
                       </td>
 
                       {/* Coeff */}
-                      <td className="px-4 py-5 text-center">
+                      <td className="px-4 py-5 text-center hidden sm:table-cell">
                         <span className="text-sm font-black text-slate-900 dark:text-white tabular-nums">
                           ×
                           {note.coefficient || note.matiere?.coefficient || "—"}
@@ -483,7 +483,7 @@ export default function StudentNotes() {
                       </td>
 
                       {/* Note + barre */}
-                      <td className="px-8 py-5 min-w-45">
+                      <td className="px-4 md:px-8 py-5 min-w-35 md:min-w-45">
                         <NoteBar
                           note={note.note}
                           noteMax={note.note_max || 20}
@@ -500,7 +500,7 @@ export default function StudentNotes() {
         {/* Footer moyennes par semestre */}
         {moyennesData?.semestres &&
           Object.keys(moyennesData.semestres).length > 0 && (
-            <div className="px-8 py-5 border-t border-slate-100 dark:border-slate-800 flex flex-wrap gap-6 items-center bg-slate-50/50 dark:bg-slate-900/50">
+            <div className="px-4 md:px-8 py-5 border-t border-slate-100 dark:border-slate-800 flex flex-wrap gap-4 md:gap-6 items-center bg-slate-50/50 dark:bg-slate-900/50">
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                 Moyennes :
               </span>

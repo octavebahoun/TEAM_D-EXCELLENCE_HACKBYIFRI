@@ -181,7 +181,7 @@ export default function ChefFilieres({
               {filieres.length} Programmes d'études
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 w-full md:w-auto">
             <button
               onClick={() => setIsImportModalOpen(true)}
               className="flex-1 md:flex-none border border-emerald-600 text-emerald-600 dark:border-emerald-500 dark:text-emerald-400 font-bold text-xs px-4 py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 dark:hover:text-white transition-all active:scale-95"
@@ -285,7 +285,7 @@ export default function ChefFilieres({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4 mt-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
                     <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
                       <p className="text-lg font-black text-slate-900 dark:text-white">
                         {filiere.users_count || 0}

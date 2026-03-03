@@ -150,6 +150,7 @@ const ChatPage = ({ session, onLeave }) => {
   const [isWhiteboardOpen, setIsWhiteboardOpen] = useState(false);
   const [typingUsers, setTypingUsers] = useState(new Map());
   const [searchTerm, setSearchTerm] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [counterStartAt, setCounterStartAt] = useState(null);
   const [inviteCopied, setInviteCopied] = useState(false);
@@ -716,20 +717,20 @@ const ChatPage = ({ session, onLeave }) => {
       <div className="pointer-events-none absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-indigo-100/60 dark:bg-indigo-900/20 blur-[120px] z-0" />
 
       {/* Tête de contrôle */}
-      <header className="relative z-50 w-full px-8 py-4 flex justify-between items-center bg-transparent">
+      <header className="relative z-50 w-full px-4 md:px-8 py-3 md:py-4 flex flex-wrap justify-between items-center gap-2 bg-transparent">
         <div>
           <img
             src={logoSvg}
             alt="AcademiX"
-            className="h-10 w-auto dark:hidden"
+            className="h-8 md:h-10 w-auto dark:hidden"
           />
           <img
             src={logoDarkSvg}
             alt="AcademiX"
-            className="h-10 w-auto hidden dark:block"
+            className="h-8 md:h-10 w-auto hidden dark:block"
           />
         </div>
-        <div className="flex gap-3 items-center">
+        <div className="flex flex-wrap gap-2 md:gap-3 items-center">
           {/* Theme Toggle */}
           <button
             onClick={() => {
@@ -783,23 +784,59 @@ const ChatPage = ({ session, onLeave }) => {
               if (onLeave) onLeave();
               navigate("/etudiant", { state: { activeTab: "sessions" } });
             }}
-            className="text-sm font-bold bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-700 px-4 py-2 rounded-xl transition-all shadow-sm"
+            className="text-sm font-bold bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-700 px-3 md:px-4 py-2 rounded-xl transition-all shadow-sm"
           >
-            Retours au Dashboard
+            <span className="hidden sm:inline">Retours au Dashboard</span>
+            <span className="sm:hidden">↩</span>
           </button>
           <button
             onClick={() => {
               authService.logout();
             }}
-            className="text-sm font-bold text-rose-500 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 px-4 py-2 rounded-xl transition-all shadow-sm"
+            className="text-sm font-bold text-rose-500 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 px-3 md:px-4 py-2 rounded-xl transition-all shadow-sm"
           >
-            Déconnexion
+            <span className="hidden sm:inline">Déconnexion</span>
+            <svg
+              className="w-4 h-4 sm:hidden"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
           </button>
         </div>
       </header>
 
-      <div className="relative mx-auto flex h-[calc(100vh-80px)] max-w-7xl gap-6 px-6 pb-6">
-        <aside className="relative z-10 flex w-80 flex-col rounded-3xl border border-slate-200/70 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.35)] dark:shadow-none backdrop-blur overflow-hidden">
+      <div className="relative mx-auto flex h-[calc(100vh-72px)] md:h-[calc(100vh-80px)] max-w-7xl gap-4 md:gap-6 px-3 md:px-6 pb-3 md:pb-6">
+        {/* Mobile sidebar backdrop */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-30 bg-slate-900/50 backdrop-blur-sm md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+        <aside
+          className={`fixed inset-y-0 left-0 z-40 w-80 max-w-[85vw] transform transition-transform duration-300 ease-in-out md:relative md:inset-auto md:z-10 md:translate-x-0 md:flex md:flex-col md:rounded-3xl ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col rounded-r-3xl md:rounded-3xl border border-slate-200/70 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 md:bg-white/80 md:dark:bg-slate-900/80 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.35)] dark:shadow-none backdrop-blur overflow-hidden`}
+        >
+          {/* Mobile close button */}
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="absolute top-3 right-3 z-50 w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 md:hidden"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
           <div className="px-4 pt-4 shrink-0">
             <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 dark:bg-emerald-900/20 dark:border-emerald-900/50 px-4 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-emerald-500">
@@ -936,19 +973,38 @@ const ChatPage = ({ session, onLeave }) => {
 
         <section className="flex-1 flex flex-col min-w-0 min-h-0 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden h-full relative">
           {/* Action Bar (Top of Chat) */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur shrink-0 z-10">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between px-3 md:px-6 py-3 md:py-4 border-b border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur shrink-0 z-10">
+            <div className="flex items-center gap-2 md:gap-3">
+              {/* Mobile hamburger to open sidebar */}
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 md:hidden"
+                title="Participants"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </button>
               <button
                 onClick={() => setIsWhiteboardOpen(true)}
-                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors shadow-sm"
+                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-3 md:px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors shadow-sm"
                 title="Tableau blanc partagé"
               >
                 <span className="text-sm font-black text-indigo-200">W</span>
-                Tableau Blanc
+                <span className="hidden sm:inline">Tableau Blanc</span>
               </button>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-full text-xs font-bold border border-slate-100 dark:border-slate-700">
+            <div className="flex items-center gap-2 md:gap-4">
+              <div className="flex items-center gap-1.5 md:gap-2 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 px-2 md:px-3 py-1.5 rounded-full text-[10px] md:text-xs font-bold border border-slate-100 dark:border-slate-700">
                 <span
                   className={`w-2 h-2 rounded-full ${activeParticipants > 0 ? "bg-emerald-500 animate-pulse" : "bg-slate-300"}`}
                 />
@@ -959,7 +1015,7 @@ const ChatPage = ({ session, onLeave }) => {
                   if (onLeave) onLeave();
                   navigate("/etudiant", { state: { activeTab: "sessions" } });
                 }}
-                className="bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-600 py-1.5 px-4 rounded-full text-xs font-bold transition-colors"
+                className="bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-600 py-1.5 px-3 md:px-4 rounded-full text-[10px] md:text-xs font-bold transition-colors"
               >
                 Quitter
               </button>

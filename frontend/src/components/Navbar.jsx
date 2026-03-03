@@ -17,13 +17,13 @@ const Navbar = () => {
     return null;
 
   return (
-    <nav className="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
-      <div className="flex items-center gap-8">
+    <nav className="bg-slate-900 border-b border-slate-800 px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-50">
+      <div className="flex items-center gap-4 md:gap-8">
         <Link to="/" className="flex items-center">
           <img src={logoDarkSvg} alt="AcademiX" className="h-10 w-auto" />
         </Link>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {role === "super_admin" && (
             <Link
               to="/admin"
