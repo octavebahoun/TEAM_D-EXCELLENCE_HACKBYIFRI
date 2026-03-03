@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StatistiqueFiliere extends Model
 {
+    protected $table = 'statistiques_filieres';
+
     protected $fillable = [
         'filiere_id',
         'annee_academique',

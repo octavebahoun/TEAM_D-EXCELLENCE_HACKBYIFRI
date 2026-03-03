@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StatistiqueDepartement extends Model
 {
+    protected $table = 'statistiques_departements';
+
     protected $fillable = [
         'departement_id',
         'annee_academique',
