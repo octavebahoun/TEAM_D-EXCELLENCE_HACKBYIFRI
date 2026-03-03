@@ -48,11 +48,13 @@ class StudentAnalysisNotification extends Notification implements ShouldQueue
             default => '📊',
         };
 
+        $prenom = $notifiable->prenom ?? $notifiable->nom ?? 'Étudiant';
+
         return (new MailMessage)
             ->subject("{$statusEmoji} Ton bilan académique personnalisé — AcademiX")
-            ->greeting("Bonjour {$notifiable->name} !")
+            ->greeting("Bonjour {$prenom} !")
             ->line($this->analysis->message_principal)
-            ->line("**Matières à prioriser :** " . implode(', ', $this->analysis->matieres_prioritaires))
+            ->line("**Matières à prioriser :** " . implode(', ', $this->analysis->matieres_prioritaires ?? []))
             ->line("💪 " . ($this->analysis->point_positif ?? "Continue tes efforts !"))
             ->action('Voir mon tableau de bord', url('/dashboard'))
             ->line('Ce message a été généré par notre IA pour t\'aider dans ta réussite.');

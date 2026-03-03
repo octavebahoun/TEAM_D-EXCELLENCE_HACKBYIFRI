@@ -732,7 +732,7 @@ export default function StudentDashboardOverview({ onNavigate }) {
 
         {/* Alert / Status Widget */}
         <motion.div variants={itemVariants}>
-          <Card className="border-0 bg-slate-900 dark:bg-slate-950 rounded-3xl shadow-xl overflow-hidden relative min-h-80 flex flex-col">
+          <Card className="border-0 bg-white dark:bg-slate-950 rounded-3xl shadow-xl overflow-hidden relative min-h-80 flex flex-col">
             {/* Dot pattern */}
             <div
               className="absolute inset-0 pointer-events-none"
