@@ -19,3 +19,8 @@ export const rateSession = async (sessionId, payload) => {
   const response = await apiClient.post(`/sessions/${sessionId}/rate`, payload);
   return response.data;
 };
+
+export const deleteSession = async (sessionId) => {
+  const response = await apiClient.delete(`/sessions/${sessionId}`);
+  return response.data;
+};

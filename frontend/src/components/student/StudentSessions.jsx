@@ -12,9 +12,15 @@ import {
   Users,
   X,
   WifiOff,
+  Trash2,
 } from "lucide-react";
 import { cn } from "../../utils/cn";
-import { createSession, getSessions, joinSession } from "../../api/sessions";
+import {
+  createSession,
+  getSessions,
+  joinSession,
+  deleteSession,
+} from "../../api/sessions";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../../services/authService";
 import toast from "react-hot-toast";
@@ -125,12 +131,19 @@ function StatCard({ icon: Icon, label, value, color, bg }) {
   );
 }
 
-function SessionCard({ session, onJoin, subjectColor }) {
+function SessionCard({
+  session,
+  onJoin,
+  onDelete,
+  currentUserId,
+  subjectColor,
+}) {
   const fmt = FORMAT_STYLES[session.format] || DEFAULT_FORMAT;
   const live = isLiveNow(session.date_debut, session.duree_minutes);
   const today = isToday(session.date_debut);
   const upcoming = isUpcoming(session.date_debut);
   const subject = session.matiere?.nom || "Session";
+  const isMine = session.createur?.id === currentUserId;
   const pct = session.max_participants
     ? Math.min(
         Math.round(
@@ -269,6 +282,20 @@ function SessionCard({ session, onJoin, subjectColor }) {
       >
         {live ? "Rejoindre maintenant" : "S'inscrire"}
       </button>
+
+      {/* Supprimer (créateur uniquement) */}
+      {isMine && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(session);
+          }}
+          className="w-full mt-2 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all active:scale-95 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center justify-center gap-2"
+        >
+          <Trash2 size={13} />
+          Supprimer ma session
+        </button>
+      )}
     </motion.div>
   );
 }
@@ -363,6 +390,32 @@ export default function StudentSessions({ isOnline = true }) {
       // navigate anyway
     }
     navigate("/chat", { state: { session } });
+  };
+
+  const handleDelete = async (session) => {
+    const sessionId = session.id || session._id;
+    if (
+      !confirm(
+        "Supprimer définitivement cette session et tout son contenu (messages, participants) ?",
+      )
+    ) {
+      return;
+    }
+    try {
+      const res = await deleteSession(sessionId);
+      if (res?.success) {
+        setSessions((prev) =>
+          prev.filter((s) => (s.id || s._id) !== sessionId),
+        );
+        toast.success("Session supprimée !");
+      } else {
+        toast.error(res?.message || "Impossible de supprimer la session.");
+      }
+    } catch (err) {
+      const msg =
+        err.response?.data?.message || "Erreur lors de la suppression.";
+      toast.error(msg);
+    }
   };
 
   const handleCreate = async (e) => {
@@ -518,6 +571,8 @@ export default function StudentSessions({ isOnline = true }) {
                 key={session.id || session._id}
                 session={session}
                 onJoin={handleJoin}
+                onDelete={handleDelete}
+                currentUserId={authUser?.id}
                 subjectColor={
                   subjectColorMap[session.matiere?.nom] ||
                   "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"

@@ -56,8 +56,10 @@ export default function StudentDashboard() {
     switch (activeTab) {
       case "dashboard":
         return {
-          title: `Bon retour, ${user?.prenom || "Sophie"} !`,
-          subtitle: `${user?.niveau || "S2"} • ${user?.filiere?.nom || "Génie Électrique et Informatique"}`,
+          title: `Bon retour, ${user?.prenom || "Étudiant"} !`,
+          subtitle: user?.filiere?.nom
+            ? `${user.niveau || ""} • ${user.filiere.nom}`
+            : "Espace étudiant",
         };
       case "sessions":
         return {
@@ -82,8 +84,10 @@ export default function StudentDashboard() {
         return { title: "Mon Profil", subtitle: "" };
       default:
         return {
-          title: `Bon retour, ${user?.prenom || "Sophie"} !`,
-          subtitle: `${user?.niveau || "S2"} • ${user?.filiere?.nom || "Génie Électrique et Informatique"}`,
+          title: `Bon retour, ${user?.prenom || "Étudiant"} !`,
+          subtitle: user?.filiere?.nom
+            ? `${user.niveau || ""} • ${user.filiere.nom}`
+            : "Espace étudiant",
         };
     }
   };

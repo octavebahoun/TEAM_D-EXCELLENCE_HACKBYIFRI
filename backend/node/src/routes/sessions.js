@@ -14,5 +14,6 @@ router.get('/', sessionController.getSessions);
 router.post('/', sessionController.createSession);
 router.post('/:id/join', sessionController.joinSession);
 router.post('/:id/rate', sessionController.rateSession);
+router.delete('/:id', sessionController.deleteSession);
 
 module.exports = router;

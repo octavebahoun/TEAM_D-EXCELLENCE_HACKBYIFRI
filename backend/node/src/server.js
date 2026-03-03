@@ -28,6 +28,7 @@ const webhookRoutes = require('./routes/webhook');
 const privateMessageSocket = require('./services/privateMessageSocket');
 const socketService = require('./services/socketService');
 const { socketAuth } = require('./middleware/auth');
+const { cleanupExpiredSessions } = require('./controllers/sessionController');
 
 const app = express();
 const server = http.createServer(app);
@@ -91,6 +92,12 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     logger.info('Connected to MongoDB');
     console.log('MongoDB connecté avec succès');
+
+    // Nettoyage automatique des sessions expirées toutes les 6 heures
+    const CLEANUP_INTERVAL = 6 * 60 * 60 * 1000; // 6h
+    cleanupExpiredSessions(); // Premier nettoyage au démarrage
+    setInterval(cleanupExpiredSessions, CLEANUP_INTERVAL);
+    logger.info(`Session cleanup scheduled every ${CLEANUP_INTERVAL / 3600000}h`);
   })
   .catch((err) => {
     logger.error('MongoDB connection error:', err);

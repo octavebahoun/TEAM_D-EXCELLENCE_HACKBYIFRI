@@ -5,7 +5,9 @@
 
 const SessionCollaborative = require('../models/SessionCollaborative');
 const SessionParticipant = require('../models/SessionParticipant');
+const SessionEvent = require('../models/SessionEvent');
 const ChatRoom = require('../models/ChatRoom');
+const Message = require('../models/Message');
 const logger = require('../utils/logger');
 
 const normalizeNumber = (value) => {
@@ -299,5 +301,103 @@ exports.rateSession = async (req, res) => {
       message: 'Erreur lors de la notation de la session',
       error: error.message
     });
+  }
+};
+
+/**
+ * DELETE /api/sessions/:id
+ * Seul le créateur (organisateur) peut supprimer sa session.
+ * Supprime en cascade : participants, events, messages, chatRoom.
+ */
+exports.deleteSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Identifiant de session invalide'
+      });
+    }
+
+    const session = await SessionCollaborative.findById(id);
+
+    if (!session) {
+      return res.status(404).json({
+        success: false,
+        message: 'Session introuvable'
+      });
+    }
+
+    // Seul le créateur peut supprimer
+    if (session.organisateur_id !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Seul le créateur de la session peut la supprimer'
+      });
+    }
+
+    // Suppression en cascade
+    const sessionObjectId = session._id;
+    await Promise.all([
+      Message.deleteMany({ session_id: sessionObjectId }),
+      SessionParticipant.deleteMany({ session_id: sessionObjectId }),
+      SessionEvent.deleteMany({ session_id: sessionObjectId }),
+      ChatRoom.deleteMany({ session_id: sessionObjectId }),
+    ]);
+
+    await SessionCollaborative.deleteOne({ _id: sessionObjectId });
+
+    logger.info(`Session ${id} supprimée par user ${req.user.id}`);
+
+    res.json({
+      success: true,
+      message: 'Session supprimée avec succès'
+    });
+  } catch (error) {
+    logger.error('Error deleting session:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la suppression de la session'
+    });
+  }
+};
+
+/**
+ * Supprime automatiquement les sessions expirées (date_fin dépassée de 48h).
+ * Appelé par un setInterval dans server.js.
+ * Nettoie en cascade : messages, participants, events, chatRooms.
+ */
+exports.cleanupExpiredSessions = async () => {
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000); // 48h après date_fin
+
+    const expiredSessions = await SessionCollaborative.find({
+      date_fin: { $lt: cutoff }
+    }).select('_id').lean();
+
+    if (expiredSessions.length === 0) return 0;
+
+    const expiredIds = expiredSessions.map((s) => s._id);
+
+    const [msgResult, partResult, evtResult, roomResult] = await Promise.all([
+      Message.deleteMany({ session_id: { $in: expiredIds } }),
+      SessionParticipant.deleteMany({ session_id: { $in: expiredIds } }),
+      SessionEvent.deleteMany({ session_id: { $in: expiredIds } }),
+      ChatRoom.deleteMany({ session_id: { $in: expiredIds } }),
+    ]);
+
+    const sessResult = await SessionCollaborative.deleteMany({ _id: { $in: expiredIds } });
+
+    logger.info(
+      `Cleanup sessions expirées : ${sessResult.deletedCount} sessions, ` +
+      `${msgResult.deletedCount} messages, ${partResult.deletedCount} participants, ` +
+      `${evtResult.deletedCount} events, ${roomResult.deletedCount} rooms supprimés`
+    );
+
+    return sessResult.deletedCount;
+  } catch (error) {
+    logger.error('Erreur cleanup sessions expirées:', error);
+    return 0;
   }
 };

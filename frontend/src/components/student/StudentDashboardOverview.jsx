@@ -337,7 +337,7 @@ function PerformanceChart({ data = [], color = "#10b981" }) {
 }
 
 // ─── Good Status Content ──────────────────────────────────────────────────────
-function GoodStatusContent({ moyenne }) {
+function GoodStatusContent({ moyenne, analysis }) {
   const dots = [
     { l: "14%", t: "58%", s: 4, d: 0, c: "bg-emerald-400" },
     { l: "33%", t: "42%", s: 3, d: 0.4, c: "bg-yellow-300" },
@@ -346,6 +346,21 @@ function GoodStatusContent({ moyenne }) {
     { l: "85%", t: "66%", s: 4, d: 0.85, c: "bg-emerald-500" },
     { l: "45%", t: "28%", s: 2, d: 1.1, c: "bg-white" },
   ];
+
+  // Textes dynamiques issus de l'analyse LLM (fallback générique si aucune analyse)
+  const badgeLabel =
+    analysis?.niveau_alerte === "info"
+      ? "✦ Bilan positif"
+      : "✦ Bonne performance";
+  const titre = analysis?.point_positif
+    ? analysis.point_positif.length > 60
+      ? analysis.point_positif.slice(0, 60) + "…"
+      : analysis.point_positif
+    : "Continuez comme ça !";
+  const message =
+    analysis?.message_principal ||
+    `Moyenne de ${moyenne.toFixed(2)}/20 — Vous êtes sur la bonne voie.`;
+
   return (
     <div className="relative flex flex-col h-full">
       {dots.map((dot, i) => (
@@ -399,19 +414,13 @@ function GoodStatusContent({ moyenne }) {
         </svg>
       </motion.div>
       <div className="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full mb-4 w-max">
-        ✦ Bonne performance
+        {badgeLabel}
       </div>
-      <h3 className="text-2xl font-bold font-display text-white mb-2 leading-snug">
-        Continuez
-        <br />
-        comme ça !
+      <h3 className="text-lg font-bold font-display text-white mb-2 leading-snug">
+        {titre}
       </h3>
-      <p className="text-sm text-slate-400 font-medium leading-relaxed mb-6">
-        Moyenne de{" "}
-        <span className="text-emerald-400 font-bold">
-          {moyenne.toFixed(2)}/20
-        </span>{" "}
-        — Vous êtes sur la bonne voie.
+      <p className="text-sm text-slate-400 font-medium leading-relaxed mb-6 line-clamp-3">
+        {message}
       </p>
       <button className="inline-flex items-center gap-2 bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-xl hover:bg-emerald-400 transition-colors duration-200 w-max">
         Voir mes stats <ChevronRight size={14} aria-hidden="true" />
@@ -421,7 +430,23 @@ function GoodStatusContent({ moyenne }) {
 }
 
 // ─── Bad Status Content ───────────────────────────────────────────────────────
-function BadStatusContent({ moyenne, onNavigate }) {
+function BadStatusContent({ moyenne, onNavigate, analysis }) {
+  // Textes dynamiques issus de l'analyse LLM (fallback générique si aucune analyse)
+  const badgeLabel =
+    analysis?.niveau_alerte === "danger"
+      ? "Situation critique"
+      : "Attention requise";
+  const titre = analysis?.message_principal
+    ? analysis.message_principal.length > 50
+      ? analysis.message_principal.slice(0, 50) + "…"
+      : analysis.message_principal
+    : "Moyenne sous le seuil";
+  const description =
+    analysis?.conseils?.length > 0
+      ? analysis.conseils[0]
+      : `Moyenne de ${moyenne.toFixed(2)}/20 — Utilisez l'IA pour vous rattraper.`;
+  const matieres = analysis?.matieres_prioritaires ?? [];
+
   return (
     <div className="relative flex flex-col h-full">
       <motion.div
@@ -479,18 +504,26 @@ function BadStatusContent({ moyenne, onNavigate }) {
         </div>
       </div>
       <div className="inline-flex items-center gap-1.5 bg-red-500/20 text-red-300 border border-red-500/30 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full mb-4 w-max">
-        <AlertTriangle size={10} aria-hidden="true" /> Alerte Critique
+        <AlertTriangle size={10} aria-hidden="true" /> {badgeLabel}
       </div>
-      <h3 className="text-xl font-bold font-display text-white mb-2 leading-snug">
-        Moyenne sous
-        <br />
-        le seuil
+      <h3 className="text-lg font-bold font-display text-white mb-2 leading-snug line-clamp-2">
+        {titre}
       </h3>
-      <p className="text-sm text-slate-400 font-medium leading-relaxed mb-6">
-        Moyenne de{" "}
-        <span className="text-red-400 font-bold">{moyenne.toFixed(2)}/20</span>{" "}
-        — Utilisez l'IA pour vous rattraper.
+      <p className="text-sm text-slate-400 font-medium leading-relaxed mb-4 line-clamp-2">
+        {description}
       </p>
+      {matieres.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {matieres.slice(0, 3).map((m, i) => (
+            <span
+              key={i}
+              className="text-[10px] font-bold bg-red-500/15 text-red-300 border border-red-500/20 px-2 py-0.5 rounded-full"
+            >
+              {m}
+            </span>
+          ))}
+        </div>
+      )}
       <button
         onClick={() => onNavigate?.("ai-revision")}
         className="inline-flex items-center gap-2 bg-red-500 text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-xl hover:bg-red-400 transition-colors duration-200 w-max"
@@ -505,21 +538,28 @@ export default function StudentDashboardOverview({ onNavigate }) {
   const [moyennesData, setMoyennesData] = useState(null);
   const [alertes, setAlertes] = useState([]);
   const [notes, setNotes] = useState([]);
+  const [lastAnalysis, setLastAnalysis] = useState(null);
   const [selectedSemestre, setSelectedSemestre] = useState("S2");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [moyennes, alertesRes, notesRes] = await Promise.all([
-          studentService.getMoyennes(),
-          studentService.getAlertes(),
-          studentService.getNotes(),
-        ]);
+        const [moyennes, alertesRes, notesRes, analysisRes] = await Promise.all(
+          [
+            studentService.getMoyennes(),
+            studentService.getAlertes(),
+            studentService.getNotes(),
+            studentService.getAnalysisHistory().catch(() => null),
+          ],
+        );
         setMoyennesData(moyennes);
         setAlertes(alertesRes.alertes || []);
         const raw = notesRes?.data ?? notesRes?.notes ?? notesRes ?? [];
         setNotes(Array.isArray(raw) ? raw : []);
+        // Dernière analyse IA (la plus récente)
+        const analyses = analysisRes?.data?.data ?? [];
+        if (analyses.length > 0) setLastAnalysis(analyses[0]);
       } catch (error) {
         console.error("Erreur lors du chargement de l'overview :", error);
       } finally {
@@ -777,6 +817,7 @@ export default function StudentDashboardOverview({ onNavigate }) {
                     <BadStatusContent
                       moyenne={moyenne}
                       onNavigate={onNavigate}
+                      analysis={lastAnalysis}
                     />
                   </motion.div>
                 ) : alerteImportante ? (
@@ -823,7 +864,10 @@ export default function StudentDashboardOverview({ onNavigate }) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                   >
-                    <GoodStatusContent moyenne={moyenne} />
+                    <GoodStatusContent
+                      moyenne={moyenne}
+                      analysis={lastAnalysis}
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>

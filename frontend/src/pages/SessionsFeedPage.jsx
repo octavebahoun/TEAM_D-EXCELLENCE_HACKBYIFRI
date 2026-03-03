@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { createSession, getSessions, joinSession } from "../api/sessions";
+import {
+  createSession,
+  getSessions,
+  joinSession,
+  deleteSession,
+} from "../api/sessions";
 import {
   getNotifications,
   getNotificationUnreadCount,
@@ -304,6 +309,24 @@ const SessionsFeedPage = ({ onJoinSession }) => {
     }
   };
 
+  const handleDelete = async (session) => {
+    const sessionId = session.id || session._id;
+    if (
+      !confirm("Supprimer définitivement cette session et tout son contenu ?")
+    )
+      return;
+    try {
+      const res = await deleteSession(sessionId);
+      if (res?.success) {
+        setSessions((prev) =>
+          prev.filter((s) => (s.id || s._id) !== sessionId),
+        );
+      }
+    } catch (error) {
+      console.error("Erreur suppression session:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white/80 backdrop-blur">
@@ -518,6 +541,14 @@ const SessionsFeedPage = ({ onJoinSession }) => {
                   >
                     {ctaLabel}
                   </button>
+                  {session.createur?.id === CURRENT_USER.id && (
+                    <button
+                      onClick={() => handleDelete(session)}
+                      className="mt-2 w-full rounded-2xl border border-red-200 py-2.5 text-xs font-semibold text-red-600 transition hover:bg-red-50"
+                    >
+                      🗑️ Supprimer ma session
+                    </button>
+                  )}
                 </motion.article>
               );
             })}
