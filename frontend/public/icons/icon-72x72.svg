@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Green letter I -->
+  <!-- Top bar -->
+  <rect x="28" y="42" width="44" height="10" rx="3" fill="#22c55e"/>
+  <!-- Stem -->
+  <rect x="43" y="52" width="14" height="30" rx="2" fill="#22c55e"/>
+  <!-- Bottom bar -->
+  <rect x="28" y="77" width="44" height="10" rx="3" fill="#22c55e"/>
+
+  <!-- Graduation cap - board (mortarboard top) -->
+  <polygon points="50,14 82,26 50,38 18,26" fill="#1a1a1a" stroke="#333" stroke-width="1"/>
+  
+  <!-- Cap top flat surface highlight -->
+  <polygon points="50,16 80,27 50,36 20,27" fill="#2a2a2a"/>
+
+  <!-- Cap head band -->
+  <ellipse cx="50" cy="34" rx="18" ry="7" fill="#111111"/>
+  
+  <!-- Tassel string -->
+  <line x1="78" y1="27" x2="78" y2="36" stroke="#22c55e" stroke-width="2"/>
+  <!-- Tassel end -->
+  <rect x="74" y="36" width="8" height="6" rx="1" fill="#22c55e"/>
+  <line x1="75" y1="42" x2="74" y2="48" stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="78" y1="42" x2="78" y2="49" stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="81" y1="42" x2="82" y2="48" stroke="#22c55e" stroke-width="1.5"/>
+</svg>

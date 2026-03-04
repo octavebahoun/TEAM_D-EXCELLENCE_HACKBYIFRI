@@ -98,8 +98,8 @@ self.addEventListener('push', (event) => {
     const title = data.title || 'AcademiX';
     const options = {
         body: data.body || 'Tu as une nouvelle notification',
-        icon: data.icon || '/icons/icon-192x192.png',
-        badge: data.badge || '/icons/icon-72x72.png',
+        icon: data.icon || '/icons/icon-192x192.svg',
+        badge: data.badge || '/icons/icon-72x72.svg',
         tag: data.tag || 'academix-notification',
         data: { url: data.url || '/dashboard' },
         vibrate: [200, 100, 200],
