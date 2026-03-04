@@ -13,7 +13,7 @@ export default function LandingPage() {
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
 
   return (
-    <div className="min-h-screen bg-slate-950 overflow-x-hidden">
+    <div className="min-h-screen bg-slate-950 overflow-x-hidden scrollbar-hide">
       {/* Progress bar */}
       <motion.div
         style={{ scaleX }}

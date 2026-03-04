@@ -49,9 +49,9 @@ export default function HeroSection() {
 
       <motion.div
         style={{ y, opacity, scale }}
-        className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20"
+        className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-16 sm:pb-20"
       >
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* Colonne gauche - Texte */}
           <div className="text-center lg:text-left">
             {/* Badge */}
@@ -59,11 +59,11 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium mb-8"
+              className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs sm:text-sm font-medium mb-6 sm:mb-8"
             >
-              <Sparkles className="w-4 h-4" />
-              Propulsé par l'Intelligence Artificielle
-              <Zap className="w-3.5 h-3.5 text-amber-400" />
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span>Propulsé par l'Intelligence Artificielle</span>
+              <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400 flex-shrink-0" />
             </motion.div>
 
             {/* Titre principal */}
@@ -93,7 +93,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="mt-6 text-lg sm:text-xl text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed"
+              className="mt-5 sm:mt-6 text-base sm:text-lg lg:text-xl text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed"
             >
               AcademiX combine{" "}
               <span className="text-emerald-400 font-semibold">
@@ -113,7 +113,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
-              className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+              className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start"
             >
               <motion.button
                 whileHover={{
@@ -122,11 +122,11 @@ export default function HeroSection() {
                 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate("/login")}
-                className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold text-lg rounded-2xl shadow-2xl shadow-emerald-500/25 transition-all"
+                className="group flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold text-base sm:text-lg rounded-2xl shadow-2xl shadow-emerald-500/25 transition-all"
               >
-                <GraduationCap className="w-5 h-5" />
+                <GraduationCap className="w-5 h-5 flex-shrink-0" />
                 Commencer gratuitement
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform flex-shrink-0" />
               </motion.button>
 
               <motion.button
@@ -140,9 +140,9 @@ export default function HeroSection() {
                     .querySelector("#features")
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
-                className="flex items-center justify-center gap-3 px-8 py-4 border border-white/20 text-white font-semibold text-lg rounded-2xl hover:border-white/40 transition-all"
+                className="flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 border border-white/20 text-white font-semibold text-base sm:text-lg rounded-2xl hover:border-white/40 transition-all"
               >
-                <Play className="w-5 h-5" />
+                <Play className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                 Découvrir
               </motion.button>
             </motion.div>
@@ -152,7 +152,7 @@ export default function HeroSection() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1 }}
-              className="mt-12 flex items-center gap-8 justify-center lg:justify-start"
+              className="mt-10 sm:mt-12 flex flex-wrap items-center gap-6 sm:gap-8 justify-center lg:justify-start"
             >
               {[
                 { value: "6+", label: "Modules IA" },
@@ -160,21 +160,23 @@ export default function HeroSection() {
                 { value: "24/7", label: "Disponible" },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className="text-2xl font-bold text-white">
+                  <div className="text-xl sm:text-2xl font-bold text-white">
                     {stat.value}
                   </div>
-                  <div className="text-sm text-slate-500">{stat.label}</div>
+                  <div className="text-xs sm:text-sm text-slate-500">
+                    {stat.label}
+                  </div>
                 </div>
               ))}
             </motion.div>
           </div>
 
-          {/* Colonne droite - Remotion Player */}
+          {/* Colonne droite - Remotion Player — masqué sur mobile */}
           <motion.div
             initial={{ opacity: 0, x: 50, rotateY: -10 }}
             animate={{ opacity: 1, x: 0, rotateY: 0 }}
             transition={{ delay: 0.6, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="relative"
+            className="relative hidden sm:block"
           >
             {/* Glow derrière le player */}
             <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-amber-500/10 rounded-3xl blur-2xl" />
@@ -207,11 +209,11 @@ export default function HeroSection() {
               />
             </div>
 
-            {/* Floating badges */}
+            {/* Floating badges — masqués sur tablette */}
             <motion.div
               animate={{ y: [0, -10, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -top-6 -right-4 px-4 py-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl text-white text-sm font-semibold shadow-xl"
+              className="absolute -top-6 -right-4 hidden lg:block px-4 py-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl text-white text-sm font-semibold shadow-xl"
             >
               🧠 IA Générative
             </motion.div>
@@ -223,7 +225,7 @@ export default function HeroSection() {
                 ease: "easeInOut",
                 delay: 1,
               }}
-              className="absolute -bottom-4 -left-4 px-4 py-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl text-white text-sm font-semibold shadow-xl"
+              className="absolute -bottom-4 -left-4 hidden lg:block px-4 py-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl text-white text-sm font-semibold shadow-xl"
             >
               ⚡ Temps réel
             </motion.div>
@@ -235,7 +237,7 @@ export default function HeroSection() {
       <motion.div
         animate={{ y: [0, 8, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+        className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-10"
       >
         <div className="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center">
           <motion.div

@@ -13,7 +13,7 @@ export default function CTASection() {
   const navigate = useNavigate();
 
   return (
-    <section className="relative py-28 sm:py-36 overflow-hidden">
+    <section className="relative py-14 sm:py-20 lg:py-28 xl:py-36 overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900" />
       <motion.div
@@ -55,7 +55,7 @@ export default function CTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
-          className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight"
+          className="font-display text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-white leading-tight tracking-tight"
         >
           Commence dès{" "}
           <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
@@ -68,7 +68,7 @@ export default function CTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="mt-6 text-xl text-slate-400 max-w-2xl mx-auto"
+          className="mt-4 sm:mt-6 text-base sm:text-lg lg:text-xl text-slate-400 max-w-2xl mx-auto"
         >
           Rejoins AcademiX gratuitement et découvre comment l'IA peut
           révolutionner ta façon d'étudier.
@@ -109,7 +109,7 @@ export default function CTASection() {
             }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/login")}
-            className="group flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold text-lg rounded-2xl shadow-2xl shadow-emerald-500/30 transition-all"
+            className="group w-full sm:w-auto flex items-center justify-center gap-3 px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold text-base sm:text-lg rounded-2xl shadow-2xl shadow-emerald-500/30 transition-all"
           >
             <GraduationCap className="w-6 h-6" />
             Créer mon compte gratuit

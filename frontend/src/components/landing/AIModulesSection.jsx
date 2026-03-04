@@ -171,7 +171,7 @@ export default function AIModulesSection() {
   return (
     <section
       id="ai-modules"
-      className="relative py-28 sm:py-36 bg-slate-950 overflow-hidden"
+      className="relative py-14 sm:py-20 lg:py-28 xl:py-36 bg-slate-950 overflow-hidden"
     >
       {/* Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-gradient-to-r from-emerald-500/5 via-cyan-500/5 to-violet-500/5 rounded-full blur-3xl" />
@@ -185,7 +185,7 @@ export default function AIModulesSection() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-16"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 lg:mb-16"
         >
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-semibold mb-6">
             <Sparkles className="w-4 h-4" />6 Modules IA
@@ -202,13 +202,13 @@ export default function AIModulesSection() {
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-[1fr_1.5fr] gap-10 items-start">
+        <div className="grid lg:grid-cols-[1fr_1.5fr] gap-6 sm:gap-8 lg:gap-10 items-start">
           {/* Tabs verticaux */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6 }}
-            className="space-y-2"
+            className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible gap-2 pb-2 lg:pb-0 snap-x snap-mandatory lg:snap-none scrollbar-hide"
           >
             {modules.map((mod) => {
               const isActive = active === mod.id;
@@ -217,34 +217,37 @@ export default function AIModulesSection() {
                 <motion.button
                   key={mod.id}
                   onClick={() => setActive(mod.id)}
-                  whileHover={{ x: 4 }}
-                  className={`w-full flex items-center gap-4 p-4 rounded-2xl text-left transition-all duration-300 ${
+                  whileHover={{ scale: 1.02 }}
+                  className={`flex-shrink-0 lg:flex-shrink lg:w-full flex items-center gap-2 lg:gap-4 p-2.5 lg:p-4 rounded-xl lg:rounded-2xl text-left transition-all duration-300 snap-start ${
                     isActive
                       ? `${mcs.bg} ring-2 ${mcs.ring} shadow-lg`
                       : "hover:bg-slate-800/60"
                   }`}
                 >
                   <div
-                    className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${
+                    className={`w-9 h-9 lg:w-11 lg:h-11 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
                       isActive
                         ? `bg-gradient-to-br ${mod.gradient} text-white shadow-md`
                         : "bg-slate-800 text-slate-400"
                     }`}
                   >
-                    <mod.icon className="w-5 h-5" />
+                    <mod.icon className="w-4 h-4 lg:w-5 lg:h-5" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div
-                      className={`text-sm font-bold ${isActive ? mcs.text : "text-white"}`}
+                      className={`text-xs lg:text-sm font-bold whitespace-nowrap lg:whitespace-normal ${isActive ? mcs.text : "text-white"}`}
                     >
                       {mod.title}
                     </div>
-                    <div className="text-xs text-slate-400 truncate">
+                    <div className="hidden lg:block text-xs text-slate-400 truncate">
                       {mod.subtitle}
                     </div>
                   </div>
                   {isActive && (
-                    <motion.div layoutId="ai-arrow" className={mcs.text}>
+                    <motion.div
+                      layoutId="ai-arrow"
+                      className={`${mcs.text} hidden lg:block`}
+                    >
                       <ArrowRight className="w-4 h-4" />
                     </motion.div>
                   )}

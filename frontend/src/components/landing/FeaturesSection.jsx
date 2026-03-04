@@ -134,7 +134,7 @@ export default function FeaturesSection() {
   return (
     <section
       id="features"
-      className="relative py-28 sm:py-36 bg-slate-950 overflow-hidden"
+      className="relative py-16 sm:py-24 lg:py-32 bg-slate-950 overflow-hidden"
     >
       {/* BG decorations */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-emerald-500/5 rounded-full blur-3xl" />
@@ -147,7 +147,7 @@ export default function FeaturesSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="text-center max-w-3xl mx-auto mb-20"
+          className="text-center max-w-3xl mx-auto mb-10 sm:mb-16 lg:mb-20"
         >
           <motion.span
             initial={{ opacity: 0, scale: 0.8 }}
@@ -175,14 +175,14 @@ export default function FeaturesSection() {
           variants={containerVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
-          className="grid md:grid-cols-3 gap-8"
+          className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8"
         >
           {featureCards.map((card, i) => (
             <motion.div
               key={card.title}
               variants={cardVariants}
               whileHover={{ y: -8, transition: { duration: 0.3 } }}
-              className={`group relative p-8 rounded-3xl bg-slate-900 border border-slate-800 ${card.borderGlow} shadow-sm hover:shadow-2xl hover:shadow-emerald-500/5 transition-all duration-500`}
+              className={`group relative p-6 sm:p-7 lg:p-8 rounded-3xl bg-slate-900 border border-slate-800 ${card.borderGlow} shadow-sm hover:shadow-2xl hover:shadow-emerald-500/5 transition-all duration-500`}
             >
               {/* Glow on hover */}
               <div

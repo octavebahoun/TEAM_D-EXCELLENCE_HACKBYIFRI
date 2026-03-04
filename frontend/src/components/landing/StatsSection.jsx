@@ -118,7 +118,7 @@ const colorMap = {
 
 export default function StatsSection() {
   return (
-    <section className="relative py-24 bg-slate-900 overflow-hidden">
+    <section className="relative py-14 sm:py-20 lg:py-24 bg-slate-900 overflow-hidden">
       {/* BG pattern */}
       <div
         className="absolute inset-0 opacity-[0.03]"
@@ -132,7 +132,7 @@ export default function StatsSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-14 lg:mb-16"
         >
           <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-white">
             AcademiX en{" "}
@@ -142,7 +142,7 @@ export default function StatsSection() {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5 lg:gap-6">
           {stats.map((stat, i) => {
             const colors = colorMap[stat.color];
             return (
@@ -157,15 +157,15 @@ export default function StatsSection() {
                   ease: [0.16, 1, 0.3, 1],
                 }}
                 whileHover={{ y: -6, scale: 1.02 }}
-                className={`relative p-6 rounded-2xl bg-slate-800 border ${colors.border} shadow-lg ${colors.glow} hover:shadow-xl transition-all`}
+                className={`relative p-4 sm:p-5 lg:p-6 rounded-2xl bg-slate-800 border ${colors.border} shadow-lg ${colors.glow} hover:shadow-xl transition-all`}
               >
                 <div
-                  className={`w-12 h-12 rounded-xl ${colors.bg} flex items-center justify-center mb-4`}
+                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${colors.bg} flex items-center justify-center mb-3 sm:mb-4`}
                 >
                   <stat.icon className={`w-6 h-6 ${colors.text}`} />
                 </div>
                 <div
-                  className={`text-3xl font-extrabold font-display ${colors.text}`}
+                  className={`text-2xl sm:text-3xl font-extrabold font-display ${colors.text}`}
                 >
                   <AnimatedCounter
                     value={stat.value}

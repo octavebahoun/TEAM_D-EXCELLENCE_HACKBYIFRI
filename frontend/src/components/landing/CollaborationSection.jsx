@@ -153,7 +153,7 @@ export default function CollaborationSection() {
   return (
     <section
       id="collaboration"
-      className="relative py-28 sm:py-36 bg-slate-900 overflow-hidden"
+      className="relative py-14 sm:py-20 lg:py-28 xl:py-36 bg-slate-900 overflow-hidden"
     >
       {/* Glow bg */}
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-3xl" />
@@ -168,7 +168,7 @@ export default function CollaborationSection() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-20"
+          className="text-center max-w-3xl mx-auto mb-10 sm:mb-14 lg:mb-20"
         >
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold mb-6">
             <Users className="w-4 h-4" />
@@ -187,7 +187,7 @@ export default function CollaborationSection() {
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-center">
           {/* Feature list */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}

@@ -54,9 +54,9 @@ export default function Footer() {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main footer */}
-        <div className="py-16 grid grid-cols-2 md:grid-cols-4 gap-10">
+        <div className="py-10 sm:py-14 lg:py-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10">
           {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
+          <div className="col-span-1 sm:col-span-2 md:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center">
                 <span className="text-white font-extrabold text-lg font-display">
@@ -109,7 +109,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="py-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="py-6 border-t border-slate-800 flex flex-col gap-3 items-center text-center sm:flex-row sm:text-left sm:justify-between">
           <div className="text-sm text-slate-500 flex items-center gap-1">
             © {new Date().getFullYear()} AcademiX. Fait avec{" "}
             <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500 inline" />{" "}
@@ -118,7 +118,7 @@ export default function Footer() {
               Team d'Excellence
             </span>
           </div>
-          <div className="flex items-center gap-4 text-xs text-slate-500">
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 text-xs text-slate-500">
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Tous les services opérationnels
