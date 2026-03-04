@@ -162,8 +162,17 @@ export default function StudentProfil() {
       setProfil((prev) => ({
         ...prev,
         ...updatedUser,
-        // On s'assure que avatar_url est mis à jour (le backend renvoie le User frais)
       }));
+
+      // PERSISTANCE : Mettre à jour l'utilisateur stocké dans le localStorage pour la Sidebar
+      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...currentUser,
+          ...updatedUser,
+        }),
+      );
 
       toast.success("Profil mis à jour !");
       setShowEditModal(false);

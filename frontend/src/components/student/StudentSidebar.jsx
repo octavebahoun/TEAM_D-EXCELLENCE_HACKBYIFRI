@@ -163,9 +163,22 @@ export default function StudentSidebar({
             <div className="flex items-center gap-3">
               <div
                 aria-hidden="true"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-xs font-semibold select-none"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-xs font-semibold select-none overflow-hidden"
               >
-                {getInitials(user)}
+                {user?.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      // Fallback aux initiales si l'image ne charge pas
+                      e.target.parentNode.textContent = getInitials(user);
+                    }}
+                  />
+                ) : (
+                  getInitials(user)
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-200">
