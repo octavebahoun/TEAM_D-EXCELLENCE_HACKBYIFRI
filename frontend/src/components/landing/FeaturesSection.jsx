@@ -16,7 +16,7 @@ const featureCards = [
     description:
       "Calendrier unifié, gestion des tâches et rappels intelligents. Ne rate plus jamais un devoir.",
     color: "emerald",
-    gradient: "from-emerald-500 to-teal-500",
+    gradient: "from-emerald-500 to-emerald-600",
     bgGlow: "bg-emerald-500/10",
     borderGlow: "group-hover:border-emerald-500/30",
     items: [
@@ -32,10 +32,10 @@ const featureCards = [
     title: "Apprentissage par IA",
     description:
       "6 modules d'IA générative pour résumer, quiz, podcasts, exercices et tutorat personnalisé.",
-    color: "cyan",
-    gradient: "from-cyan-500 to-blue-500",
-    bgGlow: "bg-cyan-500/10",
-    borderGlow: "group-hover:border-cyan-500/30",
+    color: "emerald",
+    gradient: "from-emerald-400 to-emerald-500",
+    bgGlow: "bg-emerald-400/10",
+    borderGlow: "group-hover:border-emerald-400/30",
     items: [
       "Résumés intelligents",
       "Quiz automatiques",
@@ -49,10 +49,10 @@ const featureCards = [
     title: "Collaboration Sociale",
     description:
       "Sessions d'étude en temps réel avec chat, tableau blanc partagé et éditeur de code collaboratif.",
-    color: "amber",
-    gradient: "from-amber-500 to-orange-500",
-    bgGlow: "bg-amber-500/10",
-    borderGlow: "group-hover:border-amber-500/30",
+    color: "emerald",
+    gradient: "from-emerald-600 to-emerald-700",
+    bgGlow: "bg-emerald-600/10",
+    borderGlow: "group-hover:border-emerald-600/30",
     items: [
       "Chat temps réel",
       "Tableau blanc partagé",
@@ -86,22 +86,10 @@ function LottieOrFallback({ url, icon: Icon, color }) {
     <div className="relative w-24 h-24 mx-auto mb-6">
       {/* Glow background */}
       <div
-        className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${
-          color === "emerald"
-            ? "from-emerald-500/20 to-teal-500/20"
-            : color === "cyan"
-              ? "from-cyan-500/20 to-blue-500/20"
-              : "from-amber-500/20 to-orange-500/20"
-        } blur-xl`}
+        className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-400/20 blur-xl`}
       />
       <div
-        className={`relative w-24 h-24 rounded-2xl bg-gradient-to-br ${
-          color === "emerald"
-            ? "from-emerald-500/10 to-teal-500/10 border-emerald-500/20"
-            : color === "cyan"
-              ? "from-cyan-500/10 to-blue-500/10 border-cyan-500/20"
-              : "from-amber-500/10 to-orange-500/10 border-amber-500/20"
-        } border flex items-center justify-center`}
+        className={`relative w-24 h-24 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-emerald-400/10 border-emerald-500/20 border flex items-center justify-center`}
       >
         <Lottie
           animationData={null}
@@ -114,13 +102,7 @@ function LottieOrFallback({ url, icon: Icon, color }) {
         />
         {/* Fallback icon visible si Lottie ne charge pas */}
         <Icon
-          className={`absolute w-10 h-10 opacity-0 peer-[.lottie-error]:opacity-100 ${
-            color === "emerald"
-              ? "text-emerald-400"
-              : color === "cyan"
-                ? "text-cyan-400"
-                : "text-amber-400"
-          }`}
+          className={`absolute w-10 h-10 opacity-0 peer-[.lottie-error]:opacity-100 text-emerald-400`}
         />
       </div>
     </div>
@@ -138,7 +120,7 @@ export default function FeaturesSection() {
     >
       {/* BG decorations */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-emerald-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-3xl" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -159,7 +141,7 @@ export default function FeaturesSection() {
           </motion.span>
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
             Tout ce dont tu as besoin{" "}
-            <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-emerald-400 to-white bg-clip-text text-transparent">
               pour réussir
             </span>
           </h2>

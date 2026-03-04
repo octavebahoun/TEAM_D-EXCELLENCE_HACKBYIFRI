@@ -71,7 +71,7 @@ export default function PrivacyPolicy() {
             </section>
 
             <section className="text-sm text-slate-500 pt-10">
-              Dernière mise à jour : 04 Mars 2026<br />
+              Dernière mise à jour : 01 Mars 2026<br />
               Pour toute question : <a href="mailto:privacy@academix.app" className="text-emerald-400 hover:underline">privacy@academix.app</a>
             </section>
           </div>

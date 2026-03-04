@@ -41,7 +41,7 @@ const stats = [
     suffix: "%",
     label: "Gratuit",
     description: "Aucun frais pour les étudiants",
-    color: "cyan",
+    color: "emerald",
   },
   {
     icon: Clock,
@@ -49,7 +49,7 @@ const stats = [
     suffix: "/7",
     label: "Disponible",
     description: "Accès permanent à tous les outils",
-    color: "amber",
+    color: "emerald",
   },
   {
     icon: Users,
@@ -57,7 +57,7 @@ const stats = [
     suffix: "",
     label: "Rôles",
     description: "Admin, Chef de dept., Étudiant",
-    color: "violet",
+    color: "emerald",
   },
   {
     icon: Mic,
@@ -65,7 +65,7 @@ const stats = [
     suffix: "%",
     label: "IA TTS",
     description: "Podcasts générés par l'IA",
-    color: "rose",
+    color: "emerald",
   },
   {
     icon: Code2,
@@ -73,7 +73,7 @@ const stats = [
     suffix: "",
     label: "Backends",
     description: "Laravel, Node.js, Python",
-    color: "indigo",
+    color: "emerald",
   },
 ];
 
@@ -83,36 +83,6 @@ const colorMap = {
     border: "border-emerald-500/20",
     text: "text-emerald-500",
     glow: "shadow-emerald-500/20",
-  },
-  cyan: {
-    bg: "bg-cyan-500/10",
-    border: "border-cyan-500/20",
-    text: "text-cyan-500",
-    glow: "shadow-cyan-500/20",
-  },
-  amber: {
-    bg: "bg-amber-500/10",
-    border: "border-amber-500/20",
-    text: "text-amber-500",
-    glow: "shadow-amber-500/20",
-  },
-  violet: {
-    bg: "bg-violet-500/10",
-    border: "border-violet-500/20",
-    text: "text-violet-500",
-    glow: "shadow-violet-500/20",
-  },
-  rose: {
-    bg: "bg-rose-500/10",
-    border: "border-rose-500/20",
-    text: "text-rose-500",
-    glow: "shadow-rose-500/20",
-  },
-  indigo: {
-    bg: "bg-indigo-500/10",
-    border: "border-indigo-500/20",
-    text: "text-indigo-500",
-    glow: "shadow-indigo-500/20",
   },
 };
 
@@ -136,7 +106,7 @@ export default function StatsSection() {
         >
           <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-white">
             AcademiX en{" "}
-            <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-emerald-400 to-white bg-clip-text text-transparent">
               chiffres
             </span>
           </h2>

@@ -42,6 +42,7 @@ function AppContent() {
   const hideGlobalNavbar =
     location.pathname === "/" ||
     location.pathname.startsWith("/landing") ||
+    location.pathname.startsWith("/privacy") ||
     location.pathname.startsWith("/chef") ||
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/etudiant") ||

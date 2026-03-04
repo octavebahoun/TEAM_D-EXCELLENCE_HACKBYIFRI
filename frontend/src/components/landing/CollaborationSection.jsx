@@ -16,14 +16,14 @@ const features = [
     title: "Tableau Blanc Partagé",
     description:
       "Dessinez des schémas, tracez des graphes et expliquez visuellement des concepts — synchronisation bidirectionnelle ultra-rapide.",
-    color: "cyan",
+    color: "emerald",
   },
   {
     icon: Code2,
     title: "Éditeur de Code Collaboratif",
     description:
       "Un véritable IDE dans le navigateur. Codez simultanément comme sur Google Docs, idéal pour les TP d'informatique.",
-    color: "amber",
+    color: "emerald",
   },
 ];
 
@@ -32,19 +32,7 @@ const colorClasses = {
     bg: "bg-emerald-500/10",
     text: "text-emerald-500",
     border: "border-emerald-500/20",
-    gradient: "from-emerald-500 to-teal-500",
-  },
-  cyan: {
-    bg: "bg-cyan-500/10",
-    text: "text-cyan-500",
-    border: "border-cyan-500/20",
-    gradient: "from-cyan-500 to-blue-500",
-  },
-  amber: {
-    bg: "bg-amber-500/10",
-    text: "text-amber-500",
-    border: "border-amber-500/20",
-    gradient: "from-amber-500 to-orange-500",
+    gradient: "from-emerald-500 to-emerald-600",
   },
 };
 
@@ -156,7 +144,7 @@ export default function CollaborationSection() {
       className="relative py-14 sm:py-20 lg:py-28 xl:py-36 bg-slate-900 overflow-hidden"
     >
       {/* Glow bg */}
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-3xl" />
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl" />
 
       <div
@@ -170,13 +158,13 @@ export default function CollaborationSection() {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-10 sm:mb-14 lg:mb-20"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold mb-6">
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-semibold mb-6">
             <Users className="w-4 h-4" />
             Collaboration en Temps Réel
           </span>
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
             Apprends{" "}
-            <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-emerald-400 to-white bg-clip-text text-transparent">
               ensemble
             </span>
             , réussis mieux

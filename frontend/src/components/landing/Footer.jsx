@@ -18,13 +18,10 @@ const footerLinks = {
   Ressources: [
     { label: "Documentation", href: "/docs" },
     { label: "API", href: "/docs/api" },
-    { label: "Guide d'installation", href: "/docs/install" },
-    { label: "Blog", href: "/blog" },
   ],
   Légal: [
     { label: "Politique de confidentialité", href: "/privacy" },
     { label: "Conditions d'utilisation", href: "/terms" },
-    { label: "Mentions légales", href: "/legal" },
   ],
 };
 
@@ -67,14 +64,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-1 sm:col-span-2 md:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center">
-                <span className="text-white font-extrabold text-lg font-display">
-                  A
-                </span>
-              </div>
-              <span className="font-display text-xl font-bold text-white">
-                Academi<span className="text-emerald-400">X</span>
-              </span>
+              <img src={logoDarkSvg} alt="AcademiX" className="h-10 w-auto" />
             </Link>
             <p className="text-sm text-slate-400 leading-relaxed mb-6">
               L'assistant académique intelligent propulsé par l'IA.

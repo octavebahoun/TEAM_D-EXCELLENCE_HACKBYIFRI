@@ -79,11 +79,11 @@ export default function HeroSection() {
             >
               Réussis tes
               <br />
-              <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-emerald-400 via-emerald-200 to-emerald-400 bg-clip-text text-transparent">
                 études
               </span>{" "}
               avec l'
-              <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-emerald-300 to-emerald-500 bg-clip-text text-transparent">
                 IA
               </span>
             </motion.h1>
@@ -100,9 +100,11 @@ export default function HeroSection() {
                 organisation intelligente
               </span>
               ,{" "}
-              <span className="text-cyan-400 font-semibold">IA générative</span>{" "}
+              <span className="text-emerald-500 font-semibold">
+                IA générative
+              </span>{" "}
               et{" "}
-              <span className="text-amber-400 font-semibold">
+              <span className="text-emerald-600 font-semibold">
                 collaboration en temps réel
               </span>{" "}
               pour maximiser ta réussite académique.
@@ -122,7 +124,7 @@ export default function HeroSection() {
                 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate("/login")}
-                className="group flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold text-base sm:text-lg rounded-2xl shadow-2xl shadow-emerald-500/25 transition-all"
+                className="group flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-emerald-500 to-emerald-700 text-white font-bold text-base sm:text-lg rounded-2xl shadow-2xl shadow-emerald-500/25 transition-all"
               >
                 <GraduationCap className="w-5 h-5 flex-shrink-0" />
                 Commencer gratuitement

@@ -20,7 +20,7 @@ export default function CTASection() {
         animate={{
           background: [
             "radial-gradient(600px circle at 30% 40%, rgba(16,185,129,0.15), transparent 60%)",
-            "radial-gradient(600px circle at 70% 60%, rgba(14,165,233,0.15), transparent 60%)",
+            "radial-gradient(600px circle at 70% 60%, rgba(5,150,105,0.15), transparent 60%)",
             "radial-gradient(600px circle at 30% 40%, rgba(16,185,129,0.15), transparent 60%)",
           ],
         }}
@@ -58,7 +58,7 @@ export default function CTASection() {
           className="font-display text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-white leading-tight tracking-tight"
         >
           Commence dès{" "}
-          <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-emerald-400 via-emerald-100 to-emerald-400 bg-clip-text text-transparent">
             maintenant
           </span>
         </motion.h2>
@@ -109,7 +109,7 @@ export default function CTASection() {
             }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/login")}
-            className="group w-full sm:w-auto flex items-center justify-center gap-3 px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold text-base sm:text-lg rounded-2xl shadow-2xl shadow-emerald-500/30 transition-all"
+            className="group w-full sm:w-auto flex items-center justify-center gap-3 px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-emerald-500 to-emerald-700 text-white font-bold text-base sm:text-lg rounded-2xl shadow-2xl shadow-emerald-500/30 transition-all"
           >
             <GraduationCap className="w-6 h-6" />
             Créer mon compte gratuit

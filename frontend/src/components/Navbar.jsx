@@ -27,7 +27,7 @@ const Navbar = () => {
           {role === "super_admin" && (
             <Link
               to="/admin"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${location.pathname.startsWith("/admin") ? "bg-indigo-600 text-white" : "text-slate-500 hover:text-slate-300"}`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${location.pathname.startsWith("/admin") ? "bg-emerald-600 text-white" : "text-slate-500 hover:text-slate-300"}`}
             >
               <Shield size={16} /> Admin
             </Link>
@@ -35,7 +35,7 @@ const Navbar = () => {
 
           <Link
             to="/chat"
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${location.pathname === "/chat" ? "bg-indigo-600 text-white" : "text-slate-500 hover:text-slate-300"}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${location.pathname === "/chat" ? "bg-emerald-600 text-white" : "text-slate-500 hover:text-slate-300"}`}
           >
             <MessageSquare size={16} /> Communauté
           </Link>
@@ -47,7 +47,7 @@ const Navbar = () => {
           <p className="text-xs font-bold text-white">
             {user.nom} {user.prenom}
           </p>
-          <p className="text-[10px] text-indigo-400 uppercase tracking-widest">
+          <p className="text-[10px] text-emerald-400 uppercase tracking-widest">
             {role}
           </p>
         </div>

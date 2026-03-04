@@ -55,21 +55,7 @@ export default function LandingNavbar() {
           <div className="flex h-18 items-center justify-between">
             {/* Logo */}
             <Link to="/landing" className="flex items-center gap-3 group">
-              <motion.div
-                whileHover={{ rotate: 10, scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 300 }}
-                className="relative"
-              >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                  <span className="text-white font-display font-extrabold text-lg">
-                    A
-                  </span>
-                </div>
-                <div className="absolute -inset-1 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
-              </motion.div>
-              <span className="font-display text-xl font-bold text-white">
-                Academi<span className="text-emerald-400">X</span>
-              </span>
+              <img src={logoDarkSvg} alt="AcademiX" className="h-10 w-auto" />
             </Link>
 
             {/* Nav links desktop */}

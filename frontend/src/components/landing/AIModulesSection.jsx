@@ -28,7 +28,7 @@ const modules = [
       "Export PDF",
     ],
     color: "emerald",
-    gradient: "from-emerald-500 to-teal-500",
+    gradient: "from-emerald-500 to-emerald-600",
     demo: "📄 → 🧠 → 📋",
   },
   {
@@ -44,8 +44,8 @@ const modules = [
       "Mains libres",
       "Partage facile",
     ],
-    color: "cyan",
-    gradient: "from-cyan-500 to-blue-500",
+    color: "emerald",
+    gradient: "from-emerald-400 to-emerald-500",
     demo: "📝 → 🎙️ → 🎧",
   },
   {
@@ -61,8 +61,8 @@ const modules = [
       "Score & progrès",
       "Niveaux adaptatifs",
     ],
-    color: "amber",
-    gradient: "from-amber-500 to-orange-500",
+    color: "emerald",
+    gradient: "from-emerald-500 to-emerald-400",
     demo: "📚 → ✅ → 💯",
   },
   {
@@ -78,8 +78,8 @@ const modules = [
       "Étape par étape",
       "Niveau progressif",
     ],
-    color: "violet",
-    gradient: "from-violet-500 to-purple-500",
+    color: "emerald",
+    gradient: "from-emerald-600 to-emerald-500",
     demo: "🧠 → ✏️ → ✅",
   },
   {
@@ -95,8 +95,8 @@ const modules = [
       "Base de connaissances",
       "Chat interactif",
     ],
-    color: "rose",
-    gradient: "from-rose-500 to-pink-500",
+    color: "emerald",
+    gradient: "from-emerald-500 to-emerald-700",
     demo: "❓ → 🤖 → 💡",
   },
   {
@@ -112,8 +112,8 @@ const modules = [
       "Prédictions IA",
       "Recommandations",
     ],
-    color: "indigo",
-    gradient: "from-indigo-500 to-blue-600",
+    color: "emerald",
+    gradient: "from-emerald-700 to-emerald-800",
     demo: "📊 → 📈 → 🎯",
   },
 ];
@@ -125,39 +125,6 @@ const colorStyles = {
     ring: "ring-emerald-500/30",
     badge:
       "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-  },
-  cyan: {
-    bg: "bg-cyan-500/10",
-    text: "text-cyan-500",
-    ring: "ring-cyan-500/30",
-    badge: "bg-cyan-100 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400",
-  },
-  amber: {
-    bg: "bg-amber-500/10",
-    text: "text-amber-500",
-    ring: "ring-amber-500/30",
-    badge:
-      "bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400",
-  },
-  violet: {
-    bg: "bg-violet-500/10",
-    text: "text-violet-500",
-    ring: "ring-violet-500/30",
-    badge:
-      "bg-violet-100 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400",
-  },
-  rose: {
-    bg: "bg-rose-500/10",
-    text: "text-rose-500",
-    ring: "ring-rose-500/30",
-    badge: "bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400",
-  },
-  indigo: {
-    bg: "bg-indigo-500/10",
-    text: "text-indigo-500",
-    ring: "ring-indigo-500/30",
-    badge:
-      "bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400",
   },
 };
 
@@ -174,7 +141,7 @@ export default function AIModulesSection() {
       className="relative py-14 sm:py-20 lg:py-28 xl:py-36 bg-slate-950 overflow-hidden"
     >
       {/* Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-gradient-to-r from-emerald-500/5 via-cyan-500/5 to-violet-500/5 rounded-full blur-3xl" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-gradient-to-r from-emerald-500/5 via-emerald-400/5 to-emerald-300/5 rounded-full blur-3xl" />
 
       <div
         ref={ref}
@@ -187,12 +154,12 @@ export default function AIModulesSection() {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 lg:mb-16"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-semibold mb-6">
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-semibold mb-6">
             <Sparkles className="w-4 h-4" />6 Modules IA
           </span>
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
             L'IA qui révolutionne{" "}
-            <span className="bg-gradient-to-r from-cyan-500 to-violet-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-emerald-400 to-white bg-clip-text text-transparent">
               ta façon d'apprendre
             </span>
           </h2>
