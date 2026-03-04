@@ -541,6 +541,9 @@ class MassiveSeeder extends Seeder
         foreach ($filieres as $fil) {
             $dept = $fil->departement;
             $matsCatalogue = $this->matieresCatalogue[$dept->code] ?? [];
+            if (empty($matsCatalogue)) {
+                continue;
+            }
             $students = User::where('filiere_id', $fil->id)->orderBy('id')->get();
 
             foreach ($students as $student) {
