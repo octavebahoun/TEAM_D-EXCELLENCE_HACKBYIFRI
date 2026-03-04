@@ -17,7 +17,7 @@ export default function LandingPage() {
       {/* Progress bar */}
       <motion.div
         style={{ scaleX }}
-        className="fixed top-0 left-0 right-0 z-[60] h-0.5 bg-gradient-to-r from-emerald-500 to-cyan-500 origin-left"
+        className="fixed top-0 left-0 right-0 z-[60] h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-300 origin-left"
       />
 
       <LandingNavbar />

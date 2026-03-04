@@ -8,6 +8,7 @@ import {
   Heart,
   ExternalLink,
 } from "lucide-react";
+import logoDarkSvg from "../../assets/logo-dark.svg";
 
 const footerLinks = {
   Produit: [

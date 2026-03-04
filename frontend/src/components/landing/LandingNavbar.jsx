@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronRight, Sparkles } from "lucide-react";
+import { Menu, X, ChevronRight, Sparkles, Sun, Moon } from "lucide-react";
 import logoSvg from "../../assets/logo.svg";
 import logoDarkSvg from "../../assets/logo-dark.svg";
 
@@ -14,7 +14,23 @@ const navLinks = [
 export default function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [theme, setTheme] = useState("light");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains("dark");
+    setTheme(isDark ? "dark" : "light");
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -74,6 +90,17 @@ export default function LandingNavbar() {
 
             {/* CTA + mobile toggle */}
             <div className="flex items-center gap-3">
+              {/* Theme Toggle */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={toggleTheme}
+                className="p-2.5 rounded-xl bg-slate-800/50 text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 border border-slate-700 transition-all"
+                aria-label="Changer le thème"
+              >
+                {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
+              </motion.button>
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -89,7 +116,7 @@ export default function LandingNavbar() {
                 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate("/login")}
-                className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-shadow"
+                className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-shadow"
               >
                 <Sparkles className="w-4 h-4" />
                 Commencer
@@ -137,7 +164,7 @@ export default function LandingNavbar() {
                     setMobileOpen(false);
                     navigate("/login");
                   }}
-                  className="w-full py-3 text-center rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold"
+                  className="w-full py-3 text-center rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold"
                 >
                   Commencer gratuitement
                 </button>

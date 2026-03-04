@@ -234,7 +234,7 @@ export default function CollaborationSection() {
             transition={{ duration: 0.7, delay: 0.2 }}
             className="relative"
           >
-            <div className="absolute -inset-4 bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-cyan-500/10 rounded-3xl blur-2xl" />
+            <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500/10 via-emerald-400/10 to-emerald-300/10 rounded-3xl blur-2xl" />
             <div className="relative">
               <ChatMockup />
             </div>

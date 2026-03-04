@@ -28,8 +28,8 @@ export default function HeroSection() {
           animate={{
             background: [
               "radial-gradient(600px circle at 20% 30%, rgba(16,185,129,0.12), transparent 60%)",
-              "radial-gradient(600px circle at 80% 60%, rgba(14,165,233,0.12), transparent 60%)",
-              "radial-gradient(600px circle at 40% 80%, rgba(245,158,11,0.08), transparent 60%)",
+              "radial-gradient(600px circle at 80% 60%, rgba(52,211,153,0.12), transparent 60%)",
+              "radial-gradient(600px circle at 40% 80%, rgba(16,185,129,0.08), transparent 60%)",
               "radial-gradient(600px circle at 20% 30%, rgba(16,185,129,0.12), transparent 60%)",
             ],
           }}
@@ -181,15 +181,15 @@ export default function HeroSection() {
             className="relative hidden sm:block"
           >
             {/* Glow derrière le player */}
-            <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-amber-500/10 rounded-3xl blur-2xl" />
+            <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500/20 via-emerald-400/20 to-emerald-300/10 rounded-3xl blur-2xl" />
 
             <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-emerald-500/10 bg-slate-900/50 backdrop-blur-sm">
               {/* Barre de titre browser mockup */}
               <div className="flex items-center gap-2 px-4 py-3 bg-slate-800/80 border-b border-white/5">
                 <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-amber-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-slate-700" />
+                  <div className="w-3 h-3 rounded-full bg-emerald-700" />
+                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
                 </div>
                 <div className="flex-1 text-center">
                   <span className="text-xs text-slate-500 font-mono">
