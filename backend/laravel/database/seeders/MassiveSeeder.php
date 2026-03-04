@@ -635,14 +635,18 @@ class MassiveSeeder extends Seeder
                 ? round(($notes->where('note', '>=', 10)->count() / $notes->count()) * 100, 2)
                 : 0;
 
-            StatistiqueDepartement::create([
-                'departement_id' => $dept->id,
-                'annee_academique' => $this->annee,
-                'total_etudiants' => $totalEtudiants,
-                'total_filieres' => $totalFilieres,
-                'moyenne_generale' => round($moyDept, 2),
-                'taux_reussite' => $tauxReussite,
-            ]);
+            StatistiqueDepartement::updateOrCreate(
+                [
+                    'departement_id' => $dept->id,
+                    'annee_academique' => $this->annee,
+                ],
+                [
+                    'total_etudiants' => $totalEtudiants,
+                    'total_filieres' => $totalFilieres,
+                    'moyenne_generale' => round($moyDept, 2),
+                    'taux_reussite' => $tauxReussite,
+                ]
+            );
 
             // Statistiques par filière
             foreach ($filiereIds as $filId) {
@@ -675,16 +679,20 @@ class MassiveSeeder extends Seeder
                         }
                     }
 
-                    StatistiqueFiliere::create([
-                        'filiere_id' => $filId,
-                        'annee_academique' => $this->annee,
-                        'semestre' => $sem,
-                        'total_etudiants' => User::where('filiere_id', $filId)->count(),
-                        'moyenne_generale' => $moyFil,
-                        'taux_reussite' => $tauxFil,
-                        'meilleure_matiere' => $best ? Matiere::find($best)?->nom : null,
-                        'matiere_difficile' => $worst ? Matiere::find($worst)?->nom : null,
-                    ]);
+                    StatistiqueFiliere::updateOrCreate(
+                        [
+                            'filiere_id' => $filId,
+                            'annee_academique' => $this->annee,
+                            'semestre' => $sem,
+                        ],
+                        [
+                            'total_etudiants' => User::where('filiere_id', $filId)->count(),
+                            'moyenne_generale' => $moyFil,
+                            'taux_reussite' => $tauxFil,
+                            'meilleure_matiere' => $best ? Matiere::find($best)?->nom : null,
+                            'matiere_difficile' => $worst ? Matiere::find($worst)?->nom : null,
+                        ]
+                    );
                 }
             }
         }
