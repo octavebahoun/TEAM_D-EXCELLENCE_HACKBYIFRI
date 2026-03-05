@@ -29,14 +29,20 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str | None = Field(default=(os.environ.get("GROQ_API_KEY")))
     HF_TOKEN: str | None = Field(default=(os.environ.get("HF_TOKEN")))
     OPENROUTER_API_KEY: str | None = Field(default=(os.environ.get("OPENROUTER_API_KEY")))
-    
+    OPENROUTER_MODEL: str = Field(default=os.environ.get("OPENROUTER_MODEL", "liquid/lfm-2.5-1.2b-thinking:free"))
+    YOUTUBE_API_KEY: str | None = Field(default=(os.environ.get("YOUTUBE_API_KEY")))
+
     # Configuration Base de données (MySQL)
     DB_HOST: str | None = Field(default=(os.environ.get("DB_HOST")))
     DB_PORT: int = Field(default=int(os.environ.get("DB_PORT", "3306")))
     DB_NAME: str | None = Field(default=(os.environ.get("DB_NAME")))
     DB_USER: str | None = Field(default=(os.environ.get("DB_USER")))
     DB_PASSWORD: str | None = Field(default=(os.environ.get("DB_PASSWORD")))
-    
+
+    # Redis / Celery
+    REDIS_URL: str = Field(default=os.environ.get("REDIS_URL", "redis://localhost:6379/0"))
+    CELERY_BROKER_URL: str = Field(default=os.environ.get("CELERY_BROKER_URL", os.environ.get("REDIS_URL", "redis://localhost:6379/0")))
+    CELERY_RESULT_BACKEND: str = Field(default=os.environ.get("CELERY_RESULT_BACKEND", os.environ.get("REDIS_URL", "redis://localhost:6379/0")))
 
     # Configuration uploads
     MAX_UPLOAD_SIZE: int = Field(default=10485760)  # 10MB
@@ -46,6 +52,7 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = Field(default="./uploads")
     GENERATED_DIR: str = Field(default="./generated")
     CHROMA_DB_DIR: str = Field(default="./generated/chroma_db")
+    ROADMAP_PDF_DIR: str = Field(default="./generated/roadmaps/pdf")
     
     # Modèles
     LLM_MODEL: str = "llama-3.3-70b-versatile"
@@ -58,6 +65,9 @@ class Settings(BaseSettings):
     SUMMARY_OUTPUT_DIR: str = Field(default="./generated/summaries")
     QUIZ_OUTPUT_DIR: str = Field(default="./generated/quizzes")
     EXERCISE_OUTPUT_DIR: str = Field(default="./generated/exercises")
+
+    WHISPER_MODEL: str = Field(default=os.environ.get("WHISPER_MODEL", "small"))
+    WHISPER_DEVICE: str = Field(default=os.environ.get("WHISPER_DEVICE", "cpu"))
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -74,3 +84,4 @@ os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 os.makedirs(settings.SUMMARY_OUTPUT_DIR, exist_ok=True)
 os.makedirs(settings.QUIZ_OUTPUT_DIR, exist_ok=True)
 os.makedirs(settings.EXERCISE_OUTPUT_DIR, exist_ok=True)
+os.makedirs(settings.ROADMAP_PDF_DIR, exist_ok=True)

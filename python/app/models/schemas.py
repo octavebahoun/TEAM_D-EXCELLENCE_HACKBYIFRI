@@ -1,6 +1,8 @@
-from pydantic import BaseModel, Field, field_validator
-from typing import List, Optional
+from datetime import datetime
 from enum import Enum
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class SummaryLevel(str, Enum):
@@ -182,3 +184,88 @@ class StudentAnalysisData(BaseModel):
 class StudentAnalysisResponse(BaseModel):
     success: bool
     data: StudentAnalysisData
+
+
+class RoadmapJobStatus(str, Enum):
+    pending = "pending"
+    analyzing = "analyzing"
+    scraping = "scraping"
+    transcribing = "transcribing"
+    evaluating = "evaluating"
+    building = "building"
+    done = "done"
+    failed = "failed"
+
+
+class RoadmapGenerationRequest(BaseModel):
+    mode: str = Field(description="Mode pédagogique demandé, ex: 'Révision guidée'")
+    matiere: Optional[str] = Field(default=None)
+    matiere_id: Optional[int] = Field(default=None)
+    notion: Optional[str] = Field(default=None)
+    niveau: Optional[str] = Field(default=None, description="Niveau souhaité pour la roadmap")
+
+
+class RoadmapGenerationResponse(BaseModel):
+    job_id: str
+    roadmap_id: Optional[int]
+    roadmap_uuid: Optional[str]
+    message: str
+
+
+class RoadmapStatusResponse(BaseModel):
+    job_id: str
+    roadmap_id: Optional[int]
+    roadmap_uuid: Optional[str]
+    status: RoadmapJobStatus
+    current_step: Optional[str]
+    progress: Dict[str, Any] = Field(default_factory=dict)
+    payload: Optional[Dict[str, Any]]
+    started_at: Optional[datetime]
+    finished_at: Optional[datetime]
+    celery_task_id: Optional[str]
+    error_message: Optional[str]
+    roadmap_ready: bool
+
+
+class RoadmapResourceDetail(BaseModel):
+    resource_id: int
+    resource_type: str
+    title: Optional[str]
+    url: str
+    source: Optional[str]
+    thumbnail_url: Optional[str]
+    duration_seconds: Optional[int]
+    score: Optional[int]
+    level: Optional[str]
+    summary: Optional[str]
+    transcript: Optional[str]
+    status: Optional[str]
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
+class RoadmapSectionDetail(BaseModel):
+    section_id: int
+    title: str
+    description: Optional[str]
+    position: int
+    period_label: Optional[str]
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    resources: List[RoadmapResourceDetail] = Field(default_factory=list)
+
+
+class RoadmapDetailResponse(BaseModel):
+    roadmap_id: int
+    roadmap_uuid: str
+    student_id: int
+    mode: str
+    matiere: Optional[str]
+    matiere_id: Optional[int]
+    notion: Optional[str]
+    niveau: Optional[str]
+    status: str
+    summary: Optional[str]
+    meta: Dict[str, Any] = Field(default_factory=dict)
+    sections: List[RoadmapSectionDetail]
+    started_at: Optional[datetime]
+    finished_at: Optional[datetime]
+    created_at: Optional[datetime]

@@ -135,4 +135,32 @@ export const aiService = {
         const response = await pythonApiClient.delete(`/history?type=${type}`);
         return response.data;
     },
+
+    // --- Roadmap ---
+    generateRoadmap: async ({ mode, matiere, notion, niveau }) => {
+        const response = await pythonApiClient.post('/roadmap/generate', {
+            mode,
+            matiere,
+            notion,
+            niveau,
+        });
+        return response.data;
+    },
+
+    getRoadmapStatus: async (jobId) => {
+        const response = await pythonApiClient.get(`/roadmap/${jobId}/status`);
+        return response.data;
+    },
+
+    getRoadmap: async (roadmapUuid) => {
+        const response = await pythonApiClient.get(`/roadmap/${roadmapUuid}`);
+        return response.data;
+    },
+
+    downloadRoadmapPdf: async (roadmapUuid) => {
+        const response = await pythonApiClient.get(`/roadmap/${roadmapUuid}/pdf`, {
+            responseType: 'blob',
+        });
+        return response.data;
+    },
 };

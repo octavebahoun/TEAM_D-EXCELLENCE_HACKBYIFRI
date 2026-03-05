@@ -7,6 +7,7 @@ import {
   Dumbbell,
   Image as ImageIcon,
   Bot,
+  Map,
   ArrowLeft,
   Sparkles,
   Zap,
@@ -22,13 +23,25 @@ import PodcastTool from "../ai/PodcastTool";
 import ExerciseTool from "../ai/ExerciseTool";
 import ImageTool from "../ai/ImageTool";
 import ProfAITool from "../ai/ProfAITool";
+import RoadmapTool from "../ai/RoadmapTool";
 
 // ─── Constantes ───────────────────────────────────────────────────────────────
 
 const TOOLS = [
   {
-    id: "summary",
+    id: "roadmap",
     num: "01",
+    title: "Roadmap",
+    description: "Générez un plan hebdomadaire avec vidéos et ressources validées.",
+    icon: Map,
+    gradient: "from-indigo-500 to-violet-600",
+    accent: "border-indigo-500",
+    tag: "bg-indigo-100 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300",
+    label: "Plan",
+  },
+  {
+    id: "summary",
+    num: "02",
     title: "Résumés",
     description: "Transformez vos notes en fiches synthétiques intelligentes.",
     icon: FileText,
@@ -39,7 +52,7 @@ const TOOLS = [
   },
   {
     id: "quiz",
-    num: "02",
+    num: "03",
     title: "Quiz",
     description: "Mémorisez plus vite avec des QCM personnalisés sur vos PDF.",
     icon: ClipboardCheck,
@@ -50,7 +63,7 @@ const TOOLS = [
   },
   {
     id: "podcast",
-    num: "03",
+    num: "04",
     title: "Podcasts IA",
     description: "Écoutez vos révisions en format audio immersif.",
     icon: Headphones,
@@ -61,7 +74,7 @@ const TOOLS = [
   },
   {
     id: "exercises",
-    num: "04",
+    num: "05",
     title: "Exercices",
     description: "Entraînez-vous avec des séries d'exercices progressifs.",
     icon: Dumbbell,
@@ -72,7 +85,7 @@ const TOOLS = [
   },
   {
     id: "image",
-    num: "05",
+    num: "06",
     title: "Visualisation",
     description: "Créez des schémas et illustrations pour mieux comprendre.",
     icon: ImageIcon,
@@ -84,7 +97,7 @@ const TOOLS = [
   },
   {
     id: "prof",
-    num: "06",
+    num: "07",
     title: "Prof IA",
     description: "Posez toutes vos questions à votre tuteur personnel IA.",
     icon: Bot,
@@ -99,7 +112,7 @@ const STATS = [
   {
     icon: BookOpen,
     label: "Outils IA",
-    value: "6",
+    value: "7",
     color: "text-emerald-500",
     bg: "bg-emerald-50 dark:bg-emerald-500/10",
   },
@@ -129,6 +142,8 @@ const STATS = [
 const ToolView = ({ tool, onBack }) => {
   const renderTool = () => {
     switch (tool.id) {
+      case "roadmap":
+        return <RoadmapTool />;
       case "summary":
         return <SummaryTool />;
       case "quiz":
@@ -219,6 +234,7 @@ export default function StudentAIRevision({ isOnline = true }) {
   const activeTool = TOOLS.find((t) => t.id === activeToolId);
 
   const GENERATION_TOOLS = [
+    "roadmap",
     "summary",
     "quiz",
     "podcast",
@@ -278,7 +294,7 @@ export default function StudentAIRevision({ isOnline = true }) {
                     Portail de Révision IA
                   </h1>
                   <p className="text-sm text-white/60 font-medium max-w-sm">
-                    6 outils IA pour optimiser chaque minute de vos révisions.
+                    7 outils IA pour optimiser chaque minute de vos révisions.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">

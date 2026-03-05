@@ -8,6 +8,7 @@ from app.api.image_routes import router as image_router
 from app.api.podcast_routes import router as podcast_router
 from app.api.history_routes import router as history_router
 from app.api.analysis_routes import router as analysis_router
+from app.api.roadmap_routes import router as roadmap_router
 from app.core.config import settings
 
 # Création de l'application FastAPI
@@ -36,6 +37,7 @@ app.include_router(image_router, prefix="/api/v1/image", tags=["Image Generation
 app.include_router(podcast_router, prefix="/api/v1/podcast", tags=["Podcast Service"])
 app.include_router(history_router, prefix="/api/v1/history", tags=["History"])
 app.include_router(analysis_router, prefix="/api/v1/analysis", tags=["Student Analysis"])
+app.include_router(roadmap_router, prefix="/api/v1", tags=["Roadmap Service"])
 
 @app.get("/")
 def root():
