@@ -55,9 +55,25 @@ MAX_VIDEO_AGE_DAYS = 365 * 5
 def _safe_json_load(raw: str) -> Optional[Any]:
     if not raw:
         return None
+    raw = raw.strip()
+    if raw.startswith("```json"):
+        raw = raw[7:]
+    elif raw.startswith("```"):
+        raw = raw[3:]
+    if raw.endswith("```"):
+        raw = raw[:-3]
+    raw = raw.strip()
+    
     try:
         return json.loads(raw)
     except json.JSONDecodeError:
+        start = raw.find('{')
+        end = raw.rfind('}')
+        if start != -1 and end != -1:
+            try:
+                return json.loads(raw[start:end+1])
+            except Exception:
+                pass
         try:
             return ast.literal_eval(raw)
         except Exception:
@@ -328,11 +344,34 @@ def _download_audio(video_id: str, target_dir: str) -> Optional[str]:
 
 
 def _transcribe_with_whisper(audio_path: str) -> Optional[str]:
-    if whisper is None:
+    if not getattr(settings, "GROQ_API_KEY", None):
+        logger.warning("GROQ_API_KEY manquante pour le fallback Whisper Groq.")
         return None
-    model = whisper.load_model(settings.WHISPER_MODEL)
-    result = model.transcribe(audio_path)
-    return result.get("text", "").strip()
+    
+    url = "https://api.groq.com/openai/v1/audio/transcriptions"
+    headers = {
+        "Authorization": f"Bearer {settings.GROQ_API_KEY}"
+    }
+    
+    try:
+        # L'API Groq (whisper-large-v3-turbo) est extrêmement rapide et peu coûteuse
+        with open(audio_path, "rb") as audio_file:
+            files = {
+                "file": (os.path.basename(audio_path), audio_file, "audio/mpeg")
+            }
+            data = {
+                "model": "whisper-large-v3-turbo",
+            }
+            response = requests.post(url, headers=headers, files=files, data=data, timeout=120)
+            
+        if response.status_code == 200:
+            return response.json().get("text", "").strip()
+        else:
+            logger.warning("Erreur Groq Transcription (HTTP %s): %s", response.status_code, response.text[:200])
+            return None
+    except Exception as exc:
+        logger.warning("Exception lors de la transcription Groq: %s", exc)
+        return None
 
 
 def _transcribe_video(video_id: str) -> Optional[str]:
@@ -341,9 +380,18 @@ def _transcribe_video(video_id: str) -> Optional[str]:
             transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=["fr", "en"])
             return " ".join([segment.get("text", "") for segment in transcript]).strip()
         except _TRANSCRIPT_EXCEPTIONS:
-            logger.info("Pas de transcription trouvée pour la vidéo %s, on l'ignore.", video_id)
+            logger.info("Pas de sous-titres trouvés pour %s, tentative de fallback via Groq Whisper.", video_id)
+            pass
+
+    # Fallback si pas de sous-titres : on DL l'audio et on l'envoie à l'IA vocale
+    temp_dir = tempfile.mkdtemp(prefix="roadmap_")
+    try:
+        audio_path = _download_audio(video_id, temp_dir)
+        if not audio_path:
             return None
-    return None
+        return _transcribe_with_whisper(audio_path)
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 def _create_evaluation_payload(candidate: Dict[str, Any]) -> Dict[str, Any]:
@@ -375,6 +423,7 @@ def _evaluate_candidate(candidate: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         raw = _extract_message_text(response.get("choices", [])[0].get("message", {}).get("content", ""))
         parsed = _parse_openrouter_json(raw)
         if not parsed:
+            logger.warning("Erreur de parsing JSON pour l'évaluation: %s", raw[:200])
             return None
         score = parsed.get("score")
         if isinstance(score, str):
@@ -488,12 +537,17 @@ async def _run_pipeline(job_uuid: str, celery_id: str, attempt: int) -> None:
     )
     await roadmap_service.update_roadmap(roadmap_id, status=RoadmapJobStatus.transcribing)
 
+    if not candidates:
+        logger.warning("Aucun candidat vidéo trouvé sur YouTube. Vérifiez l'API Key ou les filtres.")
+        
     async def process_transcript(candidate):
         try:
             transcript = await asyncio.to_thread(_transcribe_video, candidate.get("video_id"))
             if transcript:
                 candidate["transcript"] = transcript
                 return candidate
+            else:
+                logger.info("Vidéo %s ignorée (pas de sous-titres)", candidate.get("video_id"))
         except Exception as exc:
             logger.warning("Erreur transcription %s: %s", candidate.get("video_id"), exc)
         return None
@@ -502,6 +556,9 @@ async def _run_pipeline(job_uuid: str, celery_id: str, attempt: int) -> None:
     transcribed_results = await asyncio.gather(*transcript_tasks)
     transcribed = [c for c in transcribed_results if c is not None]
 
+    if not transcribed:
+        logger.warning("Aucune vidéo transcripte parmi les %d candidats.", len(candidates))
+
     async def process_evaluation(candidate):
         try:
             eval_result = await asyncio.to_thread(_evaluate_candidate, candidate)
@@ -509,6 +566,9 @@ async def _run_pipeline(job_uuid: str, celery_id: str, attempt: int) -> None:
                 candidate.update(eval_result)
                 candidate["summary"] = candidate.get("summary") or eval_result.get("summary")
                 return candidate
+            else:
+                score = eval_result.get("score") if eval_result else "None"
+                logger.info("Vidéo %s éliminée (score %s insuffisant ou erreur JSON)", candidate.get("video_id"), score)
         except Exception as exc:
             logger.warning("Erreur évaluation %s: %s", candidate.get("title"), exc)
         return None
