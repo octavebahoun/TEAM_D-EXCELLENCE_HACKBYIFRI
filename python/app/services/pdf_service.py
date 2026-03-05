@@ -4,7 +4,6 @@ from datetime import datetime
 from typing import Any, Dict, List
 
 from jinja2 import Environment, select_autoescape
-from weasyprint import HTML
 
 from app.core.config import settings
 from app.services.roadmap_service import fetch_roadmap_detail
@@ -90,6 +89,10 @@ def _build_html(roadmap: Dict[str, Any], sections: List[Dict[str, Any]]) -> str:
 
 
 def _render_pdf(html: str) -> bytes:
+    # Import lazy pour éviter de faire planter l'API au démarrage si les libs système
+    # de WeasyPrint (glib/pango/cairo/...) ne sont pas présentes sur l'hôte.
+    from weasyprint import HTML  # type: ignore
+
     return HTML(string=html).write_pdf()
 
 
