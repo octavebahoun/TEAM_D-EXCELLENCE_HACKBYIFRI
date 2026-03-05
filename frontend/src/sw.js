@@ -1,20 +1,16 @@
 import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching';
 import { registerRoute, NavigationRoute } from 'workbox-routing';
-import { CacheFirst, StaleWhileRevalidate, NetworkFirst } from 'workbox-strategies';
+import { CacheFirst, StaleWhileRevalidate, NetworkFirst, NetworkOnly } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { RangeRequestsPlugin } from 'workbox-range-requests';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
 
-// ── Précache + nettoyage ───────────────────────────────────────
-// Workbox injecte ici la liste des assets buildés (avec hash).
-// Les scripts/styles/fonts sont donc DÉJÀ couverts ici → pas besoin
-// d'une route CacheFirst séparée pour eux (évite le double cache).
+
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 
 
-// ── 🔴 FIX 1 : Background Sync pour les requêtes POST offline ──
 // Si l'utilisateur soumet un formulaire (quiz, profil…) sans connexion,
 // la requête est mise en file d'attente et rejouée automatiquement
 // dès que la connexion revient (via l'API Background Sync).
@@ -25,19 +21,13 @@ const bgSyncPlugin = new BackgroundSyncPlugin('post-queue', {
 // On intercepte tous les POST vers notre API
 registerRoute(
     ({ request }) => request.method === 'POST' && request.url.includes('/api/'),
-    new NetworkFirst({
-        cacheName: 'post-fallback',
-        plugins: [
-            bgSyncPlugin,
-            new CacheableResponsePlugin({ statuses: [0, 200] }),
-        ],
-        networkTimeoutSeconds: 10,
+    new NetworkOnly({
+        plugins: [bgSyncPlugin],
     }),
     'POST'
 );
 
 
-// ── Navigation (SPA fallback) ──────────────────────────────────
 // NetworkFirst : essaie le réseau, sinon sert la version en cache.
 // index.html est précaché → l'app se charge toujours hors-ligne.
 const navigationHandler = new NetworkFirst({
@@ -49,16 +39,9 @@ const navigationHandler = new NetworkFirst({
 registerRoute(new NavigationRoute(navigationHandler));
 
 
-// ── 🔴 FIX 2 : Route CacheFirst scripts/styles SUPPRIMÉE ───────
-// Ces fichiers sont déjà gérés par precacheAndRoute() ci-dessus.
-// Les conserver ici créait un double cache avec comportements imprévisibles.
-// (bloc supprimé volontairement)
-
-
-// ── API étudiant (données personnelles) ───────────────────────
 // On inclut désormais notes, emploi du temps, profil, tâches et alertes.
 registerRoute(
-    /\/api\/v1\/student\/(notes|emploi-temps|profil|moyennes|taches|alertes|analysis)/,
+    ({ url }) => url.pathname.match(/\/api\/v1\/student\/(notes|emploi-temps|profil|moyennes|taches|alertes|analysis)/),
     new StaleWhileRevalidate({
         cacheName: 'student-api-v1',
         plugins: [
@@ -86,10 +69,10 @@ self.addEventListener('message', async (event) => {
 });
 
 
-// ── Résultats IA (summary, quiz) ──────────────────────────────
+
 // CacheFirst justifié : un résumé/quiz généré pour un doc donné ne change pas.
 registerRoute(
-    /\/api\/v1\/(summary|quiz)\/[\w-]+/,
+    ({ url }) => url.pathname.match(/\/api\/v1\/(summary|quiz)\/[\w-]+/),
     new CacheFirst({
         cacheName: 'ai-results-v1',
         plugins: [
@@ -100,9 +83,8 @@ registerRoute(
 );
 
 
-// ── Exercices & images ─────────────────────────────────────────
 registerRoute(
-    /\/api\/v1\/(exercises|images)\/[\w-]+/,
+    ({ url }) => url.pathname.match(/\/api\/v1\/(exercises|images)\/[\w-]+/),
     new CacheFirst({
         cacheName: 'ai-exercices-images-v1',
         plugins: [
@@ -113,10 +95,6 @@ registerRoute(
 );
 
 
-// ── 🟠 FIX 4 : Audio — Support Range Requests & CORS ──────────
-// On utilise CacheFirst avec RangeRequestsPlugin pour permettre
-// la lecture fluide (seek) hors-ligne, même sur iOS.
-// On accepte les statuts 0 pour le support CORS (API externe).
 registerRoute(
     ({ request }) =>
         request.destination === 'audio' ||
@@ -136,7 +114,6 @@ registerRoute(
 );
 
 
-// ── Push Notifications ────────────────────────────────────────
 self.addEventListener('push', (event) => {
     if (!event.data) return;
 
@@ -147,7 +124,6 @@ self.addEventListener('push', (event) => {
         data = { title: 'AcademiX', body: event.data.text() };
     }
 
-    // 🔴 FIX 3 (suite) : si le push signale une mise à jour des notes,
     // on invalide immédiatement le cache student avant que l'app ne refetch.
     if (data.invalidateCache === 'student') {
         event.waitUntil(
@@ -164,8 +140,6 @@ self.addEventListener('push', (event) => {
         icon: data.icon || '/icons/icon-192x192.svg',
         badge: data.badge || '/icons/icon-72x72.svg',
 
-        // 🟠 FIX 6 : Tag dynamique pour éviter que les notifs se remplacent
-        // silencieusement. On utilise le tag fourni par le serveur si dispo,
         // sinon on génère un tag unique avec le timestamp.
         // renotify: true pour que le son/vibration se déclenche à chaque notif.
         tag: data.tag || `academix-${Date.now()}`,
@@ -179,7 +153,6 @@ self.addEventListener('push', (event) => {
 });
 
 
-// ── Notification click ────────────────────────────────────────
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
 

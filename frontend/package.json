@@ -21,7 +21,7 @@
     "framer-motion": "^12.34.3",
     "idb": "^7.1.1",
     "lottie-react": "^2.4.1",
-    "lucide-react": "^0.574.0",
+    "lucide-react": "^0.577.0",
     "radix-ui": "^1.4.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
