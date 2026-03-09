@@ -45,6 +45,7 @@ async def generate_roadmap(
     )
 
 
+
 @router.get(
     "/roadmap/{job_uuid}/status",
     response_model=RoadmapStatusResponse,
@@ -80,6 +81,26 @@ async def roadmap_status(
         celery_task_id=job.get("celery_task_id"),
         error_message=job.get("error_message"),
         roadmap_ready=status_enum == RoadmapJobStatus.done and bool(job.get("roadmap_id")),
+    )
+
+
+@router.get("/roadmap/{roadmap_uuid}/pdf")
+async def roadmap_pdf(
+    roadmap_uuid: str,
+    current_user: dict = Depends(get_current_user),
+) -> StreamingResponse:
+    roadmap_payload = await fetch_roadmap_detail(roadmap_uuid)
+    if not roadmap_payload:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Roadmap introuvable")
+
+    if roadmap_payload["roadmap"].get("student_id") != current_user["id"]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Accès refusé")
+
+    pdf_bytes = await generate_roadmap_pdf(roadmap_uuid)
+    return StreamingResponse(
+        io.BytesIO(pdf_bytes),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=roadmap_{roadmap_uuid}.pdf"},
     )
 
 
@@ -120,22 +141,3 @@ async def get_roadmap(
         created_at=roadmap.get("created_at"),
     )
 
-
-@router.get("/roadmap/{roadmap_uuid}/pdf")
-async def roadmap_pdf(
-    roadmap_uuid: str,
-    current_user: dict = Depends(get_current_user),
-) -> StreamingResponse:
-    roadmap_payload = await fetch_roadmap_detail(roadmap_uuid)
-    if not roadmap_payload:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Roadmap introuvable")
-
-    if roadmap_payload["roadmap"].get("student_id") != current_user["id"]:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Accès refusé")
-
-    pdf_bytes = await generate_roadmap_pdf(roadmap_uuid)
-    return StreamingResponse(
-        io.BytesIO(pdf_bytes),
-        media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename=roadmap_{roadmap_uuid}.pdf"},
-    )

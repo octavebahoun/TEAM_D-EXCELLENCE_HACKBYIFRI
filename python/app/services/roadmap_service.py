@@ -353,7 +353,7 @@ async def insert_resource(
                     now,
                 ),
             )
-    return cur.lastrowid
+            return cur.lastrowid
 
 
 async def clear_roadmap_sections(roadmap_id: int) -> None:
