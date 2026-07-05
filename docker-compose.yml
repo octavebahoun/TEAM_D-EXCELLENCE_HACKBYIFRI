@@ -58,7 +58,6 @@ services:
       --max-connections=50
       --slow-query-log=1
       --long-query-time=2
-      --mysql-native-password=OFF
 
   # ----------------------------------------------------------
   # MongoDB 8.0 - Base de données temps réel (Node.js)
