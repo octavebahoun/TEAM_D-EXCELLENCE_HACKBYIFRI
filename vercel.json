@@ -6,23 +6,23 @@
   "rewrites": [
     {
       "source": "/api/laravel/:path*",
-      "destination": "https://academix-production-bfde.up.railway.app/api/v1/:path*"
+      "destination": "http://13.36.171.214:8000/api/v1/:path*"
     },
     {
       "source": "/api/node/:path*",
-      "destination": "https://team-d-excellence-hackbyifri-2026.onrender.com/api/:path*"
+      "destination": "http://13.36.171.214:3001/api/:path*"
     },
     {
       "source": "/api/python/:path*",
-      "destination": "https://academix-production-dd5f.up.railway.app/api/v1/:path*"
+      "destination": "http://13.36.171.214:5000/api/v1/:path*"
     },
     {
       "source": "/socket.io",
-      "destination": "https://team-d-excellence-hackbyifri-2026.onrender.com/socket.io"
+      "destination": "http://13.36.171.214:3001/socket.io"
     },
     {
       "source": "/socket.io/:path*",
-      "destination": "https://team-d-excellence-hackbyifri-2026.onrender.com/socket.io/:path*"
+      "destination": "http://13.36.171.214:3001/socket.io/:path*"
     },
     {
       "source": "/((?!api|socket.io).*)",

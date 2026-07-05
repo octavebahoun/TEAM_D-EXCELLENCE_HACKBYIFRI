@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const DEFAULT_SOCKET_URL = 'https://team-d-excellence-hackbyifri-2026.onrender.com';
+const DEFAULT_SOCKET_URL = 'http://13.36.171.214:3001';
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || DEFAULT_SOCKET_URL;
 
 class SessionSocketService {
