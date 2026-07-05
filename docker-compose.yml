@@ -5,20 +5,27 @@
 #   - Laravel (PHP-FPM + Nginx) → Port 8000
 #   - Node.js (Socket.io)       → Port 3001
 #   - Python (FastAPI IA)        → Port 5000
-#   - MySQL 8.4                  → Port 3306
+#   - MySQL LTS                  → Port 3306
 #   - MongoDB 8.0                → Port 27017
 #   - Redis 7                    → Port 6379 (cache Laravel)
 #
 # Total mémoire réservée: ~1.3 Go | Limite: ~2.5 Go
 # Laisse ~1.5 Go pour l'OS + Docker daemon + marges
 # ================================================================
+#
+# ⚠ IMPORTANT - MySQL 8.4+ :
+#   --default-authentication-plugin=mysql_native_password est SUPPRIMÉ
+#   dans MySQL 8.4 (désactivé par défaut) et RETIRÉ dans MySQL 9.0.
+#   PHP 8.4+ supporte nativement caching_sha2_password.
+#   → Ce flag n'est PAS inclus. Ne pas le réactiver.
+# ================================================================
 
 services:
   # ----------------------------------------------------------
-  # MySQL 8.4 - Base de données Laravel
+  # MySQL LTS (8.4) - Base de données Laravel
   # ----------------------------------------------------------
   mysql:
-    image: mysql:8.4
+    image: mysql:lts
     container_name: academix-mysql
     restart: unless-stopped
     environment:
@@ -45,13 +52,13 @@ services:
       retries: 5
       start_period: 30s
     command: >
-      --default-authentication-plugin=mysql_native_password
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_unicode_ci
       --innodb-buffer-pool-size=128M
       --max-connections=50
       --slow-query-log=1
       --long-query-time=2
+      --mysql-native-password=OFF
 
   # ----------------------------------------------------------
   # MongoDB 8.0 - Base de données temps réel (Node.js)

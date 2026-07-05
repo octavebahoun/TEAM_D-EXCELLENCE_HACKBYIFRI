@@ -1,54 +1,99 @@
 # ============================================================
-# ÉTAPE 1 : Installation des dépendances PHP
+# STAGE 1: Dépendances vendor (Composer)
 # ============================================================
-FROM php:8.3-fpm-alpine AS builder
+FROM composer:2 AS vendor
 
 WORKDIR /app
 
-# Dépendances système pour les extensions PHP
-RUN apk add --no-cache \
-    git unzip libzip-dev icu-dev libpng-dev libjpeg-turbo-dev \
-    freetype-dev oniguruma-dev linux-headers $PHPIZE_DEPS \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install \
+COPY backend/laravel/composer.json backend/laravel/composer.lock* ./
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --no-plugins \
+    --no-scripts \
+    --prefer-dist
+
+# ============================================================
+# STAGE 2: Build application (extensions + caching Artisan)
+# ============================================================
+FROM php:8.4-fpm-alpine AS builder
+
+WORKDIR /app
+
+# Dépendances virtuelles temporaires pour la compilation
+# Supprimées à la fin du RUN pour image légère
+RUN apk add --no-cache --virtual .build-deps \
+    $PHPIZE_DEPS \
+    linux-headers \
+    oniguruma-dev \
+    icu-dev \
+    libzip-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    && docker-php-ext-configure gd \
+       --with-freetype=/usr/include/ \
+       --with-jpeg=/usr/include/ \
+    && docker-php-ext-install -j$(nproc) \
        pdo_mysql mbstring intl zip bcmath gd opcache \
     && pecl install redis \
-    && docker-php-ext-enable redis
+    && docker-php-ext-enable redis \
+    && apk del .build-deps \
+    && rm -rf /tmp/pear ~/.pearrc
 
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Installation des dépendances PHP (cache layer)
-COPY backend/laravel/composer.json backend/laravel/composer.lock* ./
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+# Vendor
+COPY --from=vendor /app/vendor ./vendor
 
-# Copie du code
+# Code source
 COPY backend/laravel .
 
-# CRÉATION DES DOSSIERS REQUIS PAR LARAVEL AVANT OPTIMISATION
-RUN mkdir -p bootstrap/cache storage/framework/cache/data storage/framework/views storage/framework/sessions storage/logs \
+# Dossiers requis par Laravel avant toute opération Artisan
+RUN mkdir -p bootstrap/cache \
+    storage/framework/cache/data \
+    storage/framework/views \
+    storage/framework/sessions \
+    storage/logs \
     && chmod -R 775 bootstrap/cache storage
 
-# Génération de l'autoloader et du cache config
+# Optimisations Laravel
 RUN composer dump-autoload --optimize \
     && php artisan config:cache \
     && php artisan route:cache \
     && php artisan view:cache
 
 # ============================================================
-# ÉTAPE 2 : Image de production (PHP-FPM + Nginx)
+# STAGE 3: Production PHP-FPM + Nginx
 # ============================================================
-FROM php:8.3-fpm-alpine AS production
+FROM php:8.4-fpm-alpine AS production
 
-RUN apk add --no-cache nginx supervisor oniguruma icu libzip
+# Paquets runtime système
+RUN apk add --no-cache nginx supervisor curl
 
-# Compilation avec dépendances virtuelles temporaires
+# Construction des extensions PHP avec dépendances virtuelles
+# .build-deps = outils de compilation (supprimés après)
+# .run-deps  = librairies partagées nécessaires au runtime (conservées)
 RUN apk add --no-cache --virtual .build-deps \
-    $PHPIZE_DEPS linux-headers oniguruma-dev icu-dev libzip-dev \
-    && docker-php-ext-install pdo_mysql mbstring intl zip bcmath opcache \
+    $PHPIZE_DEPS \
+    linux-headers \
+    oniguruma-dev \
+    icu-dev \
+    libzip-dev \
+    && docker-php-ext-install -j$(nproc) \
+       pdo_mysql mbstring intl zip bcmath opcache \
     && pecl install redis \
     && docker-php-ext-enable redis \
-    && apk del .build-deps
+    && runDeps="$( \
+         scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
+         | tr ',' '\n' \
+         | sort -u \
+         | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+       )" \
+    && apk add --no-cache --virtual .run-deps $runDeps \
+    && apk del .build-deps \
+    && rm -rf /tmp/pear ~/.pearrc
 
 # Configuration PHP optimisée
 RUN { \
@@ -64,17 +109,13 @@ RUN { \
 
 WORKDIR /var/www/html
 
-# Copie de l'application depuis le builder
 COPY --from=builder /app .
 
-# Copie Nginx
 COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
 
-# Permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
-# Supervisor pour lancer PHP-FPM + Nginx
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 EXPOSE 80
