@@ -31,3 +31,4 @@ langchain-community
 langchain-groq
 gunicorn>=21.2.0
 gTTS==2.5.1
+edge-tts==6.1.12

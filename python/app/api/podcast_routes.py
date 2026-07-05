@@ -112,10 +112,15 @@ async def generate_podcast_endpoint(
         podcast_script = await _summarize_for_podcast(text)
         
         # 3. Générer l'audio avec gTTS
-        tts = gTTS(text=podcast_script, lang="fr", slow=False)
         podcast_id = str(uuid.uuid4())
         audio_path = os.path.join(PODCAST_DIR, f"{podcast_id}.mp3")
-        tts.save(audio_path)
+
+        communicate = edge_tts.Communicate(
+            text=podcast_script,
+            voice="fr-FR-DeniseNeural"
+        )
+
+        await communicate.save(audio_path)
         
         # 4. Sauvegarder le script texte pour référence
         script_path = os.path.join(PODCAST_DIR, f"{podcast_id}.txt")
