@@ -24,10 +24,7 @@
       "destination": "http://13.36.171.214:3001/socket.io/:path*"
     },
     {
-      "handle": "filesystem"
-    },
-    {
-      "source": "/(.*)",
+      "source": "/((?!api|socket.io|assets|icons|favicon.svg|sw.js|registerSW.js|manifest.webmanifest).*)",
       "destination": "/index.html"
     }
   ]
