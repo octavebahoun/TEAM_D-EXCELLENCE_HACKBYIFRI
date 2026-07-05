@@ -1,0 +1,259 @@
+# ================================================================
+# AcademiX - Docker Compose (VPS Ubuntu 4Go RAM)
+# ================================================================
+# Architecture:
+#   - Laravel (PHP-FPM + Nginx) → Port 8000
+#   - Node.js (Socket.io)       → Port 3001
+#   - Python (FastAPI IA)        → Port 5000
+#   - MySQL 8.4                  → Port 3306
+#   - MongoDB 8.0                → Port 27017
+#   - Redis 7                    → Port 6379 (cache Laravel)
+#
+# Total mémoire réservée: ~1.3 Go | Limite: ~2.5 Go
+# Laisse ~1.5 Go pour l'OS + Docker daemon + marges
+# ================================================================
+
+services:
+  # ----------------------------------------------------------
+  # MySQL 8.4 - Base de données Laravel
+  # ----------------------------------------------------------
+  mysql:
+    image: mysql:8.4
+    container_name: academix-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-academix_root_2026}
+      MYSQL_DATABASE: ${DB_NAME:-academix}
+      MYSQL_USER: ${DB_USER:-academix_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-academix_pass_2026}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - academix-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-academix_root_2026}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --innodb-buffer-pool-size=128M
+      --max-connections=50
+      --slow-query-log=1
+      --long-query-time=2
+
+  # ----------------------------------------------------------
+  # MongoDB 8.0 - Base de données temps réel (Node.js)
+  # ----------------------------------------------------------
+  mongo:
+    image: mongo:8.0
+    container_name: academix-mongo
+    restart: unless-stopped
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - academix-net
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+        reservations:
+          memory: 192M
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ----------------------------------------------------------
+  # Redis 7 - Cache Laravel (léger)
+  # ----------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: academix-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - academix-net
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    command: redis-server --maxmemory 80mb --maxmemory-policy allkeys-lru
+
+  # ----------------------------------------------------------
+  # Laravel API - Backend principal
+  # ----------------------------------------------------------
+  laravel:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.laravel
+    container_name: academix-laravel
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_KEY=${APP_KEY}
+      - APP_URL=${APP_URL:-http://localhost}
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_NAME:-academix}
+      - DB_USERNAME=${DB_USER:-academix_user}
+      - DB_PASSWORD=${DB_PASSWORD:-academix_pass_2026}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - NODE_BACKEND_URL=http://node:3001
+      - PYTHON_AI_SERVICE_URL=http://python:5000
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET:-webhook_secret_2026}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI:-http://localhost/auth/google/callback}
+      - VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY}
+      - VAPID_SUBJECT=${VAPID_SUBJECT:-mailto:contact@academix.app}
+    ports:
+      - "${LARAVEL_PORT:-8000}:80"
+    volumes:
+      - laravel_storage:/var/www/html/storage
+    networks:
+      - academix-net
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+        reservations:
+          memory: 256M
+
+  # ----------------------------------------------------------
+  # Node.js - WebSocket + Messagerie temps réel
+  # ----------------------------------------------------------
+  node:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.node
+    container_name: academix-node
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      - PORT=3001
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongo:27017/academix_realtime
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME:-academix}
+      - DB_USER=${DB_USER:-academix_user}
+      - DB_PASSWORD=${DB_PASSWORD:-academix_pass_2026}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost}
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-http://localhost:3001}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENROUTER_REFERER=${OPENROUTER_REFERER:-http://localhost}
+      - OPENROUTER_APP_TITLE=AcademiX
+      - KAVT_ENABLED=${KAVT_ENABLED:-true}
+      - KAVT_MODEL=${KAVT_MODEL:-arcee-ai/trinity-large-preview:free}
+    ports:
+      - "${NODE_PORT:-3001}:3001"
+    volumes:
+      - node_uploads:/app/uploads
+    networks:
+      - academix-net
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+        reservations:
+          memory: 192M
+
+  # ----------------------------------------------------------
+  # Python FastAPI - Service Intelligence Artificielle
+  # ----------------------------------------------------------
+  python:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.python
+    container_name: academix-python
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=5000
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME:-academix}
+      - DB_USER=${DB_USER:-academix_user}
+      - DB_PASSWORD=${DB_PASSWORD:-academix_pass_2026}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-liquid/lfm-2.5-1.2b-thinking:free}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost}
+    ports:
+      - "${PYTHON_PORT:-5000}:5000"
+    volumes:
+      - python_uploads:/app/uploads
+      - python_generated:/app/generated
+    networks:
+      - academix-net
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 384M
+
+# ----------------------------------------------------------
+# Réseau privé
+# ----------------------------------------------------------
+networks:
+  academix-net:
+    driver: bridge
+
+# ----------------------------------------------------------
+# Volumes persistants
+# ----------------------------------------------------------
+volumes:
+  mysql_data:
+    driver: local
+  mongo_data:
+    driver: local
+  redis_data:
+    driver: local
+  laravel_storage:
+    driver: local
+  node_uploads:
+    driver: local
+  python_uploads:
+    driver: local
+  python_generated:
+    driver: local

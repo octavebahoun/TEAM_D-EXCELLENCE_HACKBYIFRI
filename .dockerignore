@@ -1,0 +1,62 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+docs/
+README.md
+*.md
+Cahiers*
+
+# Tests
+tests/
+test_*.py
+conftest.py
+report.html
+results.xml
+
+# Frontend (déployé sur Vercel, pas dans Docker)
+frontend/
+vercel.json
+
+# Présentation
+Présentation/
+
+# CSV templates (montés en volume si besoin)
+csv_templates/
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+venv/
+.venv/
+*.egg-info
+
+# Node
+node_modules/
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files (sécurité)
+.env
+.env.local
+.env.production
+
+# Docker files (pas dans l'image)
+docker-compose.yml
+docker/.env.docker
+
+# Build artifacts
+dist/
+build/
+*.log

@@ -1,0 +1,65 @@
+# ============================================================
+# ÉTAPE 1 : Installation des dépendances système + Python
+# ============================================================
+FROM python:3.12-slim AS builder
+
+WORKDIR /app
+
+# Dépendances système lourdes (WeasyPrint, gTTS, etc.)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libffi-dev \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libgdk-pixbuf2.0-dev \
+    libglib2.0-dev \
+    libharfbuzz-dev \
+    libfontconfig1-dev \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY python/requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# ============================================================
+# ÉTAPE 2 : Image de production (slim)
+# ============================================================
+FROM python:3.12-slim AS production
+
+# Dépendances runtime uniquement (sans les -dev)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libcairo2 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libgdk-pixbuf2.0-0 \
+    libglib2.0-0 \
+    libharfbuzz0b \
+    libfontconfig1 \
+    ffmpeg \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copie des packages installés depuis le builder
+COPY --from=builder /install /usr/local
+
+WORKDIR /app
+
+# Copie du code
+COPY python/main.py .
+COPY python/app ./app
+
+# Dossiers de données
+RUN mkdir -p uploads generated/summaries generated/quizzes \
+    generated/exercises generated/images generated/podcasts \
+    generated/roadmaps/pdf \
+    && useradd -m -r appuser \
+    && chown -R appuser:appuser /app
+
+USER appuser
+
+EXPOSE 5000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD curl -f http://localhost:5000/ || exit 1
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000", "--workers", "1"]

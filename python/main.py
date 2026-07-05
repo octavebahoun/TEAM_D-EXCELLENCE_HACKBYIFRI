@@ -8,14 +8,20 @@ from app.api.image_routes import router as image_router
 from app.api.podcast_routes import router as podcast_router
 from app.api.history_routes import router as history_router
 from app.api.analysis_routes import router as analysis_router
-from app.api.roadmap_routes import router as roadmap_router
 from app.core.config import settings
+
+# Roadmap (optionnel - nécessite Celery + Redis)
+try:
+    from app.api.roadmap_routes import router as roadmap_router
+    HAS_ROADMAP = True
+except ImportError:
+    HAS_ROADMAP = False
 
 # Création de l'application FastAPI
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Backend Academix - Intelligence Artificielle Éducative"
+    description="Backend AcademiX - Intelligence Artificielle Éducative"
 )
 
 # Configuration CORS
@@ -37,11 +43,13 @@ app.include_router(image_router, prefix="/api/v1/image", tags=["Image Generation
 app.include_router(podcast_router, prefix="/api/v1/podcast", tags=["Podcast Service"])
 app.include_router(history_router, prefix="/api/v1/history", tags=["History"])
 app.include_router(analysis_router, prefix="/api/v1/analysis", tags=["Student Analysis"])
-app.include_router(roadmap_router, prefix="/api/v1", tags=["Roadmap Service"])
+
+if HAS_ROADMAP:
+    app.include_router(roadmap_router, prefix="/api/v1", tags=["Roadmap Service"])
 
 @app.get("/")
 def root():
-    return {"status": "online", "message": "Bienvenue sur l'API Academix AI"}
+    return {"status": "online", "message": "Bienvenue sur l'API AcademiX AI"}
 
 # Permet de lancer avec "python main.py"
 if __name__ == "__main__":

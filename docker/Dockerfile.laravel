@@ -1,0 +1,75 @@
+# ============================================================
+# ÉTAPE 1 : Installation des dépendances PHP
+# ============================================================
+FROM php:8.3-fpm-alpine AS builder
+
+WORKDIR /app
+
+# Dépendances système pour les extensions PHP
+RUN apk add --no-cache \
+    git unzip libzip-dev icu-dev libpng-dev libjpeg-turbo-dev \
+    freetype-dev oniguruma-dev linux-headers \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install \
+       pdo_mysql mbstring intl zip bcmath gd opcache \
+    && pecl install redis \
+    && docker-php-ext-enable redis
+
+# Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Installation des dépendances PHP (cache layer)
+COPY backend/laravel/composer.json backend/laravel/composer.lock* ./
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+
+# Copie du code
+COPY backend/laravel .
+
+# Génération de l'autoloader et du cache config
+RUN composer dump-autoload --optimize \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
+
+# ============================================================
+# ÉTAPE 2 : Image de production (PHP-FPM + Nginx)
+# ============================================================
+FROM php:8.3-fpm-alpine AS production
+
+RUN apk add --no-cache nginx supervisor
+
+# PHP extensions runtime (sans les outils de build)
+RUN docker-php-ext-install pdo_mysql mbstring intl zip bcmath opcache \
+    && pecl install redis \
+    && docker-php-ext-enable redis
+
+# Configuration PHP optimisée
+RUN { \
+    echo 'memory_limit = 256M'; \
+    echo 'upload_max_filesize = 20M'; \
+    echo 'post_max_size = 25M'; \
+    echo 'max_execution_time = 300'; \
+    echo 'opcache.enable=1'; \
+    echo 'opcache.memory_consumption=64'; \
+    echo 'opcache.interned_strings_buffer=8'; \
+    echo 'opcache.max_accelerated_files=4000'; \
+    } > /usr/local/etc/php/conf.d/academix.ini
+
+WORKDIR /var/www/html
+
+# Copie de l'application depuis le builder
+COPY --from=builder /app .
+
+# Copie Nginx
+COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
+
+# Permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Supervisor pour lancer PHP-FPM + Nginx
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+EXPOSE 80
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
