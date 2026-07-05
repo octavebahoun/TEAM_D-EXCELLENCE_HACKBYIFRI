@@ -27,43 +27,26 @@ class MassiveSeeder extends Seeder
     private array $matieresCatalogue = [
         'INFO' => [
             ['nom' => 'Algorithmique', 'code' => 'ALGO101', 'coeff' => 3, 'prof' => 'Dr. AKANDE'],
-            ['nom' => 'Base de Données', 'code' => 'BDD201', 'coeff' => 2, 'prof' => 'Pr. KOUTON'],
             ['nom' => 'Programmation Web', 'code' => 'WEB201', 'coeff' => 2, 'prof' => 'M. FOLARIN'],
             ['nom' => 'Réseaux', 'code' => 'RX301', 'coeff' => 2, 'prof' => 'Dr. BIAOU'],
-            ['nom' => 'Mathématiques', 'code' => 'MATH101', 'coeff' => 2, 'prof' => 'M. ADJOVI'],
-            ['nom' => 'Systèmes d\'exploitation', 'code' => 'SYS201', 'coeff' => 2, 'prof' => 'Dr. KPANOU'],
-            ['nom' => 'Programmation C', 'code' => 'PROG101', 'coeff' => 3, 'prof' => 'M. SOGLO'],
-            ['nom' => 'Intelligence Artificielle', 'code' => 'IA401', 'coeff' => 3, 'prof' => 'Dr. DOSSOU'],
         ],
         'GC' => [
             ['nom' => 'Résistance des Matériaux', 'code' => 'RDM201', 'coeff' => 3, 'prof' => 'Pr. HOUNGAN'],
             ['nom' => 'Béton Armé', 'code' => 'BA301', 'coeff' => 3, 'prof' => 'Dr. AMOUSSOU'],
             ['nom' => 'Mécanique des Sols', 'code' => 'MDS201', 'coeff' => 2, 'prof' => 'M. TONATO'],
-            ['nom' => 'Topographie', 'code' => 'TOPO101', 'coeff' => 2, 'prof' => 'Mme ADJAKOU'],
-            ['nom' => 'Hydraulique', 'code' => 'HYD301', 'coeff' => 2, 'prof' => 'Dr. GBAGUIDI'],
-            ['nom' => 'Dessin Technique', 'code' => 'DT101', 'coeff' => 1, 'prof' => 'M. SOSSOU'],
         ],
         'ELEC' => [
             ['nom' => 'Électronique Analogique', 'code' => 'EA201', 'coeff' => 3, 'prof' => 'Pr. AGBOSSOU'],
             ['nom' => 'Électronique Numérique', 'code' => 'EN301', 'coeff' => 3, 'prof' => 'Dr. ZANNOU'],
             ['nom' => 'Automatique', 'code' => 'AUTO201', 'coeff' => 2, 'prof' => 'M. HOUNSA'],
-            ['nom' => 'Électrotechnique', 'code' => 'ELTECH301', 'coeff' => 2, 'prof' => 'Pr. DAGA'],
-            ['nom' => 'Traitement du Signal', 'code' => 'TS201', 'coeff' => 2, 'prof' => 'Dr. OKOU'],
-            ['nom' => 'Physique Appliquée', 'code' => 'PHYA101', 'coeff' => 2, 'prof' => 'M. DJOSSOU'],
         ],
         'MATH' => [
             ['nom' => 'Analyse Mathématique', 'code' => 'ANA201', 'coeff' => 3, 'prof' => 'Pr. MENSAH'],
             ['nom' => 'Algèbre Linéaire', 'code' => 'ALG101', 'coeff' => 3, 'prof' => 'Dr. BOHOUN'],
-            ['nom' => 'Probabilités et Statistiques', 'code' => 'PROBA201', 'coeff' => 2, 'prof' => 'M. AGOSSA'],
-            ['nom' => 'Optimisation', 'code' => 'OPTIM301', 'coeff' => 2, 'prof' => 'Dr. AFFO'],
-            ['nom' => 'Analyse Numérique', 'code' => 'ANUM201', 'coeff' => 2, 'prof' => 'Pr. SAVI'],
         ],
         'ECO' => [
             ['nom' => 'Microéconomie', 'code' => 'MICRO101', 'coeff' => 3, 'prof' => 'Pr. KIKI'],
             ['nom' => 'Macroéconomie', 'code' => 'MACRO201', 'coeff' => 3, 'prof' => 'Dr. HOUENON'],
-            ['nom' => 'Comptabilité Générale', 'code' => 'COMPTA101', 'coeff' => 2, 'prof' => 'M. AHOUANNOU'],
-            ['nom' => 'Statistiques Appliquées', 'code' => 'STAPP201', 'coeff' => 2, 'prof' => 'Mme BOKO'],
-            ['nom' => 'Droit des Affaires', 'code' => 'DROIT201', 'coeff' => 2, 'prof' => 'M. GNACADJA'],
         ],
     ];
 
@@ -90,35 +73,7 @@ class MassiveSeeder extends Seeder
         'Grâce',
         'David',
         'Estelle',
-        'Rodrigue',
-        'Claudine',
-        'Émile',
-        'Franck',
-        'Habibou',
-        'Inès',
-        'Joël',
-        'Karen',
-        'Léon',
-        'Marius',
-        'Nathalie',
-        'Olivier',
-        'Pascale',
-        'Quentin',
-        'Rita',
-        'Serge',
-        'Tatiana',
-        'Urbain',
-        'Viviane',
-        'Wilfried',
-        'Xavier',
-        'Yves',
-        'Zénab',
-        'Aristide',
-        'Bérénice',
-        'Cédric',
-        'Diane',
-        'Évariste',
-        'Florence',
+        'Rodrigue'
     ];
 
     private array $noms = [
@@ -143,35 +98,7 @@ class MassiveSeeder extends Seeder
         'AGOSSA',
         'AFFO',
         'KPANOU',
-        'FOLARIN',
-        'KOUTON',
-        'HOUENON',
-        'AHOUANNOU',
-        'BOKO',
-        'GNACADJA',
-        'OKOU',
-        'DJOSSOU',
-        'DAGA',
-        'ZINFLOU',
-        'TOSSOU',
-        'HOUSSOU',
-        'AZONKPIN',
-        'ASSOGBA',
-        'DEGBEY',
-        'GANGBO',
-        'HOUNKPE',
-        'KASSA',
-        'LAWANI',
-        'MEHOU',
-        'NOUKPO',
-        'OUASSA',
-        'PADONOU',
-        'QUENUM',
-        'SAGBO',
-        'TOKPO',
-        'VODOUHE',
-        'WABI',
-        'YEHOUENOU',
+        'FOLARIN'
     ];
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -256,9 +183,7 @@ class MassiveSeeder extends Seeder
     {
         $depts = [
             ['nom' => 'Informatique', 'code' => 'INFO', 'description' => 'Département d\'Informatique et Sciences du Numérique'],
-            ['nom' => 'Génie Civil', 'code' => 'GC', 'description' => 'Département de Génie Civil et Construction'],
-            ['nom' => 'Génie Électrique', 'code' => 'ELEC', 'description' => 'Département de Génie Électrique et Automatisme'],
-            ['nom' => 'Mathématiques', 'code' => 'MATH', 'description' => 'Département de Mathématiques Fondamentales et Appliquées'],
+            ['nom' => 'Génie Civil', 'code' => 'GC', 'description' => 'Département de Génie Civil et Construction'] ,
             ['nom' => 'Sciences Économiques', 'code' => 'ECO', 'description' => 'Département de Sciences Économiques et Gestion'],
         ];
 
@@ -281,8 +206,6 @@ class MassiveSeeder extends Seeder
         $chefs = [
             ['nom' => 'FOLARIN', 'prenom' => 'Mourchid', 'email' => 'chef.info@academix.com', 'dept' => 'INFO'],
             ['nom' => 'KOUTON', 'prenom' => 'Jean', 'email' => 'chef.gc@academix.com', 'dept' => 'GC'],
-            ['nom' => 'AGBOSSOU', 'prenom' => 'Paul', 'email' => 'chef.elec@academix.com', 'dept' => 'ELEC'],
-            ['nom' => 'MENSAH', 'prenom' => 'Richard', 'email' => 'chef.math@academix.com', 'dept' => 'MATH'],
             ['nom' => 'KIKI', 'prenom' => 'Emmanuel', 'email' => 'chef.eco@academix.com', 'dept' => 'ECO'],
         ];
 
@@ -400,7 +323,7 @@ class MassiveSeeder extends Seeder
         foreach ($filieres as $fil) {
             $deptCode = $fil->departement->code;
             // 8 étudiants par filière = 8 × 15 filières = 120 étudiants
-            for ($i = 1; $i <= 8; $i++) {
+            for ($i = 1; $i <= 5; $i++) {
                 $num = str_pad($totalStudents + 1, 3, '0', STR_PAD_LEFT);
                 $matricule = "ETU-{$deptCode}-{$num}";
                 $prenom = $this->prenoms[array_rand($this->prenoms)];
