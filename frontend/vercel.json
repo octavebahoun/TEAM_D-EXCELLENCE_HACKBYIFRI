@@ -1,7 +1,5 @@
 {
-  "buildCommand": "npm install && npm run build",
-  "outputDirectory": "frontend/dist",
-  "framework": "vite",
+  "cleanUrls": true,
   "rewrites": [
     {
       "source": "/api/laravel/:path*",
