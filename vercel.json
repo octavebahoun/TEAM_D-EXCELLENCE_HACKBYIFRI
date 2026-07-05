@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/laravel/:path*",
-      "destination": "http://13.36.171.214:8000/api/:path*"
+      "destination": "http://13.36.171.214:8000/api/v1/:path*"
     },
     {
       "source": "/api/node/:path*",
@@ -22,7 +22,7 @@
     {
       "source": "/socket.io/:path*",
       "destination": "http://13.36.171.214:3001/socket.io/:path*"
-    },S
+    },
     {
       "source": "/((?!api|socket.io).*)",
       "destination": "/index.html"
