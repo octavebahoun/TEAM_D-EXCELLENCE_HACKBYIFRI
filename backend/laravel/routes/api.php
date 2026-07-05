@@ -144,6 +144,7 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('student')->middleware(['auth:sanctum', 'student'])->group(function () {
         Route::get('profil', [StudentController::class, 'profil']);
+        Route::put('profil', [StudentController::class, 'updateProfil']);
         Route::get('moyennes', [StudentController::class, 'moyennes']);
         Route::get('notes', [StudentController::class, 'notes']);
         Route::get('emploi-temps', [StudentController::class, 'emploiTemps']);
@@ -155,7 +156,7 @@ Route::prefix('v1')->group(function () {
         Route::patch('alertes/{id}/read', [AlerteController::class, 'markAsRead']);
 
         // IA Analysis Routes
-        Route::post('analysis', [StudentAnalysisController::class, 'analyze']);
+        Route::match(['get', 'post'], 'analysis', [StudentAnalysisController::class, 'analyze']);
         Route::get('analysis/history', [StudentAnalysisController::class, 'history']);
         Route::post('analysis/mark-sent/{id}', [StudentAnalysisController::class, 'markAsSent']);
 

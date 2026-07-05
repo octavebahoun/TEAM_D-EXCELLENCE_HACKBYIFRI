@@ -96,6 +96,20 @@ class NoteController extends Controller
         return response()->json($note->load(['user', 'matiere']));
     }
 
+    public function show(Request $request, $id)
+    {
+        $note = Note::with(['user', 'matiere'])->findOrFail($id);
+        $note->load('user.filiere');
+
+        $admin = $request->user();
+        $isChef = method_exists($admin, 'isChefDepartement') && $admin->isChefDepartement();
+        if ($isChef && $note->user->filiere->departement_id !== $admin->departement_id) {
+            return response()->json(['message' => 'L\'étudiant n\'appartient pas à votre département.'], 403);
+        }
+
+        return response()->json($note);
+    }
+
     public function destroy(Request $request, $id)
     {
         $note = Note::findOrFail($id);
@@ -111,3 +125,4 @@ class NoteController extends Controller
         return response()->noContent();
     }
 }
+

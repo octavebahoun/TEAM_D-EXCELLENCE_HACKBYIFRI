@@ -8,6 +8,18 @@ import pytest
 import requests
 import time
 
+# Patch requests globally in tests to ensure Laravel always returns JSON errors instead of redirects
+_original_request = requests.Session.request
+def _patched_request(self, method, url, **kwargs):
+    headers = kwargs.get("headers") or {}
+    if "Accept" not in headers and "accept" not in {k.lower() for k in headers.keys()}:
+        headers = headers.copy()
+        headers["Accept"] = "application/json"
+    kwargs["headers"] = headers
+    return _original_request(self, method, url, **kwargs)
+requests.Session.request = _patched_request
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # CONFIGURATION DES URLS DE BASE
 # Modifier ces valeurs si vos serveurs tournent sur des ports différents
@@ -63,6 +75,7 @@ def check_laravel(laravel_url):
         r = requests.post(
             f"{laravel_url}/auth/admin/login",
             json={"email": "test@test.com", "password": "test"},
+            headers={"Accept": "application/json"},
             timeout=REQUEST_TIMEOUT
         )
         return True
@@ -104,6 +117,7 @@ def admin_token(laravel_url):
         r = requests.post(
             f"{laravel_url}/auth/admin/login",
             json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD},
+            headers={"Accept": "application/json"},
             timeout=REQUEST_TIMEOUT
         )
         if r.status_code == 200:
@@ -127,6 +141,7 @@ def chef_token(laravel_url):
         r = requests.post(
             f"{laravel_url}/auth/chef/login",
             json={"email": CHEF_EMAIL, "password": CHEF_PASSWORD},
+            headers={"Accept": "application/json"},
             timeout=REQUEST_TIMEOUT
         )
         if r.status_code == 200:
@@ -154,6 +169,7 @@ def student_token(laravel_url):
                 "password": STUDENT_PASSWORD,
                 "matricule": STUDENT_MATRICULE
             },
+            headers={"Accept": "application/json"},
             timeout=REQUEST_TIMEOUT
         )
         if r.status_code == 200:
