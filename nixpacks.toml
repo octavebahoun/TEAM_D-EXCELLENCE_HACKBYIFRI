@@ -1,20 +1,13 @@
-[phases.setup]
-nixPkgs = [
-  "python312",
-  "ffmpeg",
-  "cairo",
-  "pango",
-  "gdk-pixbuf",
-  "glib",
-  "libffi",
-  "harfbuzz",
-  "fontconfig"
-]
+# Racine monorepo - Railway doit déployer chaque service séparément :
+#   - backend/laravel/  → Service Laravel (PHP)
+#   - backend/node/     → Service Node.js (WebSocket)
+#   - python/           → Service Python (IA)
+#
+# Ce fichier n'est PAS utilisé par Railway si chaque service a son propre
+# nixpacks.toml dans son répertoire. Il sert de fallback inoffensif.
 
 [phases.build]
-cmds = [
-  "if [ -d python ]; then cd python && pip install --upgrade pip && pip install -r requirements.txt; fi"
-]
+cmds = ["echo 'Root monorepo - deploy individual services'"]
 
 [start]
-cmd = "cd python && python main.py"
+cmd = "echo 'Nothing to run at root level'"

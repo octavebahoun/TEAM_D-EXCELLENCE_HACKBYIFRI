@@ -13,6 +13,6 @@ nixPkgs = [
   "fontconfig"
 ]
 
-[phases.build]
-# Le provider python s'occupe déjà de "pip install -r requirements.txt"
-# On n'a rien besoin d'ajouter ici, Railway le fera auto-magiquement !
+[start]
+# Railway fournit $PORT automatiquement. uvicorn doit écouter dessus.
+cmd = "cd python && uvicorn main:app --host 0.0.0.0 --port $PORT"
