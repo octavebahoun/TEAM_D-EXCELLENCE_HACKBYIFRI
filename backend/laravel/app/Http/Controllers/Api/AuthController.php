@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Admin;
 use Illuminate\Http\Request;
 use App\Models\ChefDepartement;
+use App\Models\Enseignant;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 
@@ -205,6 +206,42 @@ class AuthController extends Controller
         return response()->json(['message' => 'Déconnecté avec succès.']);
     }
 
+    public function professeurLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $prof = Enseignant::where('email', $request->email)->first();
+
+        if (!$prof || !$prof->password || !Hash::check($request->password, $prof->password)) {
+            return response()->json(['message' => 'Identifiants incorrects'], 401);
+        }
+
+        if (!$prof->is_active) {
+            return response()->json(['message' => 'Compte désactivé. Contactez votre département.'], 403);
+        }
+
+        $prof->update(['last_login' => now()]);
+
+        $token = $prof->createToken('professeur-token')->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'token_type' => 'Bearer',
+            'professeur' => $prof->load('matieres:id,nom,code', 'departement:id,nom,code'),
+            'role' => 'professeur',
+        ]);
+    }
+
+    public function professeurLogout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Déconnecté avec succès.']);
+    }
+
     public function adminRegister(Request $request)
     {
         $validated = $request->validate([
@@ -243,6 +280,14 @@ class AuthController extends Controller
                 'profil' => $user->load('departement'),
             ]);
         }
+
+        if ($user instanceof Enseignant) {
+            return response()->json([
+                'type' => 'professeur',
+                'profil' => $user->load('matieres:id,nom,code', 'departement:id,nom,code'),
+            ]);
+        }
+
         return response()->json([
             'type' => 'student',
             'profil' => $user->load('filiere.departement'),

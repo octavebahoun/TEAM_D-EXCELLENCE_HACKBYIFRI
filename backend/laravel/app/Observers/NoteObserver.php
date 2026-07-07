@@ -12,7 +12,10 @@ class NoteObserver
      */
     public function created(Note $note): void
     {
-        $this->handleNotePerformance($note);
+        // On n'alerte l'étudiant que pour une note déjà validée.
+        if ($note->statut === 'validee') {
+            $this->handleNotePerformance($note);
+        }
     }
 
     /**
@@ -20,8 +23,12 @@ class NoteObserver
      */
     public function updated(Note $note): void
     {
-        // On génère une alerte seulement si la note a changé substantiellement
-        if ($note->isDirty('note')) {
+        // Alerte quand la note vient d'être validée, ou quand une note déjà
+        // validée voit sa valeur changer.
+        $vientDEtreValidee = $note->isDirty('statut') && $note->statut === 'validee';
+        $noteModifieeEtValidee = $note->isDirty('note') && $note->statut === 'validee';
+
+        if ($vientDEtreValidee || $noteModifieeEtValidee) {
             $this->handleNotePerformance($note);
         }
     }

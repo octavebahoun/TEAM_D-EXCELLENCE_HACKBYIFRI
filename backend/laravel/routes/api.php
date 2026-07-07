@@ -16,6 +16,11 @@ use App\Http\Controllers\Api\ChefDepartementController;
 use App\Http\Controllers\Api\StudentAnalysisController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\PushSubscriptionController;
+use App\Http\Controllers\Api\AbsenceController;
+use App\Http\Controllers\Api\EnseignantController;
+use App\Http\Controllers\Api\SalleController;
+use App\Http\Controllers\Api\AuditLogController;
+use App\Http\Controllers\Api\CommunicationController;
 
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
@@ -31,6 +36,10 @@ Route::prefix('v1')->group(function () {
         Route::post('student/login', [AuthController::class, 'studentLogin']);
         Route::post('student/activate', [AuthController::class, 'studentActivate']);
         Route::post('student/logout', [AuthController::class, 'studentLogout'])->middleware('auth:sanctum');
+
+        // Professeur (compte Enseignant connectable)
+        Route::post('professeur/login', [AuthController::class, 'professeurLogin']);
+        Route::post('professeur/logout', [AuthController::class, 'professeurLogout'])->middleware('auth:sanctum');
 
         Route::get('me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 
@@ -139,7 +148,78 @@ Route::prefix('v1')->group(function () {
             'destroy' => 'departement.emploi-temps.destroy'
         ]);
 
+        // ---------- Absences (suivi + alertes automatiques) ----------
+        Route::get('absences/stats', [AbsenceController::class, 'stats']);
+        Route::apiResource('absences', AbsenceController::class)->except(['show'])->names([
+            'index' => 'departement.absences.index',
+            'store' => 'departement.absences.store',
+            'update' => 'departement.absences.update',
+            'destroy' => 'departement.absences.destroy',
+        ]);
+
+        // ---------- Enseignants (CRUD + affectation aux matières) ----------
+        Route::post('enseignants/{id}/matieres', [EnseignantController::class, 'assignMatiere']);
+        Route::delete('enseignants/{id}/matieres/{matiere_id}', [EnseignantController::class, 'removeMatiere']);
+        Route::apiResource('enseignants', EnseignantController::class)->names([
+            'index' => 'departement.enseignants.index',
+            'store' => 'departement.enseignants.store',
+            'show' => 'departement.enseignants.show',
+            'update' => 'departement.enseignants.update',
+            'destroy' => 'departement.enseignants.destroy',
+        ]);
+
+        // ---------- Salles & réservations (disponibilité + réservation) ----------
+        Route::get('salles/disponibilite', [SalleController::class, 'disponibilite']);
+        Route::post('salles/{id}/reservations', [SalleController::class, 'reserver']);
+        Route::delete('salles/reservations/{reservation_id}', [SalleController::class, 'annulerReservation']);
+        Route::apiResource('salles', SalleController::class)->names([
+            'index' => 'departement.salles.index',
+            'store' => 'departement.salles.store',
+            'show' => 'departement.salles.show',
+            'update' => 'departement.salles.update',
+            'destroy' => 'departement.salles.destroy',
+        ]);
+
+        // ---------- Validation des notes (workflow brouillon -> validée) ----------
+        Route::post('notes/valider-lot', [NoteController::class, 'validerLot']);
+        Route::post('notes/{id}/valider', [NoteController::class, 'valider']);
+        Route::post('notes/{id}/invalider', [NoteController::class, 'invalider']);
+
+        // ---------- Communications (transmission d'infos + supports) ----------
+        Route::get('communications', [CommunicationController::class, 'index']);
+        Route::post('communications', [CommunicationController::class, 'store']);
+        Route::delete('communications/{id}', [CommunicationController::class, 'destroy']);
+
+        // ---------- Responsable de classe (badge validé par le chef) ----------
+        Route::post('etudiants/{id}/responsable', [StudentController::class, 'toggleResponsable']);
+
+        // ---------- Historique des actions (traçabilité) ----------
+        Route::get('audit-logs', [AuditLogController::class, 'index']);
+
         Route::get('dashboard', [StatistiqueController::class, 'dashboard']);
+    });
+
+    // ============ PROFESSEUR (compte Enseignant connectable) ============
+    Route::prefix('professeur')->middleware(['auth:sanctum', 'professeur'])->group(function () {
+        Route::get('communications', [CommunicationController::class, 'index']);
+        Route::post('communications', [CommunicationController::class, 'store']);
+        Route::delete('communications/{id}', [CommunicationController::class, 'destroy']);
+    });
+
+    // ============ RESPONSABLE DE CLASSE (étudiant avec badge validé) ============
+    Route::prefix('responsable')->middleware(['auth:sanctum', 'responsable'])->group(function () {
+        // Présences / absences de sa classe
+        Route::get('absences/stats', [AbsenceController::class, 'stats']);
+        Route::get('absences', [AbsenceController::class, 'index']);
+        Route::post('absences', [AbsenceController::class, 'store']);
+        Route::put('absences/{id}', [AbsenceController::class, 'update']);
+        Route::delete('absences/{id}', [AbsenceController::class, 'destroy']);
+        // Transmission d'infos + supports de cours
+        Route::get('communications', [CommunicationController::class, 'index']);
+        Route::post('communications', [CommunicationController::class, 'store']);
+        Route::delete('communications/{id}', [CommunicationController::class, 'destroy']);
+        // Ses camarades de classe (pour la saisie des présences)
+        Route::get('etudiants', [StudentController::class, 'mesCamarades']);
     });
 
     Route::prefix('student')->middleware(['auth:sanctum', 'student'])->group(function () {
@@ -173,5 +253,8 @@ Route::prefix('v1')->group(function () {
         Route::get('google/status', [GoogleAuthController::class, 'googleStatus']);
         Route::delete('google/disconnect', [GoogleAuthController::class, 'googleDisconnect']);
         Route::post('google/sync', [GoogleAuthController::class, 'googleSync']);
+
+        // Communications de la classe (lecture par l'étudiant)
+        Route::get('communications', [CommunicationController::class, 'index']);
     });
 });

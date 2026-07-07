@@ -23,6 +23,9 @@ class User extends Authenticatable
         'objectif_moyenne',
         'style_apprentissage',
         'is_active',
+        'is_responsable',
+        'responsable_valide_at',
+        'responsable_valide_par',
         'email_verified_at',
         'last_login',
         'google_access_token',
@@ -42,6 +45,8 @@ class User extends Authenticatable
     protected $casts = [
         'objectif_moyenne' => 'decimal:2',
         'is_active' => 'boolean',
+        'is_responsable' => 'boolean',
+        'responsable_valide_at' => 'datetime',
         'email_verified_at' => 'datetime',
         'last_login' => 'datetime',
     ];

@@ -48,3 +48,6 @@ backend/laravel/bootstrap/cache/
 # Misc
 *.tmp
 *.bak
+
+# Scratch / scripts de debug perso (ne jamais committer)
+scratch/

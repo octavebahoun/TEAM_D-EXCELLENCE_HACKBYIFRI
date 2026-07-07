@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Note;
 use App\Models\User;
 use App\Models\Matiere;
+use App\Models\AuditLog;
 use Illuminate\Http\Request;
 
 class NoteController extends Controller
@@ -61,6 +62,8 @@ class NoteController extends Controller
         $validated['created_by_admin_id'] = $admin->id;
 
         $note = Note::create($validated);
+        AuditLog::record($admin, 'note.creee', "Note créée pour l'étudiant #{$note->user_id}", ['note_id' => $note->id], $note);
+
         return response()->json($note->load(['user', 'matiere']), 201);
     }
 
@@ -93,6 +96,8 @@ class NoteController extends Controller
         }
 
         $note->update($validated);
+        AuditLog::record($admin, 'note.modifiee', "Note #{$note->id} modifiée", $validated, $note);
+
         return response()->json($note->load(['user', 'matiere']));
     }
 
@@ -122,7 +127,98 @@ class NoteController extends Controller
         }
 
         $note->delete();
+        AuditLog::record($admin, 'note.supprimee', "Note #{$id} supprimée", [], null);
+
         return response()->noContent();
+    }
+
+    /** Valider une note : la rend visible à l'étudiant et comptabilisée dans les moyennes. */
+    public function valider(Request $request, $id)
+    {
+        $note = Note::with('user.filiere')->findOrFail($id);
+        $admin = $request->user();
+
+        $isChef = method_exists($admin, 'isChefDepartement') && $admin->isChefDepartement();
+        if ($isChef && $note->user->filiere->departement_id !== $admin->departement_id) {
+            return response()->json(['message' => 'L\'étudiant n\'appartient pas à votre département.'], 403);
+        }
+
+        $note->update([
+            'statut'       => 'validee',
+            'validated_at' => now(),
+            'validated_by' => $admin->id,
+        ]);
+
+        AuditLog::record($admin, 'note.validee', "Note #{$note->id} validée", ['note_id' => $note->id], $note);
+
+        return response()->json($note->fresh()->load(['user:id,nom,prenom', 'matiere:id,nom']));
+    }
+
+    /** Repasser une note en brouillon (retire la validation). */
+    public function invalider(Request $request, $id)
+    {
+        $note = Note::with('user.filiere')->findOrFail($id);
+        $admin = $request->user();
+
+        $isChef = method_exists($admin, 'isChefDepartement') && $admin->isChefDepartement();
+        if ($isChef && $note->user->filiere->departement_id !== $admin->departement_id) {
+            return response()->json(['message' => 'L\'étudiant n\'appartient pas à votre département.'], 403);
+        }
+
+        $note->update([
+            'statut'       => 'brouillon',
+            'validated_at' => null,
+            'validated_by' => null,
+        ]);
+
+        AuditLog::record($admin, 'note.invalidee', "Note #{$note->id} repassée en brouillon", [], $note);
+
+        return response()->json($note->fresh());
+    }
+
+    /** Validation en lot : par liste d'IDs, et/ou filière / matière / semestre. */
+    public function validerLot(Request $request)
+    {
+        $admin = $request->user();
+        $isChef = method_exists($admin, 'isChefDepartement') && $admin->isChefDepartement();
+
+        $validated = $request->validate([
+            'note_ids'   => 'nullable|array',
+            'note_ids.*' => 'integer',
+            'filiere_id' => 'nullable|integer|exists:filieres,id',
+            'matiere_id' => 'nullable|integer|exists:matieres,id',
+            'semestre'   => 'nullable|in:S1,S2',
+        ]);
+
+        $query = Note::query()->where('statut', 'brouillon');
+
+        if ($isChef) {
+            $query->whereHas('user.filiere', function ($q) use ($admin) {
+                $q->where('departement_id', $admin->departement_id);
+            });
+        }
+        if (!empty($validated['note_ids'])) {
+            $query->whereIn('id', $validated['note_ids']);
+        }
+        if (!empty($validated['filiere_id'])) {
+            $query->whereHas('user', fn($q) => $q->where('filiere_id', $validated['filiere_id']));
+        }
+        if (!empty($validated['matiere_id'])) {
+            $query->where('matiere_id', $validated['matiere_id']);
+        }
+        if (!empty($validated['semestre'])) {
+            $query->where('semestre', $validated['semestre']);
+        }
+
+        $count = $query->update([
+            'statut'       => 'validee',
+            'validated_at' => now(),
+            'validated_by' => $admin->id,
+        ]);
+
+        AuditLog::record($admin, 'note.validee_lot', "{$count} note(s) validée(s) en lot", $validated);
+
+        return response()->json(['message' => "{$count} note(s) validée(s).", 'count' => $count]);
     }
 }
 

@@ -53,6 +53,11 @@ const MODEL_MAP = {
         // Si ta table `users` n'a pas de colonne pour la photo, retire simplement "photo," de la liste.
         fields: 'id, nom, prenom, email,filiere_id',
     },
+    'App\\Models\\Enseignant': {
+        table : 'enseignants',
+        role  : 'professeur',
+        fields: 'id, nom, prenom, email, departement_id, is_active',
+    },
 };
 
 /**

@@ -6,6 +6,7 @@ use App\Models\Note;
 use App\Models\User;
 use App\Models\Filiere;
 use App\Models\EmploiTempsFiliere;
+use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -73,6 +74,7 @@ class StudentController extends Controller
     {
         $notes = Note::with('matiere:id,nom,code,coefficient')
             ->where('user_id', $request->user()->id)
+            ->where('statut', 'validee') // l'étudiant ne voit que les notes validées
             ->when($request->semestre, function ($query, $semestre) {
                 $query->where('semestre', $semestre);
             })
@@ -90,6 +92,7 @@ class StudentController extends Controller
         $user = $request->user();
 
         $parMatiere = Note::where('user_id', $user->id)
+            ->where('notes.statut', 'validee') // seules les notes validées comptent
             ->join('matieres', 'notes.matiere_id', '=', 'matieres.id')
             ->select(
                 'notes.matiere_id',
@@ -177,5 +180,46 @@ class StudentController extends Controller
             ->find($user->filiere_id);
 
         return response()->json($filiere->matieres);
+    }
+
+    /** Le chef nomme (ou retire) un étudiant comme responsable de sa classe. */
+    public function toggleResponsable(Request $request, $id)
+    {
+        $admin = $request->user();
+        $user = User::with('filiere')->findOrFail($id);
+
+        $isChef = method_exists($admin, 'isChefDepartement') && $admin->isChefDepartement();
+        if ($isChef && (!$user->filiere || $user->filiere->departement_id != $admin->departement_id)) {
+            return response()->json(['message' => "L'étudiant n'appartient pas à votre département."], 403);
+        }
+
+        $validated = $request->validate(['is_responsable' => 'required|boolean']);
+
+        $user->update([
+            'is_responsable'         => $validated['is_responsable'],
+            'responsable_valide_at'  => $validated['is_responsable'] ? now() : null,
+            'responsable_valide_par' => $validated['is_responsable'] ? $admin->id : null,
+        ]);
+
+        AuditLog::record(
+            $admin,
+            $validated['is_responsable'] ? 'responsable.valide' : 'responsable.revoque',
+            "Étudiant #{$user->id} " . ($validated['is_responsable'] ? 'nommé' : 'retiré') . ' responsable de classe',
+            [],
+            $user
+        );
+
+        return response()->json($user->fresh()->load('filiere'));
+    }
+
+    /** Camarades de la filière du responsable (pour saisir présences / communications). */
+    public function mesCamarades(Request $request)
+    {
+        $user = $request->user();
+        $etudiants = User::where('filiere_id', $user->filiere_id)
+            ->orderBy('nom')
+            ->get(['id', 'nom', 'prenom', 'matricule', 'filiere_id', 'is_responsable']);
+
+        return response()->json($etudiants);
     }
 }

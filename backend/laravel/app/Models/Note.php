@@ -18,12 +18,16 @@ class Note extends Model
         'annee_academique',
         'import_id',
         'created_by_admin_id',
+        'statut',
+        'validated_at',
+        'validated_by',
     ];
 
     protected $casts = [
         'note' => 'decimal:2',
         'note_max' => 'decimal:2',
         'date_evaluation' => 'date',
+        'validated_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

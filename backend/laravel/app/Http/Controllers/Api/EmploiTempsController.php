@@ -129,6 +129,28 @@ class EmploiTempsController extends Controller
             }
         }
 
+        // Détection de conflit de salle aussi à la modification (en s'excluant soi-même).
+        $jour = $validated['jour'] ?? $cours->jour;
+        $salle = array_key_exists('salle', $validated) ? $validated['salle'] : $cours->salle;
+        $semestre = $validated['semestre'] ?? $cours->semestre;
+        // getRawOriginal() évite le cast Carbon (datetime:H:i) qui fausserait la comparaison SQL sur une colonne TIME.
+        $heureDebut = $validated['heure_debut'] ?? $cours->getRawOriginal('heure_debut');
+        $heureFin = $validated['heure_fin'] ?? $cours->getRawOriginal('heure_fin');
+
+        if (!empty($salle)) {
+            $conflit = EmploiTempsFiliere::where('id', '!=', $cours->id)
+                ->where('jour', $jour)
+                ->where('salle', $salle)
+                ->where('semestre', $semestre)
+                ->where('heure_debut', '<', $heureFin)
+                ->where('heure_fin', '>', $heureDebut)
+                ->exists();
+
+            if ($conflit) {
+                return response()->json(['message' => 'Conflit de salle détecté'], 409);
+            }
+        }
+
         $cours->update($validated);
         return response()->json($cours->fresh()->load('matiere'));
     }

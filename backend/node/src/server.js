@@ -39,11 +39,20 @@ const allowedOrigins = (
   .map((origin) => origin.trim())
   .filter(Boolean);
 
+// Les tunnels ngrok ne sont autorisés qu'en développement (jamais en production),
+// et via une vraie vérification de nom d'hôte (endsWith) — pas un includes exploitable.
+const allowNgrokTunnels = process.env.NODE_ENV !== 'production';
+const isNgrokOrigin = (origin) => {
+  try {
+    const { hostname } = new URL(origin);
+    return hostname.endsWith('.ngrok-free.app') || hostname.endsWith('.ngrok.app');
+  } catch {
+    return false;
+  }
+};
 const isOriginAllowed = (origin) => {
   if (!origin) return true;
-  if (origin.includes('ngrok-free.app') || origin.includes('ngrok.app')) {
-    return true;
-  }
+  if (allowNgrokTunnels && isNgrokOrigin(origin)) return true;
   return allowedOrigins.includes(origin);
 };
 
