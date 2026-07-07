@@ -238,6 +238,34 @@ services:
         reservations:
           memory: 384M
 
+  # ----------------------------------------------------------
+  # Caddy - Reverse-proxy HTTPS (TLS automatique Let's Encrypt)
+  # Point d'entrée sécurisé unique (443) devant laravel/node/python.
+  # ----------------------------------------------------------
+  caddy:
+    image: caddy:2-alpine
+    container_name: academix-caddy
+    restart: unless-stopped
+    depends_on:
+      - laravel
+      - node
+      - python
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - academix-net
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+
 # ----------------------------------------------------------
 # Réseau privé
 # ----------------------------------------------------------
@@ -262,4 +290,8 @@ volumes:
   python_uploads:
     driver: local
   python_generated:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
     driver: local

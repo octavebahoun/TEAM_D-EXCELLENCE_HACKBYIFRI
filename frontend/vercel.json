@@ -3,23 +3,23 @@
   "rewrites": [
     {
       "source": "/api/laravel/:path*",
-      "destination": "http://13.36.171.214:8000/api/v1/:path*"
+      "destination": "https://13-36-171-214.sslip.io/api/laravel/:path*"
     },
     {
       "source": "/api/node/:path*",
-      "destination": "http://13.36.171.214:3001/api/:path*"
+      "destination": "https://13-36-171-214.sslip.io/api/node/:path*"
     },
     {
       "source": "/api/python/:path*",
-      "destination": "http://13.36.171.214:5000/api/v1/:path*"
+      "destination": "https://13-36-171-214.sslip.io/api/python/:path*"
     },
     {
       "source": "/socket.io",
-      "destination": "http://13.36.171.214:3001/socket.io"
+      "destination": "https://13-36-171-214.sslip.io/socket.io"
     },
     {
       "source": "/socket.io/:path*",
-      "destination": "http://13.36.171.214:3001/socket.io/:path*"
+      "destination": "https://13-36-171-214.sslip.io/socket.io/:path*"
     },
     {
       "source": "/(.*)",

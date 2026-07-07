@@ -1,0 +1,49 @@
+# ===============================================================
+# AcademiX — Reverse-proxy HTTPS (TLS automatique via Let's Encrypt)
+# ---------------------------------------------------------------
+# Un seul point d'entrée sécurisé (port 443) devant les 3 services.
+# Caddy obtient et RENOUVELLE le certificat tout seul, gratuitement.
+#
+# Adresse gratuite fournie par sslip.io (dérivée de l'IP du serveur) :
+#   IP 13.36.171.214  ->  hôte 13-36-171-214.sslip.io
+#
+# ⚠ Si l'IP publique du serveur change un jour, remplace-la :
+#     1) ici (l'hôte ci-dessous)
+#     2) dans vercel.json (racine + frontend/)
+#     3) dans les DEFAULT_SOCKET_URL du frontend
+#   → Le plus simple : réserver une "Elastic IP" chez AWS (gratuit tant
+#     qu'elle est attachée à une instance en marche) pour qu'elle ne bouge plus.
+# ===============================================================
+
+13-36-171-214.sslip.io {
+	encode gzip
+
+	# --- API Laravel :  /api/laravel/X  ->  laravel:80  /api/v1/X
+	handle_path /api/laravel/* {
+		rewrite * /api/v1{path}
+		reverse_proxy laravel:80
+	}
+
+	# --- API Node (REST) :  /api/node/X  ->  node:3001  /api/X
+	handle_path /api/node/* {
+		rewrite * /api{path}
+		reverse_proxy node:3001
+	}
+
+	# --- API Python (IA) :  /api/python/X  ->  python:5000  /api/v1/X
+	handle_path /api/python/* {
+		rewrite * /api/v1{path}
+		reverse_proxy python:5000
+	}
+
+	# --- WebSocket temps réel (chat, whiteboard, éditeur de code)
+	#     Caddy détecte et proxifie l'upgrade WebSocket automatiquement.
+	handle /socket.io/* {
+		reverse_proxy node:3001
+	}
+
+	# --- Page de test : ouvrir https://13-36-171-214.sslip.io dans le navigateur
+	handle {
+		respond "AcademiX backend en ligne — HTTPS OK 🔒" 200
+	}
+}
