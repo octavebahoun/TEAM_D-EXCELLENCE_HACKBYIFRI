@@ -198,6 +198,11 @@ export const departementService = {
         return response.data;
     },
 
+    validerEnseignant: async (id) => {
+        const response = await laravelApiClient.post(`/departement/enseignants/${id}/valider`);
+        return response.data;
+    },
+
     assignMatiereToEnseignant: async (enseignantId, matiereId) => {
         const response = await laravelApiClient.post(`/departement/enseignants/${enseignantId}/matieres`, { matiere_id: matiereId });
         return response.data;

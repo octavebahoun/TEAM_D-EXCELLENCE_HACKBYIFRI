@@ -290,6 +290,20 @@ const LoginPage = () => {
             </motion.div>
           </form>
 
+          {/* Lien inscription professeur */}
+          <motion.p
+            variants={itemVariants}
+            className="text-center mt-8 text-sm text-slate-500 dark:text-slate-400"
+          >
+            Professeur ?{" "}
+            <Link
+              to="/inscription-professeur"
+              className="font-semibold text-primary hover:underline"
+            >
+              Créez votre compte
+            </Link>
+          </motion.p>
+
           {/* Brand Footer */}
           <motion.p
             variants={itemVariants}

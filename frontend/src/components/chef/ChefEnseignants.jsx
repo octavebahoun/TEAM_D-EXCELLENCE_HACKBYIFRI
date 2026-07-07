@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { departementService } from "../../services/departementService";
 import { toast } from "react-hot-toast";
-import { Plus, Pencil, Trash2, BookOpen, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Pencil, Trash2, BookOpen, X, ChevronDown, ChevronUp, Check } from "lucide-react";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -111,6 +111,17 @@ export default function ChefEnseignants() {
       toast.error(message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleValider = async (enseignant) => {
+    if (!confirm(`Valider le compte de "${enseignant.prenom} ${enseignant.nom}" ? Il pourra alors se connecter.`)) return;
+    try {
+      await departementService.validerEnseignant(enseignant.id);
+      toast.success("Compte professeur validé");
+      fetchEnseignants();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Erreur lors de la validation");
     }
   };
 
@@ -251,9 +262,23 @@ export default function ChefEnseignants() {
                         <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-0.5">
                           {enseignant.grade || "Grade non défini"}
                         </p>
+                        {enseignant.is_active === false && (
+                          <span className="inline-block mt-1 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400">
+                            En attente de validation
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="flex gap-1">
+                      {enseignant.is_active === false && (
+                        <button
+                          onClick={() => handleValider(enseignant)}
+                          className="text-emerald-600 hover:text-white hover:bg-emerald-500 transition-colors p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/10"
+                          title="Valider le compte"
+                        >
+                          <Check size={16} />
+                        </button>
+                      )}
                       <button
                         onClick={() => openEditModal(enseignant)}
                         className="text-slate-400 hover:text-amber-500 transition-colors p-1.5 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-500/10"

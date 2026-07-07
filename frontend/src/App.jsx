@@ -12,6 +12,7 @@ import ChefDashboard from "./pages/ChefDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import ProfesseurDashboard from "./pages/ProfesseurDashboard";
 import ResponsableDashboard from "./pages/ResponsableDashboard";
+import ProfesseurRegisterPage from "./pages/ProfesseurRegisterPage";
 import GoogleCallbackPage from "./pages/GoogleCallbackPage";
 
 import ChatPage from "./pages/ChatPage";
@@ -73,6 +74,7 @@ function AppContent() {
         {/* Routes publiques */}
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/inscription-professeur" element={<ProfesseurRegisterPage />} />
         {/* Callback OAuth Google — accessible sans auth (token lu depuis localStorage) */}
         <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />
 

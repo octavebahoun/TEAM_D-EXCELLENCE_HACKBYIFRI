@@ -7,6 +7,7 @@ use App\Models\Admin;
 use Illuminate\Http\Request;
 use App\Models\ChefDepartement;
 use App\Models\Enseignant;
+use App\Models\Departement;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 
@@ -240,6 +241,41 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Déconnecté avec succès.']);
+    }
+
+    /**
+     * Auto-inscription d'un professeur. Le compte est créé INACTIF :
+     * il doit être validé par le chef du département choisi avant toute connexion.
+     * Le mot de passe choisi ici est celui qui servira à se connecter une fois validé.
+     */
+    public function professeurRegister(Request $request)
+    {
+        $validated = $request->validate([
+            'nom'            => 'required|string|max:100',
+            'prenom'         => 'required|string|max:100',
+            'email'          => 'required|email|unique:enseignants,email',
+            'password'       => 'required|string|min:6|confirmed',
+            'telephone'      => 'nullable|string|max:20',
+            'specialite'     => 'nullable|string|max:150',
+            'grade'          => 'nullable|in:vacataire,assistant,maitre_assistant,maitre_conference,professeur',
+            'departement_id' => 'required|integer|exists:departements,id',
+        ]);
+
+        $validated['password'] = Hash::make($validated['password']);
+        $validated['is_active'] = false; // en attente de validation par le chef de département
+
+        $enseignant = Enseignant::create($validated);
+
+        return response()->json([
+            'message'    => "Inscription enregistrée. Votre compte doit être validé par votre chef de département avant que vous puissiez vous connecter.",
+            'enseignant' => $enseignant->only(['id', 'nom', 'prenom', 'email']),
+        ], 201);
+    }
+
+    /** Liste publique des départements (pour le formulaire d'inscription professeur). */
+    public function departementsPublics()
+    {
+        return response()->json(Departement::orderBy('nom')->get(['id', 'nom', 'code']));
     }
 
     public function adminRegister(Request $request)

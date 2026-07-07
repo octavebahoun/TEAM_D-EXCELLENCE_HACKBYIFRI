@@ -37,6 +37,7 @@ class EnseignantController extends Controller
                         ->orWhere('specialite', 'like', "%{$search}%");
                 });
             })
+            ->when($request->has('is_active'), fn($q) => $q->where('is_active', filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN)))
             ->orderBy('nom')
             ->paginate(20);
 
@@ -134,6 +135,21 @@ class EnseignantController extends Controller
         AuditLog::record($admin, 'enseignant.supprime', "Enseignant #{$id} supprimé", [], null);
 
         return response()->noContent();
+    }
+
+    /** Le chef valide un compte professeur en attente (is_active = true → il peut se connecter). */
+    public function valider(Request $request, $id)
+    {
+        $enseignant = Enseignant::findOrFail($id);
+        $admin = $request->user();
+        if (!$this->canAccess($admin, $enseignant)) {
+            return response()->json(['message' => 'Non autorisé.'], 403);
+        }
+
+        $enseignant->update(['is_active' => true]);
+        AuditLog::record($admin, 'enseignant.valide', "Compte professeur #{$enseignant->id} validé", [], $enseignant);
+
+        return response()->json($enseignant->fresh()->load('matieres:id,nom'));
     }
 
     /** Affecter une matière (cours) à un enseignant. */

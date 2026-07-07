@@ -40,6 +40,9 @@ Route::prefix('v1')->group(function () {
         // Professeur (compte Enseignant connectable)
         Route::post('professeur/login', [AuthController::class, 'professeurLogin']);
         Route::post('professeur/logout', [AuthController::class, 'professeurLogout'])->middleware('auth:sanctum');
+        // Auto-inscription professeur (compte inactif jusqu'à validation du chef) + départements publics
+        Route::post('professeur/register', [AuthController::class, 'professeurRegister']);
+        Route::get('professeur/departements', [AuthController::class, 'departementsPublics']);
 
         Route::get('me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 
@@ -158,6 +161,7 @@ Route::prefix('v1')->group(function () {
         ]);
 
         // ---------- Enseignants (CRUD + affectation aux matières) ----------
+        Route::post('enseignants/{id}/valider', [EnseignantController::class, 'valider']);
         Route::post('enseignants/{id}/matieres', [EnseignantController::class, 'assignMatiere']);
         Route::delete('enseignants/{id}/matieres/{matiere_id}', [EnseignantController::class, 'removeMatiere']);
         Route::apiResource('enseignants', EnseignantController::class)->names([

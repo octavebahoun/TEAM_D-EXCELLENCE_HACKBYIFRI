@@ -36,6 +36,17 @@ export const authService = {
         return response.data;
     },
 
+    // --- PROFESSEUR (auto-inscription, compte validé ensuite par le chef) ---
+    professeurRegister: async (payload) => {
+        const response = await laravelApiClient.post('/auth/professeur/register', payload);
+        return response.data;
+    },
+
+    getDepartementsPublics: async () => {
+        const response = await laravelApiClient.get('/auth/professeur/departements');
+        return response.data;
+    },
+
     studentActivate: async (payload) => {
         const response = await laravelApiClient.post('/auth/student/activate', payload);
         return response.data;
