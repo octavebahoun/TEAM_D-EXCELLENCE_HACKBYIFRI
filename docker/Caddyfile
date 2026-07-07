@@ -5,7 +5,7 @@
 # Caddy obtient et RENOUVELLE le certificat tout seul, gratuitement.
 #
 # Adresse gratuite fournie par sslip.io (dérivée de l'IP du serveur) :
-#   IP 13.36.171.214  ->  hôte 13-36-171-214.sslip.io
+#   IP 52.47.71.184  ->  hôte 52-47-71-184.sslip.io
 #
 # ⚠ Si l'IP publique du serveur change un jour, remplace-la :
 #     1) ici (l'hôte ci-dessous)
@@ -15,7 +15,7 @@
 #     qu'elle est attachée à une instance en marche) pour qu'elle ne bouge plus.
 # ===============================================================
 
-13-36-171-214.sslip.io {
+52-47-71-184.sslip.io {
 	encode gzip
 
 	# --- API Laravel :  /api/laravel/X  ->  laravel:80  /api/v1/X
@@ -42,7 +42,7 @@
 		reverse_proxy node:3001
 	}
 
-	# --- Page de test : ouvrir https://13-36-171-214.sslip.io dans le navigateur
+	# --- Page de test : ouvrir https://52-47-71-184.sslip.io dans le navigateur
 	handle {
 		respond "AcademiX backend en ligne — HTTPS OK 🔒" 200
 	}

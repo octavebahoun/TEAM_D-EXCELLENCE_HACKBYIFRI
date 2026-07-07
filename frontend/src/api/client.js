@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://13.36.171.214:8000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || '/api/laravel';
 const LARAVEL_API_URL = import.meta.env.VITE_LARAVEL_API_URL || '/api/laravel';
 const NODE_API_URL = import.meta.env.VITE_NODE_API_URL || '/api/node';
 const PYTHON_API_URL = import.meta.env.VITE_PYTHON_API_URL || '/api/python';
