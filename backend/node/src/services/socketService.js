@@ -280,8 +280,14 @@ module.exports = (io) => {
 
     socket.on('join-session', async (data) => {
       try {
-        const { sessionId, userId, userInfo, role } = data || {};
+        const { sessionId, userInfo } = data || {};
         const sessionObjectId = toObjectId(sessionId);
+
+        // Sécurité : l'identité provient TOUJOURS du token vérifié par socketAuth,
+        // jamais du payload client. Fallback sur data.userId seulement si l'auth
+        // socket est désactivée (SOCKET_AUTH_ENABLED=false, dev uniquement).
+        const authUser = socket.user || null;
+        const userId = authUser?.id != null ? authUser.id : data?.userId;
 
         if (!sessionObjectId || !userId) {
           socket.emit('session-error', {
@@ -299,18 +305,19 @@ module.exports = (io) => {
         }
 
         const safeUserInfo = {
-          nom: userInfo?.nom || 'Utilisateur',
-          prenom: userInfo?.prenom || '',
+          nom: authUser?.nom || userInfo?.nom || 'Utilisateur',
+          prenom: authUser?.prenom || userInfo?.prenom || '',
           avatar_url: userInfo?.avatar_url || null
         };
 
-        const resolvedRole = (
-          role === 'moderateur' || Number(userId) === Number(session.organisateur_id)
-        )
+        // Le rôle modérateur est décidé côté serveur uniquement : seul
+        // l'organisateur de la session l'obtient. Le client ne peut plus se
+        // l'auto-attribuer via data.role.
+        const resolvedRole = Number(userId) === Number(session.organisateur_id)
           ? 'moderateur'
           : 'participant';
 
-        socket.user = { id: userId, role: resolvedRole, ...safeUserInfo };
+        socket.user = { ...(authUser || {}), id: userId, role: resolvedRole, ...safeUserInfo };
         socket.currentSessionId = sessionId;
 
         await SessionParticipant.findOneAndUpdate(
@@ -582,23 +589,30 @@ module.exports = (io) => {
     });
 
     socket.on('typing-start', (data) => {
-      const { sessionId, userId, userInfo } = data || {};
+      const { sessionId } = data || {};
+      // Identité de l'émetteur : issue du socket authentifié, pas du client.
+      const userId = socket.user?.id != null ? socket.user.id : data?.userId;
       if (!sessionId || !userId) return;
 
       io.to(sessionRoomName(sessionId)).emit('typing', {
         userId,
-        userInfo,
+        userInfo: socket.user
+          ? { nom: socket.user.nom, prenom: socket.user.prenom, avatar_url: socket.user.avatar_url || null }
+          : data?.userInfo,
         isTyping: true
       });
     });
 
     socket.on('typing-stop', (data) => {
-      const { sessionId, userId, userInfo } = data || {};
+      const { sessionId } = data || {};
+      const userId = socket.user?.id != null ? socket.user.id : data?.userId;
       if (!sessionId || !userId) return;
 
       io.to(sessionRoomName(sessionId)).emit('typing', {
         userId,
-        userInfo,
+        userInfo: socket.user
+          ? { nom: socket.user.nom, prenom: socket.user.prenom, avatar_url: socket.user.avatar_url || null }
+          : data?.userInfo,
         isTyping: false
       });
     });
@@ -748,8 +762,11 @@ module.exports = (io) => {
 
     socket.on('leave-session', async (data) => {
       try {
-        const { sessionId, userId } = data || {};
+        const { sessionId } = data || {};
         const sessionObjectId = toObjectId(sessionId);
+
+        // Sécurité : on ne modifie que la présence de l'utilisateur authentifié.
+        const userId = socket.user?.id != null ? socket.user.id : data?.userId;
 
         if (!sessionObjectId || !userId) return;
 
