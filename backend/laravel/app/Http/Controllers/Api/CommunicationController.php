@@ -121,6 +121,23 @@ class CommunicationController extends Controller
         }
     }
 
+    /** Filières que l'utilisateur peut cibler (pour le sélecteur de publication). */
+    public function filieres(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user instanceof Enseignant || $user instanceof ChefDepartement) {
+            return response()->json(
+                Filiere::where('departement_id', $user->departement_id)->orderBy('nom')->get(['id', 'nom', 'niveau'])
+            );
+        }
+
+        // responsable / étudiant : uniquement sa filière
+        return response()->json(
+            Filiere::where('id', $user->filiere_id)->get(['id', 'nom', 'niveau'])
+        );
+    }
+
     public function destroy(Request $request, $id)
     {
         $communication = Communication::findOrFail($id);

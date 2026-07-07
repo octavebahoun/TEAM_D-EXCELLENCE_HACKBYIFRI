@@ -201,6 +201,7 @@ Route::prefix('v1')->group(function () {
 
     // ============ PROFESSEUR (compte Enseignant connectable) ============
     Route::prefix('professeur')->middleware(['auth:sanctum', 'professeur'])->group(function () {
+        Route::get('filieres', [CommunicationController::class, 'filieres']);
         Route::get('communications', [CommunicationController::class, 'index']);
         Route::post('communications', [CommunicationController::class, 'store']);
         Route::delete('communications/{id}', [CommunicationController::class, 'destroy']);
@@ -215,6 +216,7 @@ Route::prefix('v1')->group(function () {
         Route::put('absences/{id}', [AbsenceController::class, 'update']);
         Route::delete('absences/{id}', [AbsenceController::class, 'destroy']);
         // Transmission d'infos + supports de cours
+        Route::get('filieres', [CommunicationController::class, 'filieres']);
         Route::get('communications', [CommunicationController::class, 'index']);
         Route::post('communications', [CommunicationController::class, 'store']);
         Route::delete('communications/{id}', [CommunicationController::class, 'destroy']);

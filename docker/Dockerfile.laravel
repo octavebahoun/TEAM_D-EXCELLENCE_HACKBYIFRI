@@ -12,7 +12,7 @@ RUN composer install \
     --no-plugins \
     --no-scripts \
     --prefer-dist \
-    --ignore-platform-req=ext-gd
+    --ignore-platform-reqs
 
 # ============================================================
 # STAGE 2: Build application

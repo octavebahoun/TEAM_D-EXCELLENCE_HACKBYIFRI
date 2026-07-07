@@ -100,9 +100,11 @@ export default function ResponsableAbsences() {
     setEditingAbsence(absence);
     setFormData({
       user_id: absence.user_id?.toString() || "",
-      date: absence.date || new Date().toISOString().split("T")[0],
-      seance: absence.seance || "",
-      justifie: absence.justifie || false,
+      date: absence.date_absence
+        ? String(absence.date_absence).split("T")[0]
+        : new Date().toISOString().split("T")[0],
+      seance: absence.motif || "",
+      justifie: absence.justifiee || false,
     });
     setIsModalOpen(true);
     setOpenMenuId(null);
@@ -118,9 +120,9 @@ export default function ResponsableAbsences() {
     try {
       const payload = {
         user_id: parseInt(formData.user_id, 10),
-        date: formData.date,
-        seance: formData.seance,
-        justifie: formData.justifie,
+        date_absence: formData.date,
+        motif: formData.seance,
+        justifiee: formData.justifie,
       };
 
       if (editingAbsence) {
@@ -160,11 +162,9 @@ export default function ResponsableAbsences() {
   const handleToggleJustifie = async (absence) => {
     try {
       await laravelApiClient.put(`/responsable/absences/${absence.id}`, {
-        ...absence,
-        justifie: !absence.justifie,
-        user_id: absence.user_id,
+        justifiee: !absence.justifiee,
       });
-      toast.success(absence.justifie ? "Marqué comme non justifié" : "Marqué comme justifié");
+      toast.success(absence.justifiee ? "Marqué comme non justifié" : "Marqué comme justifié");
       fetchAbsences();
       fetchStats();
     } catch (error) {
@@ -283,18 +283,18 @@ export default function ResponsableAbsences() {
                   </div>
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
                     <Clock size={12} />
-                    {absence.seance}
+                    {absence.motif}
                   </div>
                   <button
                     onClick={() => handleToggleJustifie(absence)}
                     className={cn(
                       "text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border transition-all",
-                      absence.justifie
+                      absence.justifiee
                         ? "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-400"
                         : "bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:border-red-500/30 dark:text-red-400"
                     )}
                   >
-                    {absence.justifie ? "Justifié" : "Absent"}
+                    {absence.justifiee ? "Justifié" : "Absent"}
                   </button>
                   <div className="relative" ref={openMenuId === absence.id ? menuRef : null}>
                     <button
