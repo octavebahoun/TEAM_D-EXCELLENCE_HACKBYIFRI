@@ -141,13 +141,25 @@ class AbsenceController extends Controller
     {
         $admin = $request->user();
 
-        $stats = Absence::selectRaw('user_id, COUNT(*) as total, SUM(CASE WHEN justifiee = 0 THEN 1 ELSE 0 END) as non_justifiees')
+        $parEtudiant = Absence::selectRaw('user_id, COUNT(*) as total, SUM(CASE WHEN justifiee = 0 THEN 1 ELSE 0 END) as non_justifiees')
             ->tap(fn($q) => $this->scopeToDepartement($q, $admin))
             ->with('user:id,nom,prenom,matricule')
             ->groupBy('user_id')
             ->orderByDesc('total')
             ->get();
 
-        return response()->json($stats);
+        // Totaux agrégés côté serveur (exacts, indépendants de la pagination de la liste).
+        $total = $this->scopeToDepartement(Absence::query(), $admin)->count();
+        $today = $this->scopeToDepartement(Absence::query(), $admin)
+            ->whereDate('date_absence', now()->toDateString())->count();
+        $nonJustifiees = $this->scopeToDepartement(Absence::query(), $admin)
+            ->where('justifiee', false)->count();
+
+        return response()->json([
+            'total'          => $total,
+            'today'          => $today,
+            'non_justifiees' => $nonJustifiees,
+            'par_etudiant'   => $parEtudiant,
+        ]);
     }
 }
