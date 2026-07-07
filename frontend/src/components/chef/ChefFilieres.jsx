@@ -10,6 +10,8 @@ import {
   Pencil,
   Trash2,
   UserPlus,
+  Star,
+  StarOff,
 } from "lucide-react";
 import { cn } from "../../utils/cn";
 import { useState, useEffect, useRef } from "react";
@@ -500,9 +502,35 @@ export default function ChefFilieres({
                                       </p>
                                     </div>
                                   </div>
-                                  <span className="text-[9px] px-2 py-1 rounded-full font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10">
-                                    Actif
-                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    {etud.is_responsable && (
+                                      <span className="text-[9px] px-2 py-1 rounded-full font-bold uppercase tracking-wider bg-amber-50 text-amber-600 dark:bg-amber-500/10">
+                                        Responsable
+                                      </span>
+                                    )}
+                                    <button
+                                      onClick={async () => {
+                                        try {
+                                          await laravelApiClient.post(`/departement/etudiants/${etud.id}/responsable`);
+                                          toast.success(etud.is_responsable ? "Rôle responsable retiré" : "Responsable défini");
+                                          fetchTabData(filiere.id, "etudiants");
+                                        } catch (err) {
+                                          toast.error("Erreur lors de la modification");
+                                        }
+                                      }}
+                                      className={`text-[9px] p-1.5 rounded-lg font-bold uppercase tracking-wider transition-all ${
+                                        etud.is_responsable
+                                          ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
+                                          : "bg-slate-100 text-slate-500 hover:bg-amber-50 hover:text-amber-600"
+                                      }`}
+                                      title={etud.is_responsable ? "Retirer le rôle" : "Définir comme responsable"}
+                                    >
+                                      {etud.is_responsable ? <StarOff size={12} /> : <Star size={12} />}
+                                    </button>
+                                    <span className="text-[9px] px-2 py-1 rounded-full font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10">
+                                      Actif
+                                    </span>
+                                  </div>
                                 </div>
                               ))}
 

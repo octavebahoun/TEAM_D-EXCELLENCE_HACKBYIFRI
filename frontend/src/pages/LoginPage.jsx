@@ -19,7 +19,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import loginIllustration from "../assets/login_illustration.png";
 import logoSvg from "../assets/logo.svg";
@@ -49,9 +48,8 @@ const itemVariants = {
 };
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("octave@gmail.com");
-  const [password, setPassword] = useState("Test1234!");
-  const [role, setRole] = useState("admin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -79,21 +77,15 @@ const LoginPage = () => {
     setError("");
 
     try {
-      let res;
-      if (role === "admin")
-        res = await authService.adminLogin({ email, password });
-      else if (role === "chef")
-        res = await authService.chefLogin({ email, password });
-      else res = await authService.studentLogin({ login: email, password });
-
-      if (res.token) {
-        if (role === "admin") navigate("/admin");
-        else if (role === "chef") navigate("/chef");
-        else if (role === "student") navigate("/etudiant");
-        else navigate("/");
-      }
+      await authService.login({ email, password });
+      const role = authService.getRole();
+      if (role === "super_admin") navigate("/admin");
+      else if (role === "chef_departement") navigate("/chef");
+      else if (role === "professeur") navigate("/professeur");
+      else if (role === "responsable") navigate("/responsable");
+      else navigate("/etudiant");
     } catch (err) {
-      setError(err.response?.data?.message || "Erreur de connexion");
+      setError(err.message || "Erreur de connexion");
     } finally {
       setLoading(false);
     }
@@ -203,57 +195,22 @@ const LoginPage = () => {
 
           {/* Form */}
           <form onSubmit={handleLogin} className="flex flex-col gap-6">
-            {/* Role tabs */}
-            <motion.div
-              variants={itemVariants}
-              className="flex w-full justify-center"
-            >
-              <Tabs
-                defaultValue={role}
-                onValueChange={setRole}
-                className="w-full"
-              >
-                <TabsList className="grid grid-cols-3 h-12 bg-slate-100/80 dark:bg-slate-800/50 p-1 rounded-2xl gap-1">
-                  <TabsTrigger
-                    value="admin"
-                    className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700"
-                  >
-                    Admin
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="chef"
-                    className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700"
-                  >
-                    Chef
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="student"
-                    className="rounded-xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 font-bold"
-                  >
-                    Étudiant
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </motion.div>
-
-            {/* Email / Matricule */}
+            {/* Email / Identifiant */}
             <motion.div variants={itemVariants} className="space-y-2">
               <Label
                 htmlFor="email"
                 className="font-semibold text-slate-700 dark:text-slate-300 ml-1 transition-colors"
               >
-                Identifiant
+                Email ou Matricule
               </Label>
               <div className="relative group">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" />
                 <Input
                   id="email"
-                  type={role === "student" ? "text" : "email"}
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder={
-                    role === "student" ? "MAT-123456" : "votre@email.com"
-                  }
+                  placeholder="email@exemple.com ou MAT-123456"
                   className="pl-11 h-12 rounded-2xl bg-white/50 dark:bg-slate-950/50 dark:border-slate-800 focus:ring-4 focus:ring-primary/10 transition-all font-medium"
                   required
                 />

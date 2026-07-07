@@ -10,6 +10,8 @@ import RegisterPage from "./pages/RegisterPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import ChefDashboard from "./pages/ChefDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
+import ProfesseurDashboard from "./pages/ProfesseurDashboard";
+import ResponsableDashboard from "./pages/ResponsableDashboard";
 import GoogleCallbackPage from "./pages/GoogleCallbackPage";
 
 import ChatPage from "./pages/ChatPage";
@@ -46,6 +48,8 @@ function AppContent() {
     location.pathname.startsWith("/chef") ||
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/etudiant") ||
+    location.pathname.startsWith("/professeur") ||
+    location.pathname.startsWith("/responsable") ||
     location.pathname.startsWith("/chat");
 
   useEffect(() => {
@@ -102,6 +106,26 @@ function AppContent() {
           }
         />
 
+        {/* Dashboard Professeur */}
+        <Route
+          path="/professeur/*"
+          element={
+            <PrivateRoute allowedRoles={["professeur"]}>
+              <ProfesseurDashboard />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Dashboard Responsable de Classe */}
+        <Route
+          path="/responsable/*"
+          element={
+            <PrivateRoute allowedRoles={["responsable"]}>
+              <ResponsableDashboard />
+            </PrivateRoute>
+          }
+        />
+
         {/* Dashboard Étudiant */}
         <Route
           path="/etudiant/*"
@@ -144,6 +168,8 @@ const RootRedirect = () => {
   if (!user) return <Navigate to="/landing" replace />;
   if (role === "super_admin") return <Navigate to="/admin" replace />;
   if (role === "chef_departement") return <Navigate to="/chef" replace />;
+  if (role === "professeur") return <Navigate to="/professeur" replace />;
+  if (role === "responsable") return <Navigate to="/responsable" replace />;
   if (role === "student") return <Navigate to="/etudiant" replace />;
   return <Navigate to="/landing" replace />;
 };
@@ -152,6 +178,8 @@ const HomeRedirect = () => {
   const role = authService.getRole();
   if (role === "super_admin") return <Navigate to="/admin" />;
   if (role === "chef_departement") return <Navigate to="/chef" />;
+  if (role === "professeur") return <Navigate to="/professeur" />;
+  if (role === "responsable") return <Navigate to="/responsable" />;
   if (role === "student") return <Navigate to="/etudiant" />;
   return <Navigate to="/landing" />;
 };

@@ -1,18 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutGrid,
-  ListTree,
-  FileText,
-  Calendar,
+  Megaphone,
   LogOut,
   X,
-  Layers,
-  Users,
-  DoorOpen,
-  ClipboardX,
-  CheckSquare,
-  ScrollText,
-  Megaphone,
 } from "lucide-react";
 import { cn } from "../../utils/cn";
 import { Separator } from "@/components/ui/separator";
@@ -23,26 +14,18 @@ import logoDarkSvg from "../../assets/logo-dark.svg";
 
 const navItems = [
   { id: "overview", label: "Vue d'ensemble", icon: LayoutGrid },
-  { id: "filieres", label: "Gestion Filières", icon: ListTree },
-  { id: "enseignants", label: "Enseignants", icon: Users },
-  { id: "salles", label: "Salles", icon: DoorOpen },
-  { id: "absences", label: "Absences", icon: ClipboardX },
-  { id: "notes-validation", label: "Validation Notes", icon: CheckSquare },
-  { id: "import", label: "Import Notes CSV", icon: FileText },
-  { id: "emploi-temps", label: "Emploi du Temps", icon: Calendar },
-  { id: "audit-logs", label: "Audit Logs", icon: ScrollText },
   { id: "communications", label: "Communications", icon: Megaphone },
 ];
 
 function getInitials(user) {
-  if (!user) return "C";
+  if (!user) return "P";
   return (
     `${(user.prenom || "").charAt(0)}${(user.nom || "").charAt(0)}`.toUpperCase() ||
-    "C"
+    "P"
   );
 }
 
-export default function ChefSidebar({
+export default function ProfesseurSidebar({
   activeTab,
   onTabChange,
   onLogout,
@@ -52,11 +35,10 @@ export default function ChefSidebar({
   const user = authService.getCurrentUser();
   const fullName = user
     ? `${user.prenom || ""} ${user.nom || ""}`.trim()
-    : "Chef de Département";
+    : "Professeur";
 
   return (
     <>
-      {/* Mobile backdrop */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -71,14 +53,12 @@ export default function ChefSidebar({
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
       <aside
         className={cn(
           "fixed top-0 left-0 z-40 flex h-screen w-64 flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-transform duration-200 ease-out md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        {/* Logo */}
         <div className="flex items-center justify-between px-5 py-2.5">
           <img
             src={logoSvg}
@@ -101,16 +81,17 @@ export default function ChefSidebar({
 
         <Separator />
 
-        {/* Section label */}
         <div className="px-5 pt-6 pb-2">
           <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-            Département
+            Espace Professeur
           </span>
         </div>
 
-        {/* Navigation */}
         <ScrollArea className="flex-1 px-3">
-          <nav className="space-y-1 py-2" aria-label="Navigation principale">
+          <nav
+            className="space-y-1 py-2"
+            aria-label="Navigation principale"
+          >
             {navItems.map((item) => {
               const isActive = activeTab === item.id;
               const Icon = item.icon;
@@ -131,7 +112,7 @@ export default function ChefSidebar({
                 >
                   {isActive && (
                     <motion.span
-                      layoutId="chef-active-bar"
+                      layoutId="professeur-active-bar"
                       className="absolute left-0 inset-y-1.5 w-0.5 rounded-r-full bg-emerald-500 dark:bg-emerald-400"
                       transition={{
                         type: "spring",
@@ -158,25 +139,35 @@ export default function ChefSidebar({
           </nav>
         </ScrollArea>
 
-        {/* User + Logout inline */}
         <div className="mt-auto">
           <Separator />
           <div className="px-4 py-4">
             <div className="flex items-center gap-3">
               <div
                 aria-hidden="true"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-xs font-semibold select-none"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-xs font-semibold select-none overflow-hidden"
               >
-                {getInitials(user)}
+                {user?.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      e.target.parentNode.textContent = getInitials(user);
+                    }}
+                  />
+                ) : (
+                  getInitials(user)
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-200">
                   {fullName}
                 </p>
-                <span className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                  <Layers size={11} aria-hidden="true" />
-                  Chef de Département
-                </span>
+                <p className="truncate text-xs text-slate-400 dark:text-slate-500">
+                  Professeur
+                </p>
               </div>
               <button
                 onClick={onLogout}
