@@ -23,10 +23,12 @@ const sessionsRoutes = require('./routes/sessions');
 const chatRoutes = require('./routes/chat');
 const notificationsRoutes = require('./routes/notifications');
 const webhookRoutes = require('./routes/webhook');
+const discussionsRoutes = require('./routes/discussions');
 
 // Import des services Socket.io
 const privateMessageSocket = require('./services/privateMessageSocket');
 const socketService = require('./services/socketService');
+const discussionSocket = require('./services/discussionSocket');
 const { socketAuth } = require('./middleware/auth');
 const { cleanupExpiredSessions } = require('./controllers/sessionController');
 
@@ -172,10 +174,12 @@ app.use('/api/sessions', sessionsRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/webhook', webhookRoutes); // Webhook interne Laravel → Node.js
+app.use('/api/discussions', discussionsRoutes); // Discussions Prof ↔ Responsable
 
 // Initialisation des services Socket.io
 privateMessageSocket(io);
 socketService(io);
+discussionSocket(io);
 
 // Gestion des erreurs
 app.use((err, req, res, next) => {

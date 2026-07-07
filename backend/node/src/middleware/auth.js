@@ -51,7 +51,7 @@ const MODEL_MAP = {
         // --- CORRECTION ICI ---
         // Remplacement de 'avatar_url' par 'photo' pour corriger l'erreur SQL "Unknown column".
         // Si ta table `users` n'a pas de colonne pour la photo, retire simplement "photo," de la liste.
-        fields: 'id, nom, prenom, email,filiere_id',
+        fields: 'id, nom, prenom, email, filiere_id, is_responsable',
     },
     'App\\Models\\Enseignant': {
         table : 'enseignants',
