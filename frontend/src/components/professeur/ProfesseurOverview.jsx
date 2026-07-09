@@ -1,6 +1,9 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Users, FileText, Bell } from "lucide-react";
 import { authService } from "../../services/authService";
+import { professeurService } from "../../services/professeurService";
+import { discussionService } from "../../services/discussionService";
 import { Card, CardContent } from "../ui/card";
 
 const containerVariants = {
@@ -20,35 +23,35 @@ const itemVariants = {
   },
 };
 
-const stats = [
+const STAT_META = [
   {
+    key: "matieres",
     label: "Matières",
-    value: "—",
     sub: "Matières assignées",
     Icon: BookOpen,
     iconBg: "bg-emerald-50 dark:bg-emerald-500/10",
     iconColor: "text-emerald-600 dark:text-emerald-400",
   },
   {
+    key: "etudiants",
     label: "Étudiants",
-    value: "—",
     sub: "Total inscrits",
     Icon: Users,
     iconBg: "bg-blue-50 dark:bg-blue-500/10",
     iconColor: "text-blue-600 dark:text-blue-400",
   },
   {
+    key: "communications",
     label: "Communications",
-    value: "—",
     sub: "Messages envoyés",
     Icon: FileText,
     iconBg: "bg-purple-50 dark:bg-purple-500/10",
     iconColor: "text-purple-600 dark:text-purple-400",
   },
   {
+    key: "notifications",
     label: "Notifications",
-    value: "—",
-    sub: "En attente",
+    sub: "Non lues (responsables)",
     Icon: Bell,
     iconBg: "bg-orange-50 dark:bg-orange-500/10",
     iconColor: "text-orange-600 dark:text-orange-400",
@@ -60,6 +63,38 @@ export default function ProfesseurOverview() {
   const fullName = user
     ? `${user.prenom || ""} ${user.nom || ""}`.trim()
     : "Professeur";
+
+  const [values, setValues] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const [statsRes, discussionsRes] = await Promise.allSettled([
+        professeurService.stats(),
+        discussionService.list(),
+      ]);
+
+      if (!active) return;
+
+      const stats =
+        statsRes.status === "fulfilled" ? statsRes.value : {};
+      const discussions =
+        discussionsRes.status === "fulfilled" ? discussionsRes.value : [];
+      const unread = Array.isArray(discussions)
+        ? discussions.reduce((sum, d) => sum + (Number(d.unread) || 0), 0)
+        : 0;
+
+      setValues({
+        matieres: stats.matieres ?? 0,
+        etudiants: stats.etudiants ?? 0,
+        communications: stats.communications ?? 0,
+        notifications: unread,
+      });
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <motion.div
@@ -94,9 +129,11 @@ export default function ProfesseurOverview() {
         variants={itemVariants}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
       >
-        {stats.map(({ label, value, sub, Icon, iconBg, iconColor }) => (
+        {STAT_META.map(({ key, label, sub, Icon, iconBg, iconColor }) => {
+          const value = values ? values[key] : "—";
+          return (
           <Card
-            key={label}
+            key={key}
             className="border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200"
           >
             <CardContent className="px-4 py-3.5">
@@ -116,7 +153,8 @@ export default function ProfesseurOverview() {
               </span>
             </CardContent>
           </Card>
-        ))}
+          );
+        })}
       </motion.div>
     </motion.div>
   );

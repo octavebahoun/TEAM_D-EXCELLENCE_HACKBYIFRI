@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Menu, Moon, Sun } from "lucide-react";
 import { authService } from "../../services/authService";
+import NotificationBell from "../notifications/NotificationBell";
 
 function getInitials(user) {
   if (!user) return "R";
@@ -16,6 +17,7 @@ export default function ResponsableHeader({
   theme,
   onThemeToggle,
   onMenuToggle,
+  onNotificationNavigate,
 }) {
   const user = authService.getCurrentUser();
 
@@ -49,6 +51,7 @@ export default function ResponsableHeader({
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
+          <NotificationBell onNavigate={onNotificationNavigate} />
           {onThemeToggle && (
             <motion.button
               whileTap={{ scale: 0.9 }}

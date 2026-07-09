@@ -37,6 +37,14 @@ export default function ResponsableDashboard() {
     window.location.href = "/login";
   };
 
+  // Ouvre l'onglet ciblé par une notification (action_url).
+  const handleNotificationNavigate = (notif) => {
+    const url = notif?.action_url || "";
+    if (url.includes("discussion")) setActiveTab("discussions");
+    else if (url.includes("communication")) setActiveTab("communications");
+    else if (url.includes("absence")) setActiveTab("absences");
+  };
+
   const user = authService.getCurrentUser();
 
   const getPageTitles = () => {
@@ -88,6 +96,7 @@ export default function ResponsableDashboard() {
           theme={theme}
           onThemeToggle={handleThemeToggle}
           onMenuToggle={() => setIsMobileMenuOpen(true)}
+          onNotificationNavigate={handleNotificationNavigate}
         />
 
         <main className="relative flex-1 overflow-y-auto">

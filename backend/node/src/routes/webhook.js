@@ -22,6 +22,7 @@ const ALERTE_TYPE_MAP = {
     deadline_proche: 'rappel',
     absence: 'alerte',
     felicitation: 'succes',
+    communication: 'info',
 };
 
 /**

@@ -3,7 +3,6 @@ import { useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import ProfesseurSidebar from "../components/professeur/ProfesseurSidebar";
 import ProfesseurOverview from "../components/professeur/ProfesseurOverview";
-import ProfesseurCommunications from "../components/professeur/ProfesseurCommunications";
 import DiscussionsView from "../components/discussions/DiscussionsView";
 import { authService } from "../services/authService";
 
@@ -43,11 +42,6 @@ export default function ProfesseurDashboard() {
         return {
           title: `Espace Professeur`,
           subtitle: user?.prenom ? `Bonjour, ${user.prenom}` : "Tableau de bord",
-        };
-      case "communications":
-        return {
-          title: "Communications",
-          subtitle: "Gérez vos communications avec les étudiants",
         };
       case "discussions":
         return {
@@ -125,18 +119,6 @@ export default function ProfesseurDashboard() {
                 transition={{ duration: 0.3 }}
               >
                 <ProfesseurOverview />
-              </motion.div>
-            )}
-
-            {activeTab === "communications" && (
-              <motion.div
-                key="communications"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.3 }}
-              >
-                <ProfesseurCommunications />
               </motion.div>
             )}
 

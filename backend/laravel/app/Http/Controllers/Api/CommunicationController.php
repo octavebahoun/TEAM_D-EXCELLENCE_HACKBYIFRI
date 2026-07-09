@@ -94,19 +94,40 @@ class CommunicationController extends Controller
             'notifie_admin'  => (bool) ($validated['notifie_admin'] ?? false),
         ]);
 
-        $this->notifierEtudiants($communication, $filiere);
+        $this->notifier($communication, $filiere, $auteurType, $auteurId);
 
         AuditLog::record($user, 'communication.creee', "Communication « {$communication->titre} » publiée (filière #{$filiere->id})", ['communication_id' => $communication->id]);
 
         return response()->json($communication->load('filiere:id,nom'), 201);
     }
 
-    /** Notifie tous les étudiants de la filière (réutilise le pipeline d'alertes). */
-    private function notifierEtudiants(Communication $communication, Filiere $filiere): void
+    /**
+     * Notifie selon le modèle « tout passe par le responsable » :
+     *   - auteur = responsable            → toute la classe (relais aux étudiants) ;
+     *   - auteur = prof / chef / admin    → uniquement le(s) responsable(s) de la classe.
+     * Chaque alerte créée déclenche le webhook Node → notification MongoDB temps réel.
+     */
+    private function notifier(Communication $communication, Filiere $filiere, string $auteurType, $auteurId): void
     {
-        $etudiantIds = User::where('filiere_id', $filiere->id)->where('is_active', true)->pluck('id');
+        if ($auteurType === 'responsable') {
+            // Relais du responsable → tous ses camarades (hors lui-même).
+            $cibles = User::where('filiere_id', $filiere->id)
+                ->where('is_active', true)
+                ->where('id', '!=', $auteurId)
+                ->pluck('id');
+            $label = 'Voir la communication';
+            $url   = '/student/communications';
+        } else {
+            // Prof / chef / admin : plus de diffusion directe aux étudiants → le responsable relaie.
+            $cibles = User::where('filiere_id', $filiere->id)
+                ->where('is_active', true)
+                ->where('is_responsable', true)
+                ->pluck('id');
+            $label = 'Voir dans mon espace responsable';
+            $url   = '/responsable/communications';
+        }
 
-        foreach ($etudiantIds as $uid) {
+        foreach ($cibles as $uid) {
             GenerateAlerteJob::dispatch([
                 'user_id'         => $uid,
                 'reference_id'    => "comm_{$communication->id}_{$uid}",
@@ -115,7 +136,7 @@ class CommunicationController extends Controller
                 'titre'           => $communication->titre,
                 'message'         => $communication->message ?: 'Nouvelle information de votre classe.',
                 'actions_suggerees' => [
-                    ['type' => 'link', 'label' => 'Voir la communication', 'url' => '/student/communications'],
+                    ['type' => 'link', 'label' => $label, 'url' => $url],
                 ],
             ]);
         }
