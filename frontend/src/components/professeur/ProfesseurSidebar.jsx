@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutGrid,
   Megaphone,
+  MessagesSquare,
   LogOut,
   X,
 } from "lucide-react";
@@ -15,6 +16,7 @@ import logoDarkSvg from "../../assets/logo-dark.svg";
 const navItems = [
   { id: "overview", label: "Vue d'ensemble", icon: LayoutGrid },
   { id: "communications", label: "Communications", icon: Megaphone },
+  { id: "discussions", label: "Discussions", icon: MessagesSquare },
 ];
 
 function getInitials(user) {

@@ -67,6 +67,19 @@ async function notifyResponsables(io, filiereId, discussion, message, sender) {
   }
 }
 
+// POST /api/discussions/upload  (support de cours → renvoie une URL réutilisable)
+exports.uploadSupport = (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'Aucun fichier reçu.' });
+    const publicHost = process.env.PUBLIC_BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const url = `${publicHost}/uploads/chat/${req.file.filename}`;
+    return res.status(201).json({ success: true, file: { url, name: req.file.originalname } });
+  } catch (e) {
+    logger.error('uploadSupport error:', e);
+    return res.status(500).json({ success: false, message: "Erreur lors de l'upload" });
+  }
+};
+
 // GET /api/discussions
 exports.list = async (req, res) => {
   try {

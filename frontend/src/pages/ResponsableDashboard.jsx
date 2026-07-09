@@ -6,6 +6,7 @@ import ResponsableHeader from "../components/responsable/ResponsableHeader";
 import ResponsableAbsences from "../components/responsable/ResponsableAbsences";
 import ResponsableCommunications from "../components/responsable/ResponsableCommunications";
 import ResponsableCamarades from "../components/responsable/ResponsableCamarades";
+import DiscussionsView from "../components/discussions/DiscussionsView";
 import { authService } from "../services/authService";
 
 export default function ResponsableDashboard() {
@@ -54,6 +55,11 @@ export default function ResponsableDashboard() {
         return {
           title: "Mes Camarades",
           subtitle: "Responsable de Classe",
+        };
+      case "discussions":
+        return {
+          title: "Discussions",
+          subtitle: "Échanges avec les professeurs",
         };
       default:
         return {
@@ -119,6 +125,18 @@ export default function ResponsableDashboard() {
                 transition={{ duration: 0.3 }}
               >
                 <ResponsableCamarades />
+              </motion.div>
+            )}
+
+            {activeTab === "discussions" && (
+              <motion.div
+                key="discussions"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.3 }}
+              >
+                <DiscussionsView />
               </motion.div>
             )}
           </AnimatePresence>

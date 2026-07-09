@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import ProfesseurSidebar from "../components/professeur/ProfesseurSidebar";
 import ProfesseurOverview from "../components/professeur/ProfesseurOverview";
 import ProfesseurCommunications from "../components/professeur/ProfesseurCommunications";
+import DiscussionsView from "../components/discussions/DiscussionsView";
 import { authService } from "../services/authService";
 
 export default function ProfesseurDashboard() {
@@ -47,6 +48,11 @@ export default function ProfesseurDashboard() {
         return {
           title: "Communications",
           subtitle: "Gérez vos communications avec les étudiants",
+        };
+      case "discussions":
+        return {
+          title: "Discussions",
+          subtitle: "Échangez avec les responsables de classe",
         };
       default:
         return {
@@ -131,6 +137,18 @@ export default function ProfesseurDashboard() {
                 transition={{ duration: 0.3 }}
               >
                 <ProfesseurCommunications />
+              </motion.div>
+            )}
+
+            {activeTab === "discussions" && (
+              <motion.div
+                key="discussions"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.3 }}
+              >
+                <DiscussionsView isProf />
               </motion.div>
             )}
           </AnimatePresence>

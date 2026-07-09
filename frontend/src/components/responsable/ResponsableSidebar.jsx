@@ -3,6 +3,7 @@ import {
   ClipboardX,
   Megaphone,
   Users,
+  MessagesSquare,
   LogOut,
   X,
 } from "lucide-react";
@@ -17,6 +18,7 @@ const navItems = [
   { id: "absences", label: "Gestion Absences", icon: ClipboardX },
   { id: "communications", label: "Communications", icon: Megaphone },
   { id: "camarades", label: "Camarades", icon: Users },
+  { id: "discussions", label: "Discussions", icon: MessagesSquare },
 ];
 
 function getInitials(user) {
