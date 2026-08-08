@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const DEFAULT_SOCKET_URL = "https://52-47-71-184.sslip.io";
+const DEFAULT_SOCKET_URL = "https://acadmix-serveur.duckdns.org";
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || DEFAULT_SOCKET_URL;
 
 /**

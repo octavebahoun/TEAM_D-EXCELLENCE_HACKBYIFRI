@@ -9,7 +9,7 @@
 const Discussion = require('../models/Discussion');
 const DiscussionMessage = require('../models/DiscussionMessage');
 const Notification = require('../models/Notification');
-const { getPool } = require('../config/mysql');
+const { getPool } = require('../config/postgres');
 const logger = require('../utils/logger');
 
 // --- Helpers rôle ---
@@ -40,7 +40,7 @@ async function getFiliereInfo(filiereId) {
 
 async function getResponsables(filiereId) {
   const [rows] = await getPool().query(
-    'SELECT id, nom, prenom FROM users WHERE filiere_id = ? AND is_responsable = 1 AND is_active = 1',
+    'SELECT id, nom, prenom FROM users WHERE filiere_id = ? AND is_responsable = true AND is_active = true',
     [filiereId]
   );
   return rows;

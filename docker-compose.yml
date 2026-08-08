@@ -22,103 +22,6 @@
 
 services:
   # ----------------------------------------------------------
-  # MySQL LTS (8.4) - Base de données Laravel
-  # ----------------------------------------------------------
-  mysql:
-    image: mysql:9.7
-    container_name: academix-mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-academix_root_2026}
-      MYSQL_DATABASE: ${DB_NAME:-academix}
-      MYSQL_USER: ${DB_USER:-academix_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-academix_pass_2026}
-    ports:
-      - "${MYSQL_PORT:-3306}:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - academix-net
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-        reservations:
-          memory: 256M
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-academix_root_2026}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    command: >
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_unicode_ci
-      --innodb-buffer-pool-size=256M
-      --innodb-redo-log-capacity=134217728
-      --innodb-autoextend-increment=64
-      --innodb-data-file-path=ibdata1:12M:autoextend
-      --innodb-file-per-table=1
-      --max-allowed-packet=64M
-      --tmp-table-size=64M
-      --max-heap-table-size=64M
-      --max-connections=50
-      --slow-query-log=1
-      --long-query-time=2
-
-  # ----------------------------------------------------------
-  # MongoDB 8.0 - Base de données temps réel (Node.js)
-  # ----------------------------------------------------------
-  mongo:
-    image: mongo:8.0
-    container_name: academix-mongo
-    restart: unless-stopped
-    ports:
-      - "${MONGO_PORT:-27017}:27017"
-    volumes:
-      - mongo_data:/data/db
-    networks:
-      - academix-net
-    deploy:
-      resources:
-        limits:
-          memory: 384M
-        reservations:
-          memory: 192M
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-
-  # ----------------------------------------------------------
-  # Redis 7 - Cache Laravel (léger)
-  # ----------------------------------------------------------
-  redis:
-    image: redis:7-alpine
-    container_name: academix-redis
-    restart: unless-stopped
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - academix-net
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-        reservations:
-          memory: 64M
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
-    command: redis-server --maxmemory 80mb --maxmemory-policy allkeys-lru
-
-  # ----------------------------------------------------------
   # Laravel API - Backend principal
   # ----------------------------------------------------------
   laravel:
@@ -127,23 +30,25 @@ services:
       dockerfile: docker/Dockerfile.laravel
     container_name: academix-laravel
     restart: unless-stopped
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
       - APP_KEY=${APP_KEY}
       - APP_URL=${APP_URL:-http://localhost}
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_DATABASE=${DB_NAME:-academix}
-      - DB_USERNAME=${DB_USER:-academix_user}
+      - DB_CONNECTION=${DB_CONNECTION:-pgsql}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_DATABASE=${DB_DATABASE:-${DB_NAME:-academix}}
+      - DB_USERNAME=${DB_USERNAME:-${DB_USER:-academix_user}}
       - DB_PASSWORD=${DB_PASSWORD:-academix_pass_2026}
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - DB_SSL=${DB_SSL:-false}
+      - DATABASE_URL=${DATABASE_URL}
+      - DB_URL=${DB_URL}
+      - REDIS_URL=${REDIS_URL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_SCHEME=${REDIS_SCHEME:-tcp}
       - NODE_BACKEND_URL=http://node:3001
       - PYTHON_AI_SERVICE_URL=http://python:5000
       - WEBHOOK_SECRET=${WEBHOOK_SECRET:-webhook_secret_2026}
@@ -175,18 +80,22 @@ services:
       dockerfile: docker/Dockerfile.node
     container_name: academix-node
     restart: unless-stopped
-    depends_on:
-      mongo:
-        condition: service_healthy
     environment:
       - PORT=3001
       - NODE_ENV=production
-      - MONGO_URI=mongodb://mongo:27017/academix_realtime
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_NAME=${DB_NAME:-academix}
-      - DB_USER=${DB_USER:-academix_user}
+      - MONGO_URI=${MONGO_URI}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_DATABASE:-${DB_NAME:-academix}}
+      - DB_USER=${DB_USERNAME:-${DB_USER:-academix_user}}
       - DB_PASSWORD=${DB_PASSWORD:-academix_pass_2026}
+      - DB_SSL=${DB_SSL:-false}
+      - DATABASE_URL=${DATABASE_URL}
+      - DB_URL=${DB_URL}
+      - REDIS_URL=${REDIS_URL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost}
       - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-http://localhost:3001}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
@@ -216,17 +125,19 @@ services:
       dockerfile: docker/Dockerfile.python
     container_name: academix-python
     restart: unless-stopped
-    depends_on:
-      mysql:
-        condition: service_healthy
     environment:
       - API_HOST=0.0.0.0
       - API_PORT=5000
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_NAME=${DB_NAME:-academix}
-      - DB_USER=${DB_USER:-academix_user}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_DATABASE:-${DB_NAME:-academix}}
+      - DB_USER=${DB_USERNAME:-${DB_USER:-academix_user}}
       - DB_PASSWORD=${DB_PASSWORD:-academix_pass_2026}
+      - DB_SSL=${DB_SSL:-false}
+      - DATABASE_URL=${DATABASE_URL}
+      - DB_URL=${DB_URL}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-${REDIS_URL}}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-${REDIS_URL}}
       - GROQ_API_KEY=${GROQ_API_KEY}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - OPENROUTER_MODEL=${OPENROUTER_MODEL:-liquid/lfm-2.5-1.2b-thinking:free}
@@ -284,12 +195,6 @@ networks:
 # Volumes persistants
 # ----------------------------------------------------------
 volumes:
-  mysql_data:
-    driver: local
-  mongo_data:
-    driver: local
-  redis_data:
-    driver: local
   laravel_storage:
     driver: local
   node_uploads:

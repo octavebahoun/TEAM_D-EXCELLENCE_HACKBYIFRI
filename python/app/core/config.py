@@ -28,12 +28,17 @@ class Settings(BaseSettings):
     OPENROUTER_API_KEY: str | None = Field(default=(os.environ.get("OPENROUTER_API_KEY")))
     OPENROUTER_MODEL: str = Field(default=os.environ.get("OPENROUTER_MODEL", "liquid/lfm-2.5-1.2b-thinking:free"))
 
-    # Database (MySQL)
     DB_HOST: str | None = Field(default=(os.environ.get("DB_HOST")))
-    DB_PORT: int = Field(default=int(os.environ.get("DB_PORT", "3306")))
-    DB_NAME: str | None = Field(default=(os.environ.get("DB_NAME")))
-    DB_USER: str | None = Field(default=(os.environ.get("DB_USER")))
+    DB_PORT: int = Field(default=int(os.environ.get("DB_PORT", "5432")))
+    DB_NAME: str | None = Field(default=(os.environ.get("DB_NAME") or os.environ.get("DB_DATABASE")))
+    DB_USER: str | None = Field(default=(os.environ.get("DB_USER") or os.environ.get("DB_USERNAME")))
     DB_PASSWORD: str | None = Field(default=(os.environ.get("DB_PASSWORD")))
+    DB_SSL: str = Field(default=os.environ.get("DB_SSL", "false"))
+    DATABASE_URL: str | None = Field(default=(os.environ.get("DATABASE_URL") or os.environ.get("DB_URL")))
+
+    # Celery & Redis
+    CELERY_BROKER_URL: str = Field(default=os.environ.get("CELERY_BROKER_URL") or os.environ.get("REDIS_URL") or "redis://localhost:6379/0")
+    CELERY_RESULT_BACKEND: str = Field(default=os.environ.get("CELERY_RESULT_BACKEND") or os.environ.get("REDIS_URL") or "redis://localhost:6379/0")
 
     # Paths
     UPLOAD_DIR: str = Field(default="./uploads")

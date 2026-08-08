@@ -12,13 +12,13 @@ class CheckStudentOwnership
 
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::guard('web')->check()) {
+        $user = $request->user();
+
+        if (!$user) {
             return response()->json([
                 'message' => 'Non authentifié.'
             ], 401);
         }
-
-        $user = Auth::guard('web')->user();
 
         $user_id = $request->route('user_id') ?? $request->input('user_id');
 

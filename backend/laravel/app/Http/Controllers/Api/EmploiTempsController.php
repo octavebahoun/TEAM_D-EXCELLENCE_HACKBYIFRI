@@ -28,7 +28,7 @@ class EmploiTempsController extends Controller
             ->when($request->jour, function ($query, $jour) {
                 $query->where('jour', $jour);
             })
-            ->orderByRaw("FIELD(jour, 'Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi')")
+            ->orderByRaw("CASE jour WHEN 'Lundi' THEN 1 WHEN 'Mardi' THEN 2 WHEN 'Mercredi' THEN 3 WHEN 'Jeudi' THEN 4 WHEN 'Vendredi' THEN 5 WHEN 'Samedi' THEN 6 ELSE 7 END")
             ->orderBy('heure_debut')
             ->get();
 

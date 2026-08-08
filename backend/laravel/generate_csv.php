@@ -89,7 +89,7 @@ foreach ($filieres as $fil) {
     // ─── 3. CSV Emploi du temps ──────────────────────────────────────────
     $emplois = EmploiTempsFiliere::where('filiere_id', $fil->id)
         ->with('matiere')
-        ->orderByRaw("FIELD(jour, 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi')")
+        ->orderByRaw("CASE jour WHEN 'Lundi' THEN 1 WHEN 'Mardi' THEN 2 WHEN 'Mercredi' THEN 3 WHEN 'Jeudi' THEN 4 WHEN 'Vendredi' THEN 5 WHEN 'Samedi' THEN 6 ELSE 7 END")
         ->orderBy('heure_debut')
         ->get();
 

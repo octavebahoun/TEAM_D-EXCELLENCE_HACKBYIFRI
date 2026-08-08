@@ -15,7 +15,7 @@
 #     qu'elle est attachée à une instance en marche) pour qu'elle ne bouge plus.
 # ===============================================================
 
-52-47-71-184.sslip.io {
+acadmix-serveur.duckdns.org {
 	encode gzip
 
 	# --- API Laravel :  /api/laravel/X  ->  laravel:80  /api/v1/X
@@ -42,7 +42,12 @@
 		reverse_proxy node:3001
 	}
 
-	# --- Page de test : ouvrir https://52-47-71-184.sslip.io dans le navigateur
+	# --- Fichiers uploadés (dossier statique Node)
+	handle /uploads/chat/* {
+		reverse_proxy node:3001
+	}
+
+	# --- Page de test : ouvrir https://acadmix-serveur.duckdns.org dans le navigateur
 	handle {
 		respond "AcademiX backend en ligne — HTTPS OK 🔒" 200
 	}

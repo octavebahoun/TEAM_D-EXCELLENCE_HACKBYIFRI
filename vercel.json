@@ -5,23 +5,23 @@
   "rewrites": [
     {
       "source": "/api/laravel/:path*",
-      "destination": "https://52-47-71-184.sslip.io/api/laravel/:path*"
+      "destination": "https://acadmix-serveur.duckdns.org/api/laravel/:path*"
     },
     {
       "source": "/api/node/:path*",
-      "destination": "https://52-47-71-184.sslip.io/api/node/:path*"
+      "destination": "https://acadmix-serveur.duckdns.org/api/node/:path*"
     },
     {
       "source": "/api/python/:path*",
-      "destination": "https://52-47-71-184.sslip.io/api/python/:path*"
+      "destination": "https://acadmix-serveur.duckdns.org/api/python/:path*"
     },
     {
       "source": "/socket.io",
-      "destination": "https://52-47-71-184.sslip.io/socket.io"
+      "destination": "https://acadmix-serveur.duckdns.org/socket.io"
     },
     {
       "source": "/socket.io/:path*",
-      "destination": "https://52-47-71-184.sslip.io/socket.io/:path*"
+      "destination": "https://acadmix-serveur.duckdns.org/socket.io/:path*"
     },
     {
       "source": "/(.*)",

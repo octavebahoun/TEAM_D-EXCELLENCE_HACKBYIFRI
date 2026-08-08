@@ -80,9 +80,6 @@ shell-node: ## Shell dans le container Node.js
 shell-python: ## Shell dans le container Python
 	@docker compose exec python bash
 
-mysql: ## Console MySQL
-	@docker compose exec mysql mysql -u root -p
-
 # Allocation mémoire pour VPS 4Go
 stats: ## Voir l'utilisation mémoire des containers
 	@docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}\t{{.CPUPerc}}"

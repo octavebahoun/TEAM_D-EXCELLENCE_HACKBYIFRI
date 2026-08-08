@@ -21,7 +21,7 @@ class CheckIfSuperAdmin
             ], 401);
         }
 
-        if (!$user->isSuperAdmin()) {
+        if (!method_exists($user, 'isSuperAdmin') || !$user->isSuperAdmin()) {
             return response()->json([
                 'message' => 'Non autorisé. Accès réservé aux super administrateurs.'
             ], 403);

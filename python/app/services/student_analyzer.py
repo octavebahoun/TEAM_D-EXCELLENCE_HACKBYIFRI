@@ -3,7 +3,6 @@ import json
 import os
 import re
 from typing import Optional
-import aiomysql
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -33,7 +32,7 @@ class StudentAnalyzer:
 
     async def _fetch_student_data(self, student_id: int) -> dict:
         """
-        Récupère toutes les données académiques de l'étudiant depuis MySQL.
+        Récupère toutes les données académiques de l'étudiant depuis PostgreSQL.
         Utilise le pool singleton de dependencies.py.
         Les 3 requêtes sont parallélisées via asyncio.gather() pour réduire la latence.
         """
@@ -43,50 +42,47 @@ class StudentAnalyzer:
 
         async def _query_student():
             async with pool.acquire() as conn:
-                async with conn.cursor(aiomysql.DictCursor) as cur:
-                    await cur.execute(
-                        """
-                        SELECT u.id, u.nom, u.prenom, u.email, u.annee_admission,
-                               f.nom AS filiere_nom
-                        FROM users u
-                        LEFT JOIN filieres f ON f.id = u.filiere_id
-                        WHERE u.id = %s
-                        """,
-                        (student_id,),
-                    )
-                    return await cur.fetchone()
+                row = await conn.fetchrow(
+                    """
+                    SELECT u.id, u.nom, u.prenom, u.email, u.annee_admission,
+                           f.nom AS filiere_nom
+                    FROM users u
+                    LEFT JOIN filieres f ON f.id = u.filiere_id
+                    WHERE u.id = $1
+                    """,
+                    student_id,
+                )
+                return dict(row) if row else None
 
         async def _query_notes():
             async with pool.acquire() as conn:
-                async with conn.cursor(aiomysql.DictCursor) as cur:
-                    await cur.execute(
-                        """
-                        SELECT n.note, n.note_max, n.coefficient, n.type_evaluation,
-                               n.date_evaluation, m.nom AS matiere_nom
-                        FROM notes n
-                        LEFT JOIN matieres m ON m.id = n.matiere_id
-                        WHERE n.user_id = %s
-                        ORDER BY n.date_evaluation DESC
-                        LIMIT 30
-                        """,
-                        (student_id,),
-                    )
-                    return await cur.fetchall()
+                rows = await conn.fetch(
+                    """
+                    SELECT n.note, n.note_max, n.coefficient, n.type_evaluation,
+                           n.date_evaluation, m.nom AS matiere_nom
+                    FROM notes n
+                    LEFT JOIN matieres m ON m.id = n.matiere_id
+                    WHERE n.user_id = $1
+                    ORDER BY n.date_evaluation DESC
+                    LIMIT 30
+                    """,
+                    student_id,
+                )
+                return [dict(r) for r in rows]
 
         async def _query_taches():
             async with pool.acquire() as conn:
-                async with conn.cursor(aiomysql.DictCursor) as cur:
-                    await cur.execute(
-                        """
-                        SELECT titre, priorite, statut, date_limite
-                        FROM taches
-                        WHERE user_id = %s
-                        ORDER BY date_limite ASC
-                        LIMIT 20
-                        """,
-                        (student_id,),
-                    )
-                    return await cur.fetchall()
+                rows = await conn.fetch(
+                    """
+                    SELECT titre, priorite, statut, date_limite
+                    FROM taches
+                    WHERE user_id = $1
+                    ORDER BY date_limite ASC
+                    LIMIT 20
+                    """,
+                    student_id,
+                )
+                return [dict(r) for r in rows]
 
         # Exécution parallèle des 3 requêtes indépendantes
         student, notes, taches = await asyncio.gather(
@@ -99,9 +95,9 @@ class StudentAnalyzer:
             return {}
 
         return {
-            "student": dict(student),
-            "notes": [dict(n) for n in notes],
-            "taches": [dict(t) for t in taches],
+            "student": student,
+            "notes": notes,
+            "taches": taches,
         }
 
     # ─── Calcul du contexte ───────────────────────────────────────────────────

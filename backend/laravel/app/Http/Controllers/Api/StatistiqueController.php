@@ -188,7 +188,7 @@ class StatistiqueController extends Controller
                     ->join('matieres', 'notes.matiere_id', '=', 'matieres.id')
                     ->select('user_id', DB::raw('SUM(notes.note * matieres.coefficient) / SUM(matieres.coefficient) as moyenne'))
                     ->groupBy('user_id')
-                    ->having('moyenne', '<', 10)
+                    ->havingRaw('SUM(notes.note * matieres.coefficient) / SUM(matieres.coefficient) < 10')
                     ->take(10)
                     ->get();
 

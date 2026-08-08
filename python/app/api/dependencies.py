@@ -1,5 +1,5 @@
 import hashlib
-import aiomysql
+import asyncpg
 from fastapi import Header, HTTPException, Depends, status
 from app.core.config import settings
 
@@ -26,32 +26,47 @@ MODEL_MAP = {
 _db_pool = None
 
 async def get_db_pool():
-    """Crée ou réutilise un pool de connexion MySQL asynchrone (singleton)."""
+    """Crée ou réutilise un pool de connexion PostgreSQL asynchrone (singleton)."""
     global _db_pool
-    if _db_pool is not None and not _db_pool._closed:
+    if _db_pool is not None and not _db_pool.is_closing():
         return _db_pool
     try:
-        _db_pool = await aiomysql.create_pool(
-            host=settings.DB_HOST,
-            port=settings.DB_PORT,
-            user=settings.DB_USER,
-            password=settings.DB_PASSWORD,
-            db=settings.DB_NAME,
-            autocommit=True,
-            minsize=1,
-            maxsize=10
+        # Configurer le SSL automatiquement si hôte externe (Supabase) ou si DB_SSL est activé
+        use_ssl = settings.DB_SSL == 'true' or bool(settings.DATABASE_URL) or (
+            settings.DB_HOST and 
+            settings.DB_HOST != '127.0.0.1' and 
+            settings.DB_HOST != 'localhost' and 
+            settings.DB_HOST != 'mysql'
         )
+        
+        if settings.DATABASE_URL:
+            _db_pool = await asyncpg.create_pool(
+                dsn=settings.DATABASE_URL,
+                min_size=1,
+                max_size=10,
+                ssl='require' if use_ssl else None
+            )
+        else:
+            _db_pool = await asyncpg.create_pool(
+                host=settings.DB_HOST,
+                port=settings.DB_PORT,
+                user=settings.DB_USER,
+                password=settings.DB_PASSWORD,
+                database=settings.DB_NAME,
+                min_size=1,
+                max_size=10,
+                ssl='require' if use_ssl else None
+            )
         return _db_pool
     except Exception as e:
-        print(f"Erreur de connexion MySQL : {e}")
+        print(f"Erreur de connexion PostgreSQL : {e}")
         return None
 
 async def close_db_pool():
     """Ferme proprement le pool de base de données (utile pour Celery/asyncio.run)."""
     global _db_pool
     if _db_pool is not None:
-        _db_pool.close()
-        await _db_pool.wait_closed()
+        await _db_pool.close()
         _db_pool = None
 
 async def get_current_user(authorization: str = Header(None)):
@@ -92,86 +107,90 @@ async def get_current_user(authorization: str = Header(None)):
 
     try:
         async with pool.acquire() as conn:
-            async with conn.cursor(aiomysql.DictCursor) as cur:
-                # 1. Vérifier le token dans la table personal_access_tokens
-                # On s'assure que token_id est un entier
-                try:
-                    int_id = int(token_id)
-                except ValueError:
-                    print(f"DEBUG AUTH: ID de token invalide (non entier): {token_id}")
-                    raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail="Format de token invalide"
-                    )
-
-                await cur.execute(
-                    "SELECT id, tokenable_type, tokenable_id, expires_at FROM personal_access_tokens WHERE id = %s AND token = %s",
-                    (int_id, hashed_token)
+            # 1. Vérifier le token dans la table personal_access_tokens
+            # On s'assure que token_id est un entier
+            try:
+                int_id = int(token_id)
+            except ValueError:
+                print(f"DEBUG AUTH: ID de token invalide (non entier): {token_id}")
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Format de token invalide"
                 )
-                token_record = await cur.fetchone()
 
-                if not token_record:
-                    # Debug supplémentaire pour voir ce qui est en base pour cet ID
-                    await cur.execute("SELECT id, token FROM personal_access_tokens WHERE id = %s", (int_id,))
-                    debug_record = await cur.fetchone()
-                    
-                    if debug_record:
-                        print(f"DEBUG AUTH: Mismatch de HASH. Fourni: {hashed_token}, En base: {debug_record['token']}")
-                    else:
-                        print(f"DEBUG AUTH: Aucun token trouvé avec l'ID: {int_id}")
-                        
-                    print(f"DEBUG AUTH: Token introuvable en base. ID: {int_id}, HASH: {hashed_token}")
-                    raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail="Token invalide ou expiré"
-                    )
+            token_record_raw = await conn.fetchrow(
+                "SELECT id, tokenable_type, tokenable_id, expires_at FROM personal_access_tokens WHERE id = $1 AND token = $2",
+                int_id, hashed_token
+            )
 
-                # Vérifier si le token a expiré
-                if token_record.get('expires_at'):
-                    from datetime import datetime, timezone
-                    now = datetime.now(timezone.utc)
-                    # Convertir expires_at en aware datetime pour la comparaison si nécessaire
-                    expires_at = token_record['expires_at']
-                    if expires_at.tzinfo is None:
-                        # Assumer que c'est UTC ou le même fuseau que NOW
-                        pass 
-                    
-                    if expires_at < datetime.now():
-                        print(f"DEBUG AUTH: Token expiré. Expire le: {expires_at}")
-                        raise HTTPException(
-                            status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Token expiré"
-                        )
-
-                # 2. Vérifier l'utilisateur associé
-                model_info = MODEL_MAP.get(token_record['tokenable_type'])
-                if not model_info:
-                    print(f"DEBUG AUTH: Type d'utilisateur non supporté: {token_record['tokenable_type']}")
-                    raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail=f"Type d'utilisateur non supporté : {token_record['tokenable_type']}"
-                    )
-
-                query = f"SELECT {model_info['fields']} FROM {model_info['table']} WHERE id = %s"
-                await cur.execute(query, (token_record['tokenable_id'],))
-                user = await cur.fetchone()
-
-                if not user:
-                    print(f"DEBUG AUTH: Utilisateur introuvable pour ID: {token_record['tokenable_id']} and table {model_info['table']}")
-                    raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail="Utilisateur introuvable"
-                    )
+            if not token_record_raw:
+                # Debug supplémentaire pour voir ce qui est en base pour cet ID
+                debug_record_raw = await conn.fetchrow(
+                    "SELECT id, token FROM personal_access_tokens WHERE id = $1",
+                    int_id
+                )
                 
-                # Mettre à jour last_used_at
-                await cur.execute(
-                    "UPDATE personal_access_tokens SET last_used_at = NOW() WHERE id = %s",
-                    (int_id,)
+                if debug_record_raw:
+                    debug_record = dict(debug_record_raw)
+                    print(f"DEBUG AUTH: Mismatch de HASH. Fourni: {hashed_token}, En base: {debug_record['token']}")
+                else:
+                    print(f"DEBUG AUTH: Aucun token trouvé avec l'ID: {int_id}")
+                    
+                print(f"DEBUG AUTH: Token introuvable en base. ID: {int_id}, HASH: {hashed_token}")
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token invalide ou expiré"
                 )
 
-                # Ajouter le rôle au dictionnaire utilisateur
-                user['role'] = model_info['role']
-                return user
+            token_record = dict(token_record_raw)
+
+            # Vérifier si le token a expiré
+            if token_record.get('expires_at'):
+                from datetime import datetime, timezone
+                now = datetime.now(timezone.utc)
+                expires_at = token_record['expires_at']
+                if expires_at.tzinfo is not None:
+                    now_comparison = datetime.now(timezone.utc)
+                else:
+                    now_comparison = datetime.now()
+                
+                if expires_at < now_comparison:
+                    print(f"DEBUG AUTH: Token expiré. Expire le: {expires_at}")
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Token expiré"
+                    )
+
+            # 2. Vérifier l'utilisateur associé
+            model_info = MODEL_MAP.get(token_record['tokenable_type'])
+            if not model_info:
+                print(f"DEBUG AUTH: Type d'utilisateur non supporté: {token_record['tokenable_type']}")
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail=f"Type d'utilisateur non supporté : {token_record['tokenable_type']}"
+                )
+
+            query = f"SELECT {model_info['fields']} FROM {model_info['table']} WHERE id = $1"
+            user_raw = await conn.fetchrow(query, token_record['tokenable_id'])
+
+            if not user_raw:
+                print(f"DEBUG AUTH: Utilisateur introuvable pour ID: {token_record['tokenable_id']} and table {model_info['table']}")
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Utilisateur introuvable"
+                )
+            
+            user = dict(user_raw)
+            
+            # Mettre à jour last_used_at
+            await conn.execute(
+                "UPDATE personal_access_tokens SET last_used_at = NOW() WHERE id = $1",
+                int_id
+            )
+
+            # Ajouter le rôle au dictionnaire utilisateur
+            user['role'] = model_info['role']
+            return user
 
     except Exception as e:
         print(f"DEBUG AUTH: Erreur lors de la vérification de l'auth: {e}")
